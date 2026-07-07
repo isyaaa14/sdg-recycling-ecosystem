@@ -2,7 +2,9 @@ import cors from "cors";
 import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { buildCorsOptions } from "./utils/cors.js";
+import authRoutes from "./routes/auth.routes.js";
 import missionRoutes from "./routes/mission.routes.js";
+import submissionRoutes from "./routes/submission.routes.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -29,6 +31,8 @@ app.get("/api/v1/db-test", async (_request, response) => {
   }
 });
 
+app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/missions", missionRoutes);
+app.use("/api/v1/submissions", submissionRoutes);
 
 export default app;
