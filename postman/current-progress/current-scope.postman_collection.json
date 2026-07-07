@@ -1,0 +1,188 @@
+{
+  "info": {
+    "_postman_id": "7e17ef44-f40f-4a83-b9b7-6ee817ea8e35",
+    "name": "SDG Recycling Current Scope",
+    "description": "Temporary tester collection for the backend routes that are implemented right now.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Smoke Checks",
+      "item": [
+        {
+          "name": "Backend Root",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Response includes a message\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.message).to.be.a(\"string\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                ""
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "API Health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Health status is ok\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.data.status).to.eql(\"ok\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/health",
+              "host": [
+                "{{baseUrl}}{{apiPrefix}}"
+              ],
+              "path": [
+                "health"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Database Test",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "pm.test(\"Database status is ok\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.data.status).to.eql(\"ok\");",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/db-test",
+              "host": [
+                "{{baseUrl}}{{apiPrefix}}"
+              ],
+              "path": [
+                "db-test"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Missions",
+      "item": [
+        {
+          "name": "Create Mission - Current Backend",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "pm.test(\"Mission is returned\", function () {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json.data.mission.id).to.be.a(\"string\");",
+                  "  pm.collectionVariables.set(\"missionId\", json.data.mission.id);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Tester Mission {{$timestamp}}\",\n  \"description\": \"Temporary mission used for current-scope Postman testing.\",\n  \"type\": \"QUANTITY_BASED\",\n  \"startAt\": \"2026-08-10T00:00:00.000Z\",\n  \"endAt\": \"2026-08-31T23:59:59.000Z\",\n  \"submissionCap\": 1,\n  \"points\": 30,\n  \"autoApprove\": false,\n  \"createdById\": \"USR001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}{{apiPrefix}}"
+              ],
+              "path": [
+                "missions"
+              ]
+            },
+            "description": "Matches the backend service as implemented today. This request requires `createdById` and should use a non-overlapping date range."
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000",
+      "type": "string"
+    },
+    {
+      "key": "apiPrefix",
+      "value": "/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "missionId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
