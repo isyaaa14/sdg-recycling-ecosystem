@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "66fb0005-251f-4380-9509-e32dde3d8b4c",
     "name": "SDG Engagement Backend v2",
-    "description": "Postman collection for the clean v2 backend serving mobile and web admin clients. Scope is limited to missions, educational content, quizzes, badges, analytics, and auth.",
+    "description": "Postman collection for the clean v2 backend serving mobile and web admin clients. Current runnable smoke scope: health, auth, missions, submissions, and basic content. Quiz, progress, badge, and analytics requests are preserved in their original flows for later backend phases.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "45093891",
     "_collection_link": "https://go.postman.co/collection/45093891-66fb0005-251f-4380-9509-e32dde3d8b4c?source=collection_link"
@@ -262,7 +262,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content?q=recycling",
+              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=plastic",
               "host": [
                 "{{baseUrl}}{{apiPrefix}}"
               ],
@@ -271,8 +271,8 @@
               ],
               "query": [
                 {
-                  "key": "q",
-                  "value": "recycling"
+                  "key": "tag",
+                  "value": "plastic"
                 }
               ]
             }
@@ -617,6 +617,22 @@
     }
   ],
   "variable": [
+    {
+      "key": "baseurl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "apiprefix",
+      "value": "/api/v1"
+    },
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "apiPrefix",
+      "value": "/api/v1"
+    },
     {
       "key": "studentToken",
       "value": ""

@@ -9,3 +9,6 @@ dist/
 backend/prisma/dev.db
 
 mobile-app/
+
+sdg-recycling-ecosystem.code-workspace
+

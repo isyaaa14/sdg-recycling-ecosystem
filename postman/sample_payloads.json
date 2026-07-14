@@ -1,0 +1,133 @@
+{
+  "current_runnable": {
+    "create_mission": {
+      "active_quantity_mission": {
+        "title": "Campus Sorting Drill",
+        "description": "Sort recyclable items correctly this week.",
+        "type": "QUANTITY_BASED",
+        "startAt": "2026-07-01T00:00:00.000Z",
+        "endAt": "2026-07-31T23:59:59.000Z",
+        "submissionCap": 1,
+        "points": 30,
+        "autoApprove": false,
+        "isActive": true,
+        "status": "ACTIVE"
+      },
+      "draft_quantity_mission": {
+        "title": "Draft Bin Audit",
+        "description": "Draft test mission for bin-audit planning.",
+        "type": "QUANTITY_BASED",
+        "startAt": "2026-08-01T00:00:00.000Z",
+        "endAt": "2026-08-31T23:59:59.000Z",
+        "submissionCap": 1,
+        "points": 20,
+        "autoApprove": false,
+        "isActive": false,
+        "status": "DRAFT"
+      },
+      "invalid_overlap_test": {
+        "title": "Overlapping Sorting Drill",
+        "description": "Use this after creating another quantity mission with the same date window.",
+        "type": "QUANTITY_BASED",
+        "startAt": "2026-07-15T00:00:00.000Z",
+        "endAt": "2026-07-20T23:59:59.000Z",
+        "submissionCap": 1,
+        "points": 10,
+        "autoApprove": false,
+        "isActive": true,
+        "status": "ACTIVE"
+      }
+    },
+    "submit_mission": {
+      "text_only_proof": {
+        "proofText": "Collected recyclables from the cafeteria."
+      },
+      "quantity_proof": {
+        "proofText": "Collected recyclables from the cafeteria.",
+        "quantity": 12
+      }
+    },
+    "review_submission": {
+      "approve": {
+        "status": "APPROVED",
+        "reviewNote": "Approved after evidence review."
+      },
+      "reject": {
+        "status": "REJECTED",
+        "reviewNote": "Rejected because the evidence was incomplete."
+      }
+    },
+    "create_content": {
+      "published_article": {
+        "title": "Glass Recycling Safety",
+        "body": "Handle broken glass carefully and use approved disposal flows.",
+        "tags": [
+          "glass",
+          "safety"
+        ],
+        "status": "PUBLISHED"
+      },
+      "draft_article": {
+        "title": "Draft Compost Sorting Notes",
+        "body": "Draft notes for a future compost sorting article.",
+        "tags": [
+          "compost",
+          "sorting"
+        ],
+        "status": "DRAFT"
+      },
+      "duplicate_title_conflict_test": {
+        "title": "Glass Recycling Safety",
+        "body": "Run this after creating the published article to test duplicate slug behavior.",
+        "tags": [
+          "glass",
+          "duplicate-test"
+        ],
+        "status": "PUBLISHED"
+      }
+    }
+  },
+  "future_examples": {
+    "create_quiz_example": {
+      "note": "Not runnable until quiz routes are mounted.",
+      "body": {
+        "title": "Plastic Recycling Basics Quiz",
+        "passingScore": 70,
+        "questions": [
+          {
+            "questionText": "What is the main goal of sorting plastics?",
+            "options": [
+              "Reduce contamination",
+              "Burn waste",
+              "Ignore labels"
+            ],
+            "correctAnswer": "Reduce contamination",
+            "points": 1
+          }
+        ]
+      }
+    },
+    "submit_quiz_attempt_example": {
+      "note": "Not runnable until quiz attempt routes are mounted.",
+      "body": {
+        "answers": [
+          {
+            "questionId": "{{quizQuestion1Id}}",
+            "answer": "Reduce contamination"
+          }
+        ]
+      }
+    },
+    "create_badge_example": {
+      "note": "Not runnable until badge routes are mounted.",
+      "body": {
+        "name": "Mission Starter",
+        "description": "Complete your first approved mission.",
+        "tier": "BRONZE",
+        "criteriaType": "MISSIONS_COMPLETED",
+        "criteriaValue": 1,
+        "isActive": true
+      }
+    }
+  }
+}
