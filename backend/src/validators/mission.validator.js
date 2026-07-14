@@ -8,7 +8,9 @@ export const createMissionSchema = z.object({
   endAt: z.coerce.date(),
   submissionCap: z.number().int().positive(),
   points: z.number().int().positive(),
-  autoApprove: z.boolean()
+  autoApprove: z.boolean(),
+  status: z.enum(["DRAFT", "ACTIVE", "ARCHIVED"]).optional(),
+  isActive: z.boolean().optional()
 });
 
 export const updateMissionSchema = createMissionSchema.partial();

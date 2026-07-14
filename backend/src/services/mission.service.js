@@ -44,6 +44,8 @@ export async function createMission(payload, createdById) {
     submissionCap: data.submissionCap,
     points: data.points,
     autoApprove: data.autoApprove,
+    ...(data.status !== undefined ? { status: data.status } : {}),
+    ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
     createdById
   });
 }

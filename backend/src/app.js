@@ -5,6 +5,7 @@ import { buildCorsOptions } from "./utils/cors.js";
 import authRoutes from "./routes/auth.routes.js";
 import missionRoutes from "./routes/mission.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
+import contentRoutes from "./routes/content.routes.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -34,5 +35,6 @@ app.get("/api/v1/db-test", async (_request, response) => {
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/missions", missionRoutes);
 app.use("/api/v1/submissions", submissionRoutes);
+app.use("/api/v1/content", contentRoutes);
 
 export default app;

@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "7e17ef44-f40f-4a83-b9b7-6ee817ea8e35",
     "name": "SDG Recycling Current Scope",
-    "description": "Temporary tester collection for the backend routes that are implemented right now.",
+    "description": "Tester collection matching the backend routes implemented right now: smoke checks, auth, missions, submissions, and content.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -34,12 +34,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                ""
-              ]
+              "host": ["{{baseUrl}}"],
+              "path": [""]
             }
           },
           "response": []
@@ -69,12 +65,8 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/health",
-              "host": [
-                "{{baseUrl}}{{apiPrefix}}"
-              ],
-              "path": [
-                "health"
-              ]
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["health"]
             }
           },
           "response": []
@@ -104,12 +96,127 @@
             "header": [],
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/db-test",
-              "host": [
-                "{{baseUrl}}{{apiPrefix}}"
-              ],
-              "path": [
-                "db-test"
-              ]
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["db-test"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login Admin",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"adminToken\", json.data.token);",
+                  "pm.collectionVariables.set(\"adminUserId\", json.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sdg.local\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Seeded admin account. Run this before any Missions/Content request that needs an ADMIN token."
+          },
+          "response": []
+        },
+        {
+          "name": "Login Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 200\", function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"studentToken\", json.data.token);",
+                  "pm.collectionVariables.set(\"studentUserId\", json.data.user.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@sdg.local\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Seeded student account. Run this before any submission request that needs a STUDENT token."
+          },
+          "response": []
+        },
+        {
+          "name": "Register New Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Tester {{$timestamp}}\",\n  \"email\": \"tester{{$timestamp}}@sdg.local\",\n  \"password\": \"Password123!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Always creates a STUDENT account regardless of any role field sent."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Me",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["auth", "me"]
             }
           },
           "response": []
@@ -120,7 +227,7 @@
       "name": "Missions",
       "item": [
         {
-          "name": "Create Mission - Current Backend",
+          "name": "Create Mission (Admin)",
           "event": [
             {
               "listen": "test",
@@ -142,26 +249,241 @@
           ],
           "request": {
             "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"title\": \"Tester Mission {{$timestamp}}\",\n  \"description\": \"Temporary mission used for current-scope Postman testing.\",\n  \"type\": \"QUANTITY_BASED\",\n  \"startAt\": \"2026-08-10T00:00:00.000Z\",\n  \"endAt\": \"2026-08-31T23:59:59.000Z\",\n  \"submissionCap\": 1,\n  \"points\": 30,\n  \"autoApprove\": false,\n  \"createdById\": \"USR001\"\n}"
+              "raw": "{\n  \"title\": \"Tester Mission {{$timestamp}}\",\n  \"description\": \"Temporary mission used for current-scope Postman testing.\",\n  \"type\": \"QUANTITY_BASED\",\n  \"startAt\": \"2026-07-01T00:00:00.000Z\",\n  \"endAt\": \"2026-07-31T23:59:59.000Z\",\n  \"submissionCap\": 1,\n  \"points\": 30,\n  \"autoApprove\": false,\n  \"status\": \"ACTIVE\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/missions",
-              "host": [
-                "{{baseUrl}}{{apiPrefix}}"
-              ],
-              "path": [
-                "missions"
-              ]
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["missions"]
             },
-            "description": "Matches the backend service as implemented today. This request requires `createdById` and should use a non-overlapping date range."
+            "description": "Requires an ADMIN token (run Login Admin first). `createdById` comes from the token, not the body. `status: \"ACTIVE\"` is required for the mission to be submittable — without it the mission defaults to DRAFT and Submit Mission will return 400. If you get a 409 overlap error, change the startAt/endAt to a date range that doesn't collide with an existing QUANTITY_BASED mission."
+          },
+          "response": []
+        },
+        {
+          "name": "List Missions",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["missions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Mission By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["missions", "{{missionId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Mission (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"points\": 45\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["missions", "{{missionId}}"]
+            },
+            "description": "Partial update - only send the fields you want to change."
+          },
+          "response": []
+        },
+        {
+          "name": "Submit Mission (Student)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  pm.collectionVariables.set(\"submissionId\", json.data.submission.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proofText\": \"Collected recyclables from the cafeteria.\",\n  \"quantity\": 8\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submit",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["missions", "{{missionId}}", "submit"]
+            },
+            "description": "Only works if the mission's startAt/endAt window includes right now, and status is ACTIVE."
+          },
+          "response": []
+        },
+        {
+          "name": "List Mission Submissions (Admin)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submissions",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["missions", "{{missionId}}", "submissions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Archive Mission (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["missions", "{{missionId}}"]
+            },
+            "description": "Soft-delete: sets isActive=false and status=ARCHIVED rather than deleting the row."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Submissions",
+      "item": [
+        {
+          "name": "List Submissions (Admin, filter by status)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions?status=PENDING_REVIEW",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["submissions"],
+              "query": [{ "key": "status", "value": "PENDING_REVIEW" }]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Review Submission (Admin)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"reviewNote\": \"Approved after evidence review.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/{{submissionId}}/review",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["submissions", "{{submissionId}}", "review"]
+            },
+            "description": "Returns 409 if this submission was already reviewed once."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "Create Content (Admin)",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"Status code is 201\", function () {",
+                  "  pm.response.to.have.status(201);",
+                  "});",
+                  "",
+                  "const json = pm.response.json();",
+                  "pm.collectionVariables.set(\"contentId\", json.data.content.id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Glass Recycling Guide {{$timestamp}}\",\n  \"body\": \"How to safely recycle glass.\",\n  \"tags\": [\"glass\", \"safety\"],\n  \"status\": \"DRAFT\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["content"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Content By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["content", "{{contentId}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Content (Admin, creates a revision)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"body\": \"Updated: how to safely recycle glass, revised.\",\n  \"status\": \"PUBLISHED\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["content", "{{contentId}}"]
+            },
+            "description": "The pre-update state is snapshotted into ContentRevision automatically and `version` increments by 1."
+          },
+          "response": []
+        },
+        {
+          "name": "Search Content By Tag",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=glass",
+              "host": ["{{baseUrl}}{{apiPrefix}}"],
+              "path": ["content"],
+              "query": [{ "key": "tag", "value": "glass" }]
+            },
+            "description": "The `tag` query param is required - GET /content with no tag returns 400."
           },
           "response": []
         }
@@ -169,20 +491,14 @@
     }
   ],
   "variable": [
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:5000",
-      "type": "string"
-    },
-    {
-      "key": "apiPrefix",
-      "value": "/api/v1",
-      "type": "string"
-    },
-    {
-      "key": "missionId",
-      "value": "",
-      "type": "string"
-    }
+    { "key": "baseUrl", "value": "http://localhost:5000", "type": "string" },
+    { "key": "apiPrefix", "value": "/api/v1", "type": "string" },
+    { "key": "adminToken", "value": "", "type": "string" },
+    { "key": "adminUserId", "value": "", "type": "string" },
+    { "key": "studentToken", "value": "", "type": "string" },
+    { "key": "studentUserId", "value": "", "type": "string" },
+    { "key": "missionId", "value": "", "type": "string" },
+    { "key": "submissionId", "value": "", "type": "string" },
+    { "key": "contentId", "value": "", "type": "string" }
   ]
 }

@@ -1,0 +1,50 @@
+import { randomUUID } from "node:crypto";
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
+
+export function createContent(data) {
+  return prisma.content.create({ data });
+}
+
+export function findContentById(id) {
+  return prisma.content.findUnique({ where: { id } });
+}
+
+export function findContentBySlug(slug) {
+  return prisma.content.findUnique({ where: { slug } });
+}
+
+export function findContentByTag(tag) {
+  return prisma.content.findMany({
+    where: { tags: { has: tag } },
+    orderBy: { createdAt: "desc" }
+  });
+}
+
+export async function updateContent(id, data) {
+  const existing = await prisma.content.findUnique({ where: { id } });
+  if (!existing) {
+    return null;
+  }
+
+  const [, updated] = await prisma.$transaction([
+    prisma.contentRevision.create({
+      data: {
+        id: randomUUID(),
+        contentId: existing.id,
+        version: existing.version,
+        title: existing.title,
+        body: existing.body,
+        tags: existing.tags,
+        status: existing.status
+      }
+    }),
+    prisma.content.update({
+      where: { id },
+      data: { ...data, version: existing.version + 1 }
+    })
+  ]);
+
+  return updated;
+}
