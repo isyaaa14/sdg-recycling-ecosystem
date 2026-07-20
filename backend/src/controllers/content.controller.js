@@ -2,7 +2,9 @@ import {
   createContent,
   getContentById,
   updateContent,
-  searchContentByTag,
+  listContent,
+  getContentRevisions,
+  archiveContent,
   ContentServiceError
 } from "../services/content.service.js";
 
@@ -25,7 +27,7 @@ export async function createContentHandler(request, response) {
 
 export async function getContentHandler(request, response) {
   try {
-    const content = await getContentById(request.params.id);
+    const content = await getContentById(request.params.id, request.user);
     return response.status(200).json({ data: { content } });
   } catch (error) {
     return handleError(error, response);
@@ -41,9 +43,27 @@ export async function updateContentHandler(request, response) {
   }
 }
 
-export async function searchContentHandler(request, response) {
+export async function listContentHandler(request, response) {
   try {
-    const content = await searchContentByTag(request.query.tag);
+    const content = await listContent(request.query, request.user);
+    return response.status(200).json({ data: { content } });
+  } catch (error) {
+    return handleError(error, response);
+  }
+}
+
+export async function getContentRevisionsHandler(request, response) {
+  try {
+    const revisions = await getContentRevisions(request.params.id);
+    return response.status(200).json({ data: { revisions } });
+  } catch (error) {
+    return handleError(error, response);
+  }
+}
+
+export async function archiveContentHandler(request, response) {
+  try {
+    const content = await archiveContent(request.params.id);
     return response.status(200).json({ data: { content } });
   } catch (error) {
     return handleError(error, response);

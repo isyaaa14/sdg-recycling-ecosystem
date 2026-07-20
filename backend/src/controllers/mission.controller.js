@@ -27,7 +27,7 @@ export async function createMissionHandler(request, response) {
 
 export async function listMissionsHandler(request, response) {
   try {
-    const missions = await listMissions(request.query);
+    const missions = await listMissions(request.query, request.user);
     return response.json({ data: { missions } });
   } catch (error) {
     return handleError(error, response);

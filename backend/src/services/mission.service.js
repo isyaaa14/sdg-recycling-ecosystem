@@ -3,6 +3,7 @@ import {
   createMission as createMissionRecord,
   findOverlappingMission,
   findMissionById,
+  findActiveMissions,
   findAllMissions,
   updateMission as updateMissionRecord
 } from "../repositories/mission.repository.js";
@@ -52,7 +53,13 @@ export async function createMission(payload, createdById) {
   );
 }
 
-export function listMissions(query = {}) {
+export function listMissions(query = {}, user) {
+  const hasExplicitFilters = query.status !== undefined || query.isActive !== undefined || query.type !== undefined;
+
+  if (user?.role !== "ADMIN" && !hasExplicitFilters) {
+    return findActiveMissions();
+  }
+
   const filters = {};
   if (query.status) filters.status = query.status;
   if (query.isActive !== undefined) filters.isActive = query.isActive === "true";

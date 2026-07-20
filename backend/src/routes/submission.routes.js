@@ -1,12 +1,19 @@
 import { Router } from "express";
-import { listSubmissionsHandler, reviewSubmissionHandler } from "../controllers/submission.controller.js";
+import {
+  listSubmissionsHandler,
+  listMySubmissionsHandler,
+  getSubmissionHandler,
+  reviewSubmissionHandler
+} from "../controllers/submission.controller.js";
 import { authenticate, requireRole } from "../middleware/auth.js";
 
 const router = Router();
 
-router.use(authenticate, requireRole("ADMIN"));
+router.use(authenticate);
 
-router.get("/", listSubmissionsHandler);
-router.patch("/:id/review", reviewSubmissionHandler);
+router.get("/", requireRole("ADMIN"), listSubmissionsHandler);
+router.get("/me", requireRole("STUDENT"), listMySubmissionsHandler);
+router.get("/:id", getSubmissionHandler);
+router.patch("/:id/review", requireRole("ADMIN"), reviewSubmissionHandler);
 
 export default router;

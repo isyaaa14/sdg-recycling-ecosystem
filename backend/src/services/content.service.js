@@ -3,7 +3,8 @@ import {
   createContent as createContentRecord,
   findContentById,
   findContentBySlug,
-  findContentByTag,
+  findContent,
+  findRevisionsByContentId,
   updateContent as updateContentRecord
 } from "../repositories/content.repository.js";
 import { slugify } from "../utils/slugify.js";
@@ -43,11 +44,16 @@ export async function createContent(payload, createdById) {
   );
 }
 
-export async function getContentById(id) {
+export async function getContentById(id, user) {
   const content = await findContentById(id);
   if (!content) {
     throw new ContentServiceError(404, "Content not found.");
   }
+
+  if (user?.role !== "ADMIN" && content.status !== "PUBLISHED") {
+    throw new ContentServiceError(404, "Content not found.");
+  }
+
   return content;
 }
 
@@ -76,10 +82,33 @@ export async function updateContent(id, payload) {
   return updateContentRecord(id, updateData);
 }
 
-export async function searchContentByTag(tag) {
-  if (!tag) {
-    throw new ContentServiceError(400, "Missing or invalid parameters.");
+export function listContent(query = {}, user) {
+  const filters = {};
+  if (query.tag) filters.tags = { has: query.tag };
+
+  if (user?.role !== "ADMIN") {
+    filters.status = "PUBLISHED";
+  } else if (query.status) {
+    filters.status = query.status;
   }
 
-  return findContentByTag(tag);
+  return findContent(filters);
+}
+
+export async function getContentRevisions(contentId) {
+  const content = await findContentById(contentId);
+  if (!content) {
+    throw new ContentServiceError(404, "Content not found.");
+  }
+
+  return findRevisionsByContentId(contentId);
+}
+
+export async function archiveContent(id) {
+  const existing = await findContentById(id);
+  if (!existing) {
+    throw new ContentServiceError(404, "Content not found.");
+  }
+
+  return updateContentRecord(id, { status: "ARCHIVED" });
 }

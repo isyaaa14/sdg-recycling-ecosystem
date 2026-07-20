@@ -18,5 +18,6 @@ export const updateMissionSchema = createMissionSchema.partial();
 export const submitMissionSchema = z.object({
   proofText: z.string().min(1).optional(),
   proofImageUrl: z.string().url().optional(),
-  quantity: z.number().int().positive().optional()
+  quantity: z.number().int().positive().optional(),
+  uploadId: z.string().min(1).optional()
 });

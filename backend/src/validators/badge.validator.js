@@ -7,3 +7,7 @@ export const createBadgeSchema = z.object({
   criteriaType: z.enum(["MISSIONS_COMPLETED", "QUIZZES_PASSED", "CONTENT_COMPLETED", "ACTIVITY_METRIC"]),
   criteriaValue: z.number().int().positive()
 });
+
+export const updateBadgeSchema = createBadgeSchema.partial().extend({
+  isActive: z.boolean().optional()
+});

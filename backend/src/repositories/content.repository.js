@@ -22,6 +22,20 @@ export function findContentByTag(tag) {
   });
 }
 
+export function findContent(filters) {
+  return prisma.content.findMany({
+    where: filters,
+    orderBy: { createdAt: "desc" }
+  });
+}
+
+export function findRevisionsByContentId(contentId) {
+  return prisma.contentRevision.findMany({
+    where: { contentId },
+    orderBy: { version: "desc" }
+  });
+}
+
 export async function updateContent(id, data) {
   const existing = await prisma.content.findUnique({ where: { id } });
   if (!existing) {

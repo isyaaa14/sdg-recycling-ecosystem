@@ -22,6 +22,24 @@ export function findActiveBadges() {
   });
 }
 
+export function findAllBadges() {
+  return prisma.badge.findMany({
+    orderBy: { createdAt: "asc" }
+  });
+}
+
+export function updateBadge(id, data) {
+  return prisma.badge.update({ where: { id }, data });
+}
+
+export function findAwardsByBadge(badgeId) {
+  return prisma.badgeAward.findMany({
+    where: { badgeId },
+    include: { user: { select: { id: true, name: true, email: true } } },
+    orderBy: { awardedAt: "asc" }
+  });
+}
+
 export function findBadgeAward(userId, badgeId) {
   return prisma.badgeAward.findUnique({
     where: { userId_badgeId: { userId, badgeId } }

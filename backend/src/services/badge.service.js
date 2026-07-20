@@ -1,10 +1,14 @@
-import { createBadgeSchema } from "../validators/badge.validator.js";
+import { createBadgeSchema, updateBadgeSchema } from "../validators/badge.validator.js";
 import {
   createBadge as createBadgeRecord,
+  findBadgeById,
   findBadgeBySlug,
   findActiveBadges,
+  findAllBadges,
+  updateBadge as updateBadgeRecord,
   findBadgeAward,
   createBadgeAward,
+  findAwardsByBadge,
   countApprovedMissionSubmissions,
   countPassedQuizAttempts,
   countCompletedLearningProgress,
@@ -45,6 +49,61 @@ export async function createBadge(payload) {
       criteriaValue: data.criteriaValue
     })
   );
+}
+
+export async function getBadgeById(id) {
+  const badge = await findBadgeById(id);
+  if (!badge) {
+    throw new BadgeServiceError(404, "Badge not found.");
+  }
+  return badge;
+}
+
+export function listBadges() {
+  return findAllBadges();
+}
+
+export async function updateBadge(id, payload) {
+  const result = updateBadgeSchema.safeParse(payload);
+  if (!result.success) {
+    throw new BadgeServiceError(400, "Missing or invalid parameters.");
+  }
+
+  const existing = await findBadgeById(id);
+  if (!existing) {
+    throw new BadgeServiceError(404, "Badge not found.");
+  }
+
+  const data = result.data;
+  const updateData = { ...data };
+  if (data.name) {
+    const slug = slugify(data.name);
+    const conflicting = await findBadgeBySlug(slug);
+    if (conflicting && conflicting.id !== id) {
+      throw new BadgeServiceError(409, "Badge with this name already exists.");
+    }
+    updateData.slug = slug;
+  }
+
+  return updateBadgeRecord(id, updateData);
+}
+
+export async function deactivateBadge(id) {
+  const existing = await findBadgeById(id);
+  if (!existing) {
+    throw new BadgeServiceError(404, "Badge not found.");
+  }
+
+  return updateBadgeRecord(id, { isActive: false });
+}
+
+export async function listBadgeAwards(badgeId) {
+  const badge = await findBadgeById(badgeId);
+  if (!badge) {
+    throw new BadgeServiceError(404, "Badge not found.");
+  }
+
+  return findAwardsByBadge(badgeId);
 }
 
 async function getCurrentProgress(userId, criteriaType) {

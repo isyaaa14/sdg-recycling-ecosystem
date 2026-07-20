@@ -7,6 +7,10 @@ import missionRoutes from "./routes/mission.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
 import contentRoutes from "./routes/content.routes.js";
 import badgeRoutes from "./routes/badge.routes.js";
+import pointsRoutes from "./routes/points.routes.js";
+import quizRoutes from "./routes/quiz.routes.js";
+import progressRoutes from "./routes/progress.routes.js";
+import uploadRoutes from "./routes/upload.routes.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -38,5 +42,9 @@ app.use("/api/v1/missions", missionRoutes);
 app.use("/api/v1/submissions", submissionRoutes);
 app.use("/api/v1/content", contentRoutes);
 app.use("/api/v1/badges", badgeRoutes);
+app.use("/api/v1/points", pointsRoutes);
+app.use("/api/v1/quizzes", quizRoutes);
+app.use("/api/v1/progress", progressRoutes);
+app.use("/api/v1/uploads", uploadRoutes);
 
 export default app;
