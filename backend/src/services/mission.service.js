@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { createMissionSchema, updateMissionSchema } from "../validators/mission.validator.js";
 import {
   createMission as createMissionRecord,
@@ -8,6 +7,7 @@ import {
   updateMission as updateMissionRecord
 } from "../repositories/mission.repository.js";
 import { slugify } from "../utils/slugify.js";
+import { createWithGeneratedId } from "../utils/idGenerator.js";
 
 export class MissionServiceError extends Error {
   constructor(statusCode, message) {
@@ -23,7 +23,7 @@ export async function createMission(payload, createdById) {
   }
 
   const data = result.data;
-
+  
   if (data.endAt <= data.startAt) {
     throw new MissionServiceError(400, "Invalid time window.");
   }
@@ -33,21 +33,23 @@ export async function createMission(payload, createdById) {
     throw new MissionServiceError(409, "Mission time window overlaps with an existing mission of this type.");
   }
 
-  return createMissionRecord({
-    id: randomUUID(),
-    slug: slugify(data.title),
-    title: data.title,
-    description: data.description,
-    type: data.type,
-    startAt: data.startAt,
-    endAt: data.endAt,
-    submissionCap: data.submissionCap,
-    points: data.points,
-    autoApprove: data.autoApprove,
-    ...(data.status !== undefined ? { status: data.status } : {}),
-    ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
-    createdById
-  });
+  return createWithGeneratedId("mission", "MIS", (id) =>
+    createMissionRecord({
+      id,
+      slug: slugify(data.title),
+      title: data.title,
+      description: data.description,
+      type: data.type,
+      startAt: data.startAt,
+      endAt: data.endAt,
+      submissionCap: data.submissionCap,
+      points: data.points,
+      autoApprove: data.autoApprove,
+      ...(data.status !== undefined ? { status: data.status } : {}),
+      ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
+      createdById
+    })
+  );
 }
 
 export function listMissions(query = {}) {

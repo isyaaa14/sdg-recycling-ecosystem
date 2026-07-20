@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { submitMissionSchema } from "../validators/mission.validator.js";
 import { reviewSubmissionSchema } from "../validators/submission.validator.js";
 import { MissionServiceError } from "./mission.service.js";
@@ -11,6 +10,7 @@ import {
   findSubmissionById,
   updateSubmission
 } from "../repositories/submission.repository.js";
+import { createWithGeneratedId } from "../utils/idGenerator.js";
 
 export async function submitMission(missionId, payload, userId) {
   const result = submitMissionSchema.safeParse(payload);
@@ -42,16 +42,18 @@ export async function submitMission(missionId, payload, userId) {
   const data = result.data;
   const autoApproved = mission.autoApprove;
 
-  return createSubmission({
-    id: randomUUID(),
-    missionId: mission.id,
-    userId,
-    proofText: data.proofText,
-    proofImageUrl: data.proofImageUrl,
-    quantity: data.quantity,
-    status: autoApproved ? "APPROVED" : "PENDING_REVIEW",
-    reviewedAt: autoApproved ? now : null
-  });
+  return createWithGeneratedId("missionSubmission", "SUB", (id) =>
+    createSubmission({
+      id,
+      missionId: mission.id,
+      userId,
+      proofText: data.proofText,
+      proofImageUrl: data.proofImageUrl,
+      quantity: data.quantity,
+      status: autoApproved ? "APPROVED" : "PENDING_REVIEW",
+      reviewedAt: autoApproved ? now : null
+    })
+  );
 }
 
 export async function listMissionSubmissions(missionId) {

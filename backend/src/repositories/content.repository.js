@@ -1,5 +1,5 @@
-import { randomUUID } from "node:crypto";
 import { PrismaClient } from "@prisma/client";
+import { createWithGeneratedId } from "../utils/idGenerator.js";
 
 const prisma = new PrismaClient();
 
@@ -28,23 +28,25 @@ export async function updateContent(id, data) {
     return null;
   }
 
-  const [, updated] = await prisma.$transaction([
-    prisma.contentRevision.create({
-      data: {
-        id: randomUUID(),
-        contentId: existing.id,
-        version: existing.version,
-        title: existing.title,
-        body: existing.body,
-        tags: existing.tags,
-        status: existing.status
-      }
-    }),
-    prisma.content.update({
-      where: { id },
-      data: { ...data, version: existing.version + 1 }
-    })
-  ]);
+  return createWithGeneratedId("contentRevision", "CRV", async (revisionId) => {
+    const [, updated] = await prisma.$transaction([
+      prisma.contentRevision.create({
+        data: {
+          id: revisionId,
+          contentId: existing.id,
+          version: existing.version,
+          title: existing.title,
+          body: existing.body,
+          tags: existing.tags,
+          status: existing.status
+        }
+      }),
+      prisma.content.update({
+        where: { id },
+        data: { ...data, version: existing.version + 1 }
+      })
+    ]);
 
-  return updated;
+    return updated;
+  });
 }

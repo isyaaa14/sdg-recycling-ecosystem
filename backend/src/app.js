@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.js";
 import missionRoutes from "./routes/mission.routes.js";
 import submissionRoutes from "./routes/submission.routes.js";
 import contentRoutes from "./routes/content.routes.js";
+import badgeRoutes from "./routes/badge.routes.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -36,5 +37,6 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/missions", missionRoutes);
 app.use("/api/v1/submissions", submissionRoutes);
 app.use("/api/v1/content", contentRoutes);
+app.use("/api/v1/badges", badgeRoutes);
 
 export default app;

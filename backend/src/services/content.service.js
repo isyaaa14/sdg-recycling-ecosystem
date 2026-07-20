@@ -1,4 +1,3 @@
-import { randomUUID } from "node:crypto";
 import { createContentSchema, updateContentSchema } from "../validators/content.validator.js";
 import {
   createContent as createContentRecord,
@@ -8,6 +7,7 @@ import {
   updateContent as updateContentRecord
 } from "../repositories/content.repository.js";
 import { slugify } from "../utils/slugify.js";
+import { createWithGeneratedId } from "../utils/idGenerator.js";
 
 export class ContentServiceError extends Error {
   constructor(statusCode, message) {
@@ -30,15 +30,17 @@ export async function createContent(payload, createdById) {
     throw new ContentServiceError(409, "Content with this title already exists.");
   }
 
-  return createContentRecord({
-    id: randomUUID(),
-    slug,
-    title: data.title,
-    body: data.body,
-    tags: data.tags,
-    status: data.status,
-    createdById
-  });
+  return createWithGeneratedId("content", "CNT", (id) =>
+    createContentRecord({
+      id,
+      slug,
+      title: data.title,
+      body: data.body,
+      tags: data.tags,
+      status: data.status,
+      createdById
+    })
+  );
 }
 
 export async function getContentById(id) {

@@ -1,8 +1,8 @@
 import bcrypt from "bcrypt";
-import { randomUUID } from "node:crypto";
 import { registerSchema, loginSchema } from "../validators/auth.validator.js";
 import { createUser, findUserByEmail } from "../repositories/user.repository.js";
 import { signToken } from "../utils/jwt.js";
+import { createWithGeneratedId } from "../utils/idGenerator.js";
 
 export class AuthServiceError extends Error {
   constructor(statusCode, message) {
@@ -30,13 +30,15 @@ export async function register(payload) {
   }
 
   const passwordHash = await bcrypt.hash(password, 10);
-  const user = await createUser({
-    id: randomUUID(),
-    name,
-    email,
-    passwordHash,
-    role: "STUDENT"
-  });
+  const user = await createWithGeneratedId("user", "USR", (id) =>
+    createUser({
+      id,
+      name,
+      email,
+      passwordHash,
+      role: "STUDENT"
+    })
+  );
 
   const token = signToken({ sub: user.id, role: user.role });
   return { token, user: sanitizeUser(user) };
