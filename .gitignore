@@ -1,0 +1,14 @@
+.env
+
+node_modules/
+
+dist/
+
+*.log
+
+backend/prisma/dev.db
+
+mobile-app/
+
+sdg-recycling-ecosystem.code-workspace
+
