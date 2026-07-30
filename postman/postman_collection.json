@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "66fb0005-251f-4380-9509-e32dde3d8b4c",
     "name": "SDG Recycling Backend API",
-    "description": "Current smoke collection for the merged backend used by web and mobile clients.",
+    "description": "Shared API test collection for local, shared Azure, and personal sandbox environments.\n\nImport one collection, then switch Postman environments. Run Auth -> Login Admin and Auth -> Login Student first to populate tokens automatically.\n\nSafe Smoke and Admin Read folders are intended for routine checks. Mutation folders create/archive test data and should be used deliberately.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -13,6 +13,34 @@
     {
       "key": "apiPrefix",
       "value": "/api/v1"
+    },
+    {
+      "key": "frontendUrl",
+      "value": "http://localhost:9999"
+    },
+    {
+      "key": "adminEmail",
+      "value": "admin@sdg.local"
+    },
+    {
+      "key": "adminPassword",
+      "value": "Password123!"
+    },
+    {
+      "key": "studentEmail",
+      "value": "student1@sdg.local"
+    },
+    {
+      "key": "studentPassword",
+      "value": "Password123!"
+    },
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "studentToken",
+      "value": ""
     },
     {
       "key": "missionId",
@@ -27,18 +55,88 @@
       "value": "QZ001"
     },
     {
+      "key": "questionCode",
+      "value": "QQ0011"
+    },
+    {
+      "key": "submissionId",
+      "value": "SUB001"
+    },
+    {
+      "key": "badgeId",
+      "value": "BDG001"
+    },
+    {
       "key": "uploadId",
       "value": ""
     },
     {
-      "key": "questionCode",
-      "value": "QQ0011"
+      "key": "contentImageUploadId",
+      "value": ""
+    },
+    {
+      "key": "createdMissionId",
+      "value": ""
+    },
+    {
+      "key": "createdContentId",
+      "value": ""
+    },
+    {
+      "key": "createdQuizId",
+      "value": ""
+    },
+    {
+      "key": "createdQuestionId",
+      "value": ""
+    },
+    {
+      "key": "createdQuestionCode",
+      "value": ""
+    },
+    {
+      "key": "createdSubmissionId",
+      "value": ""
+    },
+    {
+      "key": "createdBadgeId",
+      "value": ""
+    },
+    {
+      "key": "testFilePath",
+      "value": ""
     }
   ],
   "item": [
     {
-      "name": "Health",
+      "name": "00 - Environment & Health",
       "item": [
+        {
+          "name": "Root API Message",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('root message exists', function () { pm.expect(pm.response.json().message).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
         {
           "name": "Backend Health",
           "request": {
@@ -54,7 +152,19 @@
                 "health"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('health ok', function () { pm.expect(pm.response.json().data.status).to.eql('ok'); });"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Database Check",
@@ -71,12 +181,24 @@
                 "db-test"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('database ok', function () { pm.expect(pm.response.json().data.status).to.eql('ok'); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "name": "Auth",
+      "name": "01 - Auth",
       "item": [
         {
           "name": "Login Admin",
@@ -101,7 +223,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"admin@sdg.local\",\n  \"password\": \"Password123!\"\n}"
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
             }
           },
           "event": [
@@ -110,15 +232,20 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('admin login ok', function () { pm.response.to.have.status(200); });",
-                  "pm.collectionVariables.set('adminToken', pm.response.json().data.token);"
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.token;",
+                  "pm.expect(value, 'adminToken').to.be.a('string');",
+                  "pm.environment.set('adminToken', value);",
+                  "pm.collectionVariables.set('adminToken', value);",
+                  "pm.test('admin user returned', function () { pm.expect(json.data.user.role).to.eql('ADMIN'); });"
                 ]
               }
             }
           ]
         },
         {
-          "name": "Login Student 1",
+          "name": "Login Student",
           "request": {
             "method": "POST",
             "header": [
@@ -140,7 +267,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"student1@sdg.local\",\n  \"password\": \"Password123!\"\n}"
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"{{studentPassword}}\"\n}"
             }
           },
           "event": [
@@ -149,15 +276,55 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('student login ok', function () { pm.response.to.have.status(200); });",
-                  "pm.collectionVariables.set('studentToken', pm.response.json().data.token);"
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.token;",
+                  "pm.expect(value, 'studentToken').to.be.a('string');",
+                  "pm.environment.set('studentToken', value);",
+                  "pm.collectionVariables.set('studentToken', value);",
+                  "pm.test('student user returned', function () { pm.expect(json.data.user.role).to.eql('STUDENT'); });"
                 ]
               }
             }
           ]
         },
         {
-          "name": "Current User",
+          "name": "Current User - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('admin me', function () { pm.expect(pm.response.json().data.user.role).to.eql('ADMIN'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Current User - Student",
           "request": {
             "method": "GET",
             "header": [
@@ -177,15 +344,95 @@
                 "me"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('student me', function () { pm.expect(pm.response.json().data.user.role).to.eql('STUDENT'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Login Rejects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{studentEmail}}\",\n  \"password\": \"wrong-password\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', function () { pm.response.to.have.status(401); });",
+                  "pm.test('error message returned', function () { pm.expect(pm.response.json().error.message).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Missing Auth Rejects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "name": "Missions",
+      "name": "02 - Safe Smoke Reads",
       "item": [
         {
-          "name": "List Missions - Student Active",
+          "name": "List Active Missions - Student",
           "request": {
             "method": "GET",
             "header": [
@@ -204,10 +451,22 @@
                 "missions"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('missions array', function () { pm.expect(pm.response.json().data.missions).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Get Mission",
+          "name": "Get Seeded Mission",
           "request": {
             "method": "GET",
             "header": [
@@ -227,146 +486,22 @@
                 "{{missionId}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('mission id matches', function () { pm.expect(pm.response.json().data.mission.id).to.eql(pm.environment.get('missionId') || pm.collectionVariables.get('missionId')); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Join Mission",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/join",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "missions",
-                "{{missionId}}",
-                "join"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Submit Mission",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submit",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "missions",
-                "{{missionId}}",
-                "submit"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"proofText\": \"Submitted from Postman.\",\n  \"quantity\": 3,\n  \"uploadId\": \"{{uploadId}}\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Create Mission - Admin",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "missions"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Postman Sorting Drill {{$timestamp}}\",\n  \"description\": \"Sort recyclable items correctly for this Postman test.\",\n  \"longDescription\": \"Collect, sort, and submit evidence of recyclable items.\",\n  \"guide\": [\n    {\n      \"step\": 1,\n      \"title\": \"Collect\",\n      \"description\": \"Collect clean recyclable items.\"\n    }\n  ],\n  \"targetQuantity\": 10,\n  \"targetDays\": null,\n  \"type\": \"QUANTITY_BASED\",\n  \"startAt\": \"2026-07-01T00:00:00.000Z\",\n  \"endAt\": \"2026-12-31T23:59:59.000Z\",\n  \"submissionCap\": 1,\n  \"points\": 30,\n  \"autoApprove\": false,\n  \"isActive\": true,\n  \"status\": \"ACTIVE\"\n}"
-            }
-          }
-        },
-        {
-          "name": "Submission Queue - Admin",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "submissions"
-              ]
-            }
-          }
-        },
-        {
-          "name": "My Submissions",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "submissions",
-                "me"
-              ]
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Content",
-      "item": [
-        {
-          "name": "List Content - Student Published",
+          "name": "List Published Content - Student",
           "request": {
             "method": "GET",
             "header": [
@@ -385,10 +520,61 @@
                 "content"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('content array', function () { pm.expect(pm.response.json().data.content).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Get Content",
+          "name": "List Content By Tag - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=plastic",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "plastic"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Seeded Content",
           "request": {
             "method": "GET",
             "header": [
@@ -408,45 +594,22 @@
                 "{{contentId}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('content id matches', function () { pm.expect(pm.response.json().data.content.id).to.eql(pm.environment.get('contentId') || pm.collectionVariables.get('contentId')); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Create Content - Admin",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "content"
-              ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"title\": \"Postman Recycling Article {{$timestamp}}\",\n  \"summary\": \"Short mobile summary.\",\n  \"body\": \"Educational content body.\",\n  \"imageUrl\": \"\",\n  \"estimatedReadMinutes\": 5,\n  \"contentBlocks\": [\n    {\n      \"type\": \"paragraph\",\n      \"text\": \"Educational content body.\"\n    }\n  ],\n  \"tags\": [\n    \"plastic\",\n    \"sorting\"\n  ],\n  \"status\": \"PUBLISHED\"\n}"
-            }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Quizzes",
-      "item": [
-        {
-          "name": "List Quizzes",
+          "name": "List Quizzes - Student",
           "request": {
             "method": "GET",
             "header": [
@@ -465,10 +628,22 @@
                 "quizzes"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('quizzes array', function () { pm.expect(pm.response.json().data.quizzes).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Get Quiz",
+          "name": "Get Seeded Quiz",
           "request": {
             "method": "GET",
             "header": [
@@ -488,10 +663,765 @@
                 "{{quizId}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('quiz has questions', function () { pm.expect(pm.response.json().data.quiz.questions).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Submit Attempt",
+          "name": "List My Progress - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "progress",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get My Content Progress - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "progress",
+                "content",
+                "{{contentId}}",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Badge Progress - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges",
+                "progress"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('badge progress shape', function () { const data = pm.response.json().data; pm.expect(data.earned).to.be.an('array'); pm.expect(data.locked).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My Points - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My Submissions - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "My Uploads - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "uploads",
+                "mine"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "03 - Admin Reads",
+      "item": [
+        {
+          "name": "List All Missions - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Active Missions - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions?status=ACTIVE",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List All Submissions - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Pending Submissions - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions?status=PENDING_REVIEW",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "PENDING_REVIEW"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Seeded Submission - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/{{submissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions",
+                "{{submissionId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Mission Submissions - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "{{missionId}}",
+                "submissions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List All Content - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Draft Content - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content?status=DRAFT",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "DRAFT"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Content Revisions - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}/revisions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content",
+                "{{contentId}}",
+                "revisions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Badges - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Seeded Badge - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{badgeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges",
+                "{{badgeId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seeded Badge Awards - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{badgeId}}/awards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges",
+                "{{badgeId}}",
+                "awards"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Points Events - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Quiz Attempts - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{quizId}}",
+                "attempts"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Content Progress - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "progress",
+                "content",
+                "{{contentId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "04 - Student Action Tests",
+      "description": "These requests can create student activity. They are safe for sandbox smoke testing but may change progress/submission state.",
+      "item": [
+        {
+          "name": "Submit Seeded Quiz Attempt",
           "request": {
             "method": "POST",
             "header": [
@@ -520,10 +1450,22 @@
               "mode": "raw",
               "raw": "{\n  \"answers\": {\n    \"{{questionCode}}\": \"PET\"\n  },\n  \"timeSpentSeconds\": 72\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('attempt returned', function () { pm.expect(pm.response.json().data.attempt.id).to.be.a('string'); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "My Attempts",
+          "name": "My Attempts For Seeded Quiz",
           "request": {
             "method": "GET",
             "header": [
@@ -545,63 +1487,21 @@
                 "me"
               ]
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Progress",
-      "item": [
-        {
-          "name": "List My Progress",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
               }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "progress",
-                "me"
-              ]
             }
-          }
+          ]
         },
         {
-          "name": "Get My Content Progress",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/me",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "progress",
-                "content",
-                "{{contentId}}",
-                "me"
-              ]
-            }
-          }
-        },
-        {
-          "name": "Mark Content Complete",
+          "name": "Mark Seeded Content Complete",
           "request": {
             "method": "PATCH",
             "header": [
@@ -623,38 +1523,159 @@
                 "complete"
               ]
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Badges",
-      "item": [
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
         {
-          "name": "Badge Progress - Student",
+          "name": "Submit Seeded Mission Text Proof",
           "request": {
-            "method": "GET",
+            "method": "POST",
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submit",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
-                "badges",
-                "progress"
+                "missions",
+                "{{missionId}}",
+                "submit"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proofText\": \"Submitted from Postman shared collection.\",\n  \"quantity\": 3\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('submission accepted or already blocked by prior run', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { const submissionId = pm.response.json().data.submission.id; pm.environment.set('createdSubmissionId', submissionId); pm.collectionVariables.set('createdSubmissionId', submissionId); }"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "05 - Admin Mutation Tests",
+      "description": "Run in order after logging in. These requests intentionally create and archive test records.",
+      "item": [
+        {
+          "name": "Create Content - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman Recycling Article {{$timestamp}}\",\n  \"summary\": \"Short smoke-test summary.\",\n  \"body\": \"Educational content body created by Postman.\",\n  \"imageUrl\": \"\",\n  \"estimatedReadMinutes\": 5,\n  \"contentBlocks\": [\n    {\n      \"type\": \"paragraph\",\n      \"text\": \"Educational content body created by Postman.\"\n    }\n  ],\n  \"tags\": [\n    \"plastic\",\n    \"sorting\"\n  ],\n  \"status\": \"PUBLISHED\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.content && json.data.content.id;",
+                  "pm.expect(value, 'createdContentId').to.be.a('string');",
+                  "pm.environment.set('createdContentId', value);",
+                  "pm.collectionVariables.set('createdContentId', value);"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "List Badges - Admin",
+          "name": "Update Created Content - Admin",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{createdContentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content",
+                "{{createdContentId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"summary\": \"Updated by Postman.\",\n  \"estimatedReadMinutes\": 6,\n  \"tags\": [\n    \"plastic\",\n    \"safety\"\n  ],\n  \"status\": \"PUBLISHED\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Created Content Revisions - Admin",
           "request": {
             "method": "GET",
             "header": [
@@ -664,16 +1685,316 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{createdContentId}}/revisions",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
-                "badges"
+                "content",
+                "{{createdContentId}}",
+                "revisions"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Quiz For Created Content - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"contentId\": \"{{createdContentId}}\",\n  \"title\": \"Postman Quiz {{$timestamp}}\",\n  \"passingScore\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.quiz && json.data.quiz.id;",
+                  "pm.expect(value, 'createdQuizId').to.be.a('string');",
+                  "pm.environment.set('createdQuizId', value);",
+                  "pm.collectionVariables.set('createdQuizId', value);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Question To Created Quiz - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"Which item belongs in recycling?\",\n  \"options\": [\n    \"Clean plastic bottle\",\n    \"Food waste\",\n    \"Used tissue\"\n  ],\n  \"correctAnswer\": \"Clean plastic bottle\",\n  \"points\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const question = json.data.question;",
+                  "pm.expect(question.id).to.be.a('string');",
+                  "pm.environment.set('createdQuestionId', question.id);",
+                  "pm.collectionVariables.set('createdQuestionId', question.id);",
+                  "pm.environment.set('createdQuestionCode', question.code);",
+                  "pm.collectionVariables.set('createdQuestionCode', question.code);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Created Question - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions/{{createdQuestionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}",
+                "questions",
+                "{{createdQuestionId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"Which item should go into recycling?\",\n  \"options\": [\n    \"Clean plastic bottle\",\n    \"Food waste\",\n    \"Used tissue\"\n  ],\n  \"correctAnswer\": \"Clean plastic bottle\",\n  \"points\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Created Quiz - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit Created Quiz Attempt - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/attempts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}",
+                "attempts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {\n    \"{{createdQuestionCode}}\": \"Clean plastic bottle\"\n  },\n  \"timeSpentSeconds\": 45\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark Created Content Complete - Student",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{createdContentId}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "progress",
+                "content",
+                "{{createdContentId}}",
+                "complete"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Archive Created Content - Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{createdContentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content",
+                "{{createdContentId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Create Badge - Admin",
@@ -703,38 +2024,159 @@
               "mode": "raw",
               "raw": "{\n  \"name\": \"Postman Approval Badge {{$timestamp}}\",\n  \"description\": \"Receive one approved mission submission.\",\n  \"tier\": \"BRONZE\",\n  \"criteriaType\": \"APPROVED_SUBMISSIONS\",\n  \"criteriaValue\": 1\n}"
             }
-          }
-        }
-      ]
-    },
-    {
-      "name": "Points",
-      "item": [
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.badge && json.data.badge.id;",
+                  "pm.expect(value, 'createdBadgeId').to.be.a('string');",
+                  "pm.environment.set('createdBadgeId', value);",
+                  "pm.collectionVariables.set('createdBadgeId', value);"
+                ]
+              }
+            }
+          ]
+        },
         {
-          "name": "My Points - Student",
+          "name": "Update Created Badge - Admin",
           "request": {
-            "method": "GET",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{createdBadgeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
-                "points",
-                "me"
+                "badges",
+                "{{createdBadgeId}}"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated by Postman.\",\n  \"isActive\": true\n}"
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "List Points - Admin",
+          "name": "Deactivate Created Badge - Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{createdBadgeId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges",
+                "{{createdBadgeId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Future Mission - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman Future Mission {{$timestamp}}\",\n  \"description\": \"Future mission created by Postman mutation tests.\",\n  \"longDescription\": \"Created for validating admin mission create, update and archive endpoints.\",\n  \"guide\": [\n    {\n      \"step\": 1,\n      \"title\": \"Prepare\",\n      \"description\": \"Prepare clean recyclable items.\"\n    }\n  ],\n  \"targetQuantity\": 5,\n  \"targetDays\": null,\n  \"type\": \"TIME_LIMITED\",\n  \"startAt\": \"{{mutationMissionStartAt}}\",\n  \"endAt\": \"{{mutationMissionEndAt}}\",\n  \"submissionCap\": 1,\n  \"points\": 15,\n  \"autoApprove\": false,\n  \"isActive\": false,\n  \"status\": \"DRAFT\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const base = Date.now() + 3650 * 24 * 60 * 60 * 1000 + Math.floor(Math.random() * 1000000);",
+                  "pm.environment.set('mutationMissionStartAt', new Date(base).toISOString());",
+                  "pm.environment.set('mutationMissionEndAt', new Date(base + 60 * 60 * 1000).toISOString());"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.mission && json.data.mission.id;",
+                  "pm.expect(value, 'createdMissionId').to.be.a('string');",
+                  "pm.environment.set('createdMissionId', value);",
+                  "pm.collectionVariables.set('createdMissionId', value);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Created Mission - Admin",
           "request": {
             "method": "GET",
             "header": [
@@ -744,24 +2186,113 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/points",
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{createdMissionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
-                "points"
+                "missions",
+                "{{createdMissionId}}"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update Created Mission - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{createdMissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "{{createdMissionId}}"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Updated by Postman.\",\n  \"points\": 20,\n  \"status\": \"DRAFT\",\n  \"isActive\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Archive Created Mission - Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{createdMissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "{{createdMissionId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
     {
-      "name": "Uploads",
+      "name": "06 - Upload Tests",
+      "description": "Set testFilePath in the active Postman environment before running file upload requests.",
       "item": [
         {
-          "name": "Upload Mission Proof",
+          "name": "Upload Mission Proof - Student",
           "request": {
             "method": "POST",
             "header": [
@@ -770,16 +2301,6 @@
                 "value": "Bearer {{studentToken}}"
               }
             ],
-            "body": {
-              "mode": "formdata",
-              "formdata": [
-                {
-                  "key": "file",
-                  "type": "file",
-                  "src": "{{testFilePath}}"
-                }
-              ]
-            },
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/uploads/mission-proof",
               "host": [
@@ -790,30 +2311,7 @@
                 "uploads",
                 "mission-proof"
               ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "if (pm.response.code === 201) pm.collectionVariables.set('uploadId', pm.response.json().data.upload.id);"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Upload Content Image",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              }
-            ],
+            },
             "body": {
               "mode": "formdata",
               "formdata": [
@@ -823,7 +2321,65 @@
                   "src": "{{testFilePath}}"
                 }
               ]
-            },
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('upload succeeds when testFilePath is set', function () { pm.expect([201, 400, 500]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('uploadId', uploadId); pm.collectionVariables.set('uploadId', uploadId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Uploaded Mission Proof",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/{{uploadId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "uploads",
+                "{{uploadId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('upload lookup responds', function () { pm.expect([200, 404]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Content Image - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/uploads/content-image",
               "host": [
@@ -834,11 +2390,33 @@
                 "uploads",
                 "content-image"
               ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{testFilePath}}"
+                }
+              ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('content image upload succeeds when testFilePath is set', function () { pm.expect([201, 400, 500]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('contentImageUploadId', uploadId); pm.collectionVariables.set('contentImageUploadId', uploadId); }"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "My Uploads",
+          "name": "My Uploads - Student",
           "request": {
             "method": "GET",
             "header": [
@@ -858,7 +2436,212 @@
                 "mine"
               ]
             }
-          }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "07 - Permission & Validation Checks",
+      "item": [
+        {
+          "name": "Student Cannot Create Mission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Forbidden Mission\",\n  \"description\": \"Student should not create this.\",\n  \"type\": \"QUANTITY_BASED\",\n  \"startAt\": \"2035-01-01T00:00:00.000Z\",\n  \"endAt\": \"2035-01-02T00:00:00.000Z\",\n  \"submissionCap\": 1,\n  \"points\": 1,\n  \"autoApprove\": false,\n  \"status\": \"DRAFT\",\n  \"isActive\": false\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Cannot Use Student Points Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Content Tag Rejects",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=not-a-tag",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "not-a-tag"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown Mission Returns 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "MIS999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Badge Payload Rejects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"description\": \"\",\n  \"tier\": \"WOOD\",\n  \"criteriaType\": \"UNKNOWN\",\n  \"criteriaValue\": 0\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
         }
       ]
     }

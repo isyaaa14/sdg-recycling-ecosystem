@@ -14,6 +14,11 @@ Postman files:
 - `postman/postman_collection.json`
 - `postman/postman_environment_local.json`
 - `postman/postman_environment_shared.json`
+- `postman/sample_payloads.json`
+
+The Postman collection is shared across environments. Keep team-safe local and
+shared environment exports in `postman/`. Personal sandbox exports and other
+private testing files can live in ignored `offline/`.
 
 Backend local base URL:
 
