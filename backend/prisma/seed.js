@@ -42,7 +42,7 @@ async function upsertMissions(adminId) {
       description: "Collect and record recyclable plastic bottles this week.",
       longDescription:
         "Reduce plastic waste by collecting recyclable plastic bottles from your home, campus, or workplace throughout the week. Sort and count the bottles before submitting your total to encourage responsible recycling habits. Every bottle recycled contributes to a cleaner environment and helps reduce landfill waste.",
-      imageUrl: "",
+      imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Plastic%20bottles%20for%20recycling.jpg",
       type: "QUANTITY_BASED",
       targetQuantity: 20,
       guide: [
@@ -78,7 +78,7 @@ async function upsertMissions(adminId) {
       description: "Maintain three consecutive days of recycling activity.",
       longDescription:
         "Build a sustainable habit by completing at least one recycling activity each day for three consecutive days. Consistency is the key to making environmental responsibility part of your daily routine. Record your progress every day to successfully complete the challenge.",
-      imageUrl: "",
+      imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Recyclables.JPG",
       type: "STREAK_BASED",
       targetDays: 3,
       guide: [
@@ -114,7 +114,7 @@ async function upsertMissions(adminId) {
       description: "Join the campus e-waste collection event and share evidence.",
       longDescription:
         "Participate in the campus weekend e-waste collection drive by bringing unwanted electronic items for proper disposal. Recycling electronic waste prevents harmful materials from polluting the environment and allows valuable resources to be recovered. Share your participation by submitting evidence after dropping off your items.",
-      imageUrl: "",
+      imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Recycled%20Electronics%20-%20Circuit%20Boards%20(48659415958).jpg",
       type: "TIME_LIMITED",
       guide: [
         {
@@ -188,7 +188,7 @@ async function upsertContent(adminId) {
       slug: "plastic-recycling-basics",
       title: "Plastic Recycling Basics",
       summary: "Learn how to identify common plastic recycling codes and sort them correctly.",
-      imageUrl: "https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=1200&q=80",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Plastic_Bottle_Recycling_Bin.jpg",
       estimatedReadMinutes: 6,
       body: "Plastic recycling starts with knowing what each container is made from and whether it is clean enough to be processed. This guide explains how to read plastic codes, rinse common packaging, and sort bottles before they reach the recycling bin.",
       contentBlocks: [
@@ -206,7 +206,7 @@ async function upsertContent(adminId) {
         },
         {
           type: "image",
-          url: "https://images.unsplash.com/photo-1604187351574-c75ca79f5807?auto=format&fit=crop&w=1200&q=80",
+        url: "https://commons.wikimedia.org/wiki/Special:FilePath/Plastic_Bottle_Recycling_Bin.jpg",
           alt: "Sorted plastic bottles prepared for recycling"
         },
         {
@@ -225,7 +225,7 @@ async function upsertContent(adminId) {
       slug: "paper-recycling-essentials",
       title: "Paper Recycling Essentials",
       summary: "Understand contamination rules and how to prepare paper for recycling.",
-      imageUrl: "https://images.unsplash.com/photo-1605600659908-0ef719419d41?auto=format&fit=crop&w=1200&q=80",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Recyclable_Cardboard_Packaging.jpg",
       estimatedReadMinutes: 5,
       body: "Paper recycling works best when paper is dry, clean, and separated from food waste. This article explains what paper can be recycled and why wet or greasy paper should be kept out of the recycling stream.",
       contentBlocks: [
@@ -243,7 +243,7 @@ async function upsertContent(adminId) {
         },
         {
           type: "image",
-          url: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?auto=format&fit=crop&w=1200&q=80",
+        url: "https://commons.wikimedia.org/wiki/Special:FilePath/Recycled_Paper_Pulp%2C_Post-Consumer_Waste_Recycling_Material_%2843544030305%29.jpg",
           alt: "Clean paper and cardboard sorted for recycling"
         },
         {
@@ -262,7 +262,7 @@ async function upsertContent(adminId) {
       slug: "e-waste-recycling-awareness",
       title: "E-Waste Recycling Awareness",
       summary: "Discover safe disposal paths for electronics and batteries on campus.",
-      imageUrl: "https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=1200&q=80",
+    imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/E-Waste_Recycling_%287027059003%29.jpg",
       estimatedReadMinutes: 7,
       body: "E-waste contains valuable materials, but it can also contain batteries, heavy metals, and parts that should not enter normal bins. Learn how to store old devices safely and send them to the correct collection point.",
       contentBlocks: [
@@ -280,7 +280,7 @@ async function upsertContent(adminId) {
         },
         {
           type: "image",
-          url: "https://images.unsplash.com/photo-1550009158-9ebf69173e03?auto=format&fit=crop&w=1200&q=80",
+        url: "https://commons.wikimedia.org/wiki/Special:FilePath/E-Waste_Recycling_%287027059003%29.jpg",
           alt: "Electronic components prepared for recycling"
         },
         {
@@ -628,8 +628,8 @@ async function seedSubmissions(missions, students, adminId) {
     update: {
       missionId: firstMission.id,
       userId: firstStudent.id,
-      proofText: "Collected 12 bottles from the cafeteria bins.",
-      quantity: 12,
+      proofText: "Collected 20 bottles from the cafeteria bins.",
+      quantity: 20,
       status: "APPROVED",
       reviewedById: adminId,
       reviewedAt: new Date()
@@ -638,8 +638,8 @@ async function seedSubmissions(missions, students, adminId) {
       id: "SUB001",
       missionId: firstMission.id,
       userId: firstStudent.id,
-      proofText: "Collected 12 bottles from the cafeteria bins.",
-      quantity: 12,
+      proofText: "Collected 20 bottles from the cafeteria bins.",
+      quantity: 20,
       status: "APPROVED",
       reviewedById: adminId,
       reviewedAt: new Date()
@@ -653,7 +653,7 @@ async function seedSubmissions(missions, students, adminId) {
       missionId: firstMission.id,
       submissionId: approvedSubmission.id,
       points: firstMission.points,
-      eventType: "MISSION_APPROVED",
+      eventType: "MISSION_COMPLETED",
       status: "SENT",
       approvedAt: approvedSubmission.reviewedAt ?? new Date()
     },
@@ -663,7 +663,7 @@ async function seedSubmissions(missions, students, adminId) {
       missionId: firstMission.id,
       submissionId: approvedSubmission.id,
       points: firstMission.points,
-      eventType: "MISSION_APPROVED",
+      eventType: "MISSION_COMPLETED",
       status: "SENT",
       approvedAt: approvedSubmission.reviewedAt ?? new Date()
     }
@@ -727,3 +727,4 @@ main()
     await prisma.$disconnect();
     process.exit(1);
   });
+

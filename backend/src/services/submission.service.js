@@ -10,17 +10,43 @@ import {
   findSubmissionsByMission,
   findAllSubmissions,
   findSubmissionById,
+  getApprovedMissionProgressForUser,
   updateSubmission
 } from "../repositories/submission.repository.js";
 import { findUploadedFileById, attachUploadToSubmission } from "../repositories/upload.repository.js";
 import { createWithGeneratedId } from "../utils/idGenerator.js";
-import { createPointsEventForApproval } from "./points.service.js";
+import { createPointsEventForMissionCompletion } from "./points.service.js";
 import { evaluateAndIssueBadges } from "./badge.service.js";
 import { createMissionProofReadUrl } from "./upload.service.js";
 
-async function applyApprovalSideEffects({ userId, missionId, submissionId, points }) {
+function isMissionCompletedByProgress(mission, progress) {
+  switch (mission.type) {
+    case "QUANTITY_BASED":
+      return mission.targetQuantity == null
+        ? progress.approvedCount > 0
+        : progress.approvedQuantity >= mission.targetQuantity;
+    case "STREAK_BASED":
+      return mission.targetDays == null
+        ? progress.approvedCount > 0
+        : progress.approvedCount >= mission.targetDays;
+    case "TIME_LIMITED":
+      return progress.approvedCount > 0;
+    default:
+      return false;
+  }
+}
+
+async function applyApprovalSideEffects({ userId, mission, submissionId }) {
   try {
-    await createPointsEventForApproval({ userId, missionId, submissionId, points });
+    const progress = await getApprovedMissionProgressForUser(mission.id, userId);
+    if (isMissionCompletedByProgress(mission, progress)) {
+      await createPointsEventForMissionCompletion({
+        userId,
+        missionId: mission.id,
+        submissionId,
+        points: mission.points
+      });
+    }
   } catch (error) {
     console.error(error);
   }
@@ -155,22 +181,21 @@ export async function submitMission(missionId, payload, userId) {
         })
       );
 
+  let responseSubmission = submission;
   if (data.uploadId) {
     await attachUploadToSubmission(data.uploadId, submission.id);
-    const submissionWithUploads = await findSubmissionById(submission.id);
-    return withMissionProofReadUrl(submissionWithUploads);
+    responseSubmission = await findSubmissionById(submission.id);
   }
 
   if (autoApproved) {
     await applyApprovalSideEffects({
       userId,
-      missionId: mission.id,
-      submissionId: submission.id,
-      points: mission.points
+      mission,
+      submissionId: submission.id
     });
   }
 
-  return withMissionProofReadUrl(submission);
+  return withMissionProofReadUrl(responseSubmission);
 }
 
 export async function listMissionSubmissions(missionId) {
@@ -243,9 +268,8 @@ export async function reviewSubmission(submissionId, payload, reviewerId) {
     const mission = await findMissionById(submission.missionId);
     await applyApprovalSideEffects({
       userId: submission.userId,
-      missionId: submission.missionId,
-      submissionId: submission.id,
-      points: mission.points
+      mission,
+      submissionId: submission.id
     });
   }
 

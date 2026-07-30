@@ -60,6 +60,7 @@ enum PointsEventStatus {
 
 enum PointsEventType {
   MISSION_APPROVED
+  MISSION_COMPLETED
 }
 
 enum UploadPurpose {
@@ -142,7 +143,9 @@ model PointsEvent {
   id             String            @id
   userId         String
   missionId      String?
-  submissionId   String?           @unique
+  // For MISSION_COMPLETED, this is the final approved submission
+  // that caused the mission to reach its completion target.
+  submissionId   String?
   points         Int
   eventType      PointsEventType
   status         PointsEventStatus @default(PENDING)
@@ -300,3 +303,4 @@ model UploadedFile {
   user                User             @relation(fields: [userId], references: [id])
   missionSubmission   MissionSubmission? @relation(fields: [missionSubmissionId], references: [id])
 }
+
