@@ -25,6 +25,7 @@ enum MissionStatus {
 }
 
 enum SubmissionStatus {
+  ONGOING
   PENDING_REVIEW
   APPROVED
   REJECTED
@@ -46,6 +47,8 @@ enum BadgeCriteriaType {
   MISSIONS_COMPLETED
   QUIZZES_PASSED
   CONTENT_COMPLETED
+  APPROVED_SUBMISSIONS
+  // Deprecated. Kept for existing dev database rows until they are reseeded/migrated away.
   ACTIVITY_METRIC
 }
 
@@ -61,6 +64,8 @@ enum PointsEventType {
 
 enum UploadPurpose {
   MISSION_PROOF
+  CONTENT_IMAGE
+  MISSION_IMAGE
 }
 
 model User {
@@ -87,6 +92,11 @@ model Mission {
   slug           String               @unique
   title          String
   description    String
+  longDescription String?
+  imageUrl       String?
+  guide          Json?
+  targetQuantity Int?
+  targetDays     Int?
   type           MissionType
   startAt        DateTime
   endAt          DateTime
@@ -153,6 +163,10 @@ model Content {
   slug            String             @unique
   title           String
   body            String
+  summary         String?
+  imageUrl        String?
+  estimatedReadMinutes Int           @default(5)
+  contentBlocks   Json?
   tags            String[]
   status          ContentStatus      @default(DRAFT)
   version         Int                @default(1)
@@ -171,6 +185,10 @@ model ContentRevision {
   version     Int
   title       String
   body        String
+  summary     String?
+  imageUrl    String?
+  estimatedReadMinutes Int?
+  contentBlocks Json?
   tags        String[]
   status      ContentStatus
   createdAt   DateTime @default(now())
@@ -184,7 +202,7 @@ model Quiz {
   contentId      String
   slug           String        @unique
   title          String
-  passingScore   Int           @default(70)
+  passingScore   Int           @default(4)
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
   content        Content       @relation(fields: [contentId], references: [id])
@@ -212,6 +230,7 @@ model QuizAttempt {
   correctAnswers Int
   passed         Boolean
   answers        Json
+  timeSpentSeconds Int?
   attemptedAt    DateTime @default(now())
   quiz           Quiz     @relation(fields: [quizId], references: [id])
   user           User     @relation(fields: [userId], references: [id])
@@ -256,6 +275,7 @@ model LearningProgress {
   quizAttemptsCount   Int      @default(0)
   passedQuizCount     Int      @default(0)
   latestScore         Int?
+  bestScore           Int?
   lastActivityAt      DateTime @default(now())
   createdAt           DateTime @default(now())
   updatedAt           DateTime @updatedAt

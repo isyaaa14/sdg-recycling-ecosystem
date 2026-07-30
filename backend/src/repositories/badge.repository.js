@@ -60,6 +60,55 @@ export function countApprovedMissionSubmissions(userId) {
   });
 }
 
+export async function countCompletedMissions(userId) {
+  const approvalStats = await prisma.missionSubmission.groupBy({
+    by: ["missionId"],
+    where: { userId, status: "APPROVED" },
+    _count: { _all: true },
+    _sum: { quantity: true }
+  });
+
+  if (approvalStats.length === 0) {
+    return 0;
+  }
+
+  const missions = await prisma.mission.findMany({
+    where: { id: { in: approvalStats.map((stat) => stat.missionId) } },
+    select: { id: true, type: true, targetQuantity: true, targetDays: true }
+  });
+
+  const missionsById = new Map(missions.map((mission) => [mission.id, mission]));
+
+  return approvalStats.reduce((total, stat) => {
+    const mission = missionsById.get(stat.missionId);
+    return total + (isMissionCompletedByApprovals(mission, stat) ? 1 : 0);
+  }, 0);
+}
+
+function isMissionCompletedByApprovals(mission, approvalStat) {
+  if (!mission) {
+    return false;
+  }
+
+  const approvedCount = approvalStat._count._all ?? 0;
+  const approvedQuantity = approvalStat._sum.quantity ?? 0;
+
+  switch (mission.type) {
+    case "QUANTITY_BASED":
+      return mission.targetQuantity == null
+        ? approvedCount > 0
+        : approvedQuantity >= mission.targetQuantity;
+    case "STREAK_BASED":
+      return mission.targetDays == null
+        ? approvedCount > 0
+        : approvedCount >= mission.targetDays;
+    case "TIME_LIMITED":
+      return approvedCount > 0;
+    default:
+      return false;
+  }
+}
+
 export function countPassedQuizAttempts(userId) {
   return prisma.quizAttempt.count({
     where: { userId, passed: true }
@@ -70,12 +119,4 @@ export function countCompletedLearningProgress(userId) {
   return prisma.learningProgress.count({
     where: { userId, completed: true }
   });
-}
-
-export async function sumActivityMetric(userId) {
-  const result = await prisma.learningProgress.aggregate({
-    where: { userId },
-    _sum: { completionCount: true }
-  });
-  return result._sum.completionCount ?? 0;
 }

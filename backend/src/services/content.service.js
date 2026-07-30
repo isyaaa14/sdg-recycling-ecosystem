@@ -1,4 +1,4 @@
-import { createContentSchema, updateContentSchema } from "../validators/content.validator.js";
+import { contentTagValues, createContentSchema, updateContentSchema } from "../validators/content.validator.js";
 import {
   createContent as createContentRecord,
   findContentById,
@@ -37,6 +37,10 @@ export async function createContent(payload, createdById) {
       slug,
       title: data.title,
       body: data.body,
+      summary: data.summary,
+      imageUrl: data.imageUrl,
+      estimatedReadMinutes: data.estimatedReadMinutes,
+      contentBlocks: data.contentBlocks,
       tags: data.tags,
       status: data.status,
       createdById
@@ -84,7 +88,12 @@ export async function updateContent(id, payload) {
 
 export function listContent(query = {}, user) {
   const filters = {};
-  if (query.tag) filters.tags = { has: query.tag };
+  if (query.tag) {
+    if (!contentTagValues.includes(query.tag)) {
+      throw new ContentServiceError(400, "Invalid content tag.");
+    }
+    filters.tags = { has: query.tag };
+  }
 
   if (user?.role !== "ADMIN") {
     filters.status = "PUBLISHED";

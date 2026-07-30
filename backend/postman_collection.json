@@ -1,12 +1,40 @@
 {
   "info": {
     "_postman_id": "66fb0005-251f-4380-9509-e32dde3d8b4c",
-    "name": "SDG Engagement Backend v2",
-    "description": "Postman collection for the clean v2 backend serving mobile and web admin clients. Current runnable smoke scope: health, auth, missions, submissions, and basic content. Quiz, progress, badge, and analytics requests are preserved in their original flows for later backend phases.",
-    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-    "_exporter_id": "45093891",
-    "_collection_link": "https://go.postman.co/collection/45093891-66fb0005-251f-4380-9509-e32dde3d8b4c?source=collection_link"
+    "name": "SDG Recycling Backend API",
+    "description": "Current smoke collection for the merged backend used by web and mobile clients.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:5000"
+    },
+    {
+      "key": "apiPrefix",
+      "value": "/api/v1"
+    },
+    {
+      "key": "missionId",
+      "value": "MIS002"
+    },
+    {
+      "key": "contentId",
+      "value": "CNT001"
+    },
+    {
+      "key": "quizId",
+      "value": "QZ001"
+    },
+    {
+      "key": "uploadId",
+      "value": ""
+    },
+    {
+      "key": "questionCode",
+      "value": "QQ0011"
+    }
+  ],
   "item": [
     {
       "name": "Health",
@@ -19,14 +47,14 @@
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/health",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "health"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Database Check",
@@ -36,14 +64,14 @@
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/db-test",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "db-test"
               ]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
@@ -52,19 +80,6 @@
       "item": [
         {
           "name": "Login Admin",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "pm.collectionVariables.set('adminToken', json.data.token);",
-                  "pm.collectionVariables.set('adminUserId', json.data.user.id);"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
@@ -73,38 +88,37 @@
                 "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"admin@sdg.local\",\"password\":\"Password123!\"}"
-            },
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "auth",
                 "login"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@sdg.local\",\n  \"password\": \"Password123!\"\n}"
             }
           },
-          "response": []
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('admin login ok', function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set('adminToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ]
         },
         {
           "name": "Login Student 1",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "pm.collectionVariables.set('studentToken', json.data.token);",
-                  "pm.collectionVariables.set('studentUserId', json.data.user.id);"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "POST",
             "header": [
@@ -113,25 +127,37 @@
                 "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"email\":\"student1@sdg.local\",\"password\":\"Password123!\"}"
-            },
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "auth",
                 "login"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"student1@sdg.local\",\n  \"password\": \"Password123!\"\n}"
             }
           },
-          "response": []
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('student login ok', function () { pm.response.to.have.status(200); });",
+                  "pm.collectionVariables.set('studentToken', pm.response.json().data.token);"
+                ]
+              }
+            }
+          ]
         },
         {
-          "name": "Get Me",
+          "name": "Current User",
           "request": {
             "method": "GET",
             "header": [
@@ -143,36 +169,23 @@
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "auth",
                 "me"
               ]
             }
-          },
-          "response": []
+          }
         }
       ]
     },
     {
-      "name": "Student Flow",
+      "name": "Missions",
       "item": [
         {
-          "name": "List Missions",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "const mission = json.data.missions.find((item) => item.slug === pm.collectionVariables.get('missionSlug'));",
-                  "if (mission) { pm.collectionVariables.set('missionId', mission.id); }"
-                ]
-              }
-            }
-          ],
+          "name": "List Missions - Student Active",
           "request": {
             "method": "GET",
             "header": [
@@ -184,29 +197,40 @@
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/missions",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "missions"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Submit Mission",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "pm.collectionVariables.set('submissionId', json.data.submission.id);"
-                ]
+          "name": "Get Mission",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
               }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "{{missionId}}"
+              ]
             }
-          ],
+          }
+        },
+        {
+          "name": "Join Mission",
           "request": {
             "method": "POST",
             "header": [
@@ -215,85 +239,106 @@
                 "value": "Bearer {{studentToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"proofText\":\"Collected recyclables from the cafeteria.\",\"quantity\":12}",
-              "options": {
-                "raw": {
-                  "language": "json"
-                }
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/join",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "{{missionId}}",
+                "join"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Submit Mission",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
-            },
+            ],
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submit",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "missions",
                 "{{missionId}}",
                 "submit"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proofText\": \"Submitted from Postman.\",\n  \"quantity\": 3,\n  \"uploadId\": \"{{uploadId}}\"\n}"
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "List Content",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "const content = json.data.content.find((item) => item.slug === pm.collectionVariables.get('contentSlug'));",
-                  "if (content) { pm.collectionVariables.set('contentId', content.id); }"
-                ]
+          "name": "Create Mission - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
               }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman Sorting Drill {{$timestamp}}\",\n  \"description\": \"Sort recyclable items correctly for this Postman test.\",\n  \"longDescription\": \"Collect, sort, and submit evidence of recyclable items.\",\n  \"guide\": [\n    {\n      \"step\": 1,\n      \"title\": \"Collect\",\n      \"description\": \"Collect clean recyclable items.\"\n    }\n  ],\n  \"targetQuantity\": 10,\n  \"targetDays\": null,\n  \"type\": \"QUANTITY_BASED\",\n  \"startAt\": \"2026-07-01T00:00:00.000Z\",\n  \"endAt\": \"2026-12-31T23:59:59.000Z\",\n  \"submissionCap\": 1,\n  \"points\": 30,\n  \"autoApprove\": false,\n  \"isActive\": true,\n  \"status\": \"ACTIVE\"\n}"
             }
-          ],
+          }
+        },
+        {
+          "name": "Submission Queue - Admin",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
+                "value": "Bearer {{adminToken}}"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=plastic",
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "content"
-              ],
-              "query": [
-                {
-                  "key": "tag",
-                  "value": "plastic"
-                }
+                "{{apiPrefix}}",
+                "submissions"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "List Content Quizzes",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "const quiz = json.data.quizzes.find((item) => item.slug === pm.collectionVariables.get('quizSlug'));",
-                  "if (quiz) { pm.collectionVariables.set('quizId', quiz.id); }"
-                ]
-              }
-            }
-          ],
+          "name": "My Submissions",
           "request": {
             "method": "GET",
             "header": [
@@ -303,37 +348,127 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}/quizzes",
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/me",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
+                "submissions",
+                "me"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        {
+          "name": "List Content - Student Published",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Content",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
                 "content",
-                "{{contentId}}",
+                "{{contentId}}"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Content - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Postman Recycling Article {{$timestamp}}\",\n  \"summary\": \"Short mobile summary.\",\n  \"body\": \"Educational content body.\",\n  \"imageUrl\": \"\",\n  \"estimatedReadMinutes\": 5,\n  \"contentBlocks\": [\n    {\n      \"type\": \"paragraph\",\n      \"text\": \"Educational content body.\"\n    }\n  ],\n  \"tags\": [\n    \"plastic\",\n    \"sorting\"\n  ],\n  \"status\": \"PUBLISHED\"\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Quizzes",
+      "item": [
+        {
+          "name": "List Quizzes",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
                 "quizzes"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
           "name": "Get Quiz",
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "const json = pm.response.json();",
-                  "pm.collectionVariables.set('quizId', json.data.quiz.id);",
-                  "const questions = json.data.quiz.questions || [];",
-                  "questions.forEach((question, index) => {",
-                  "  pm.collectionVariables.set(`quizQuestion${index + 1}Id`, question.id);",
-                  "});"
-                ]
-              }
-            }
-          ],
           "request": {
             "method": "GET",
             "header": [
@@ -345,18 +480,18 @@
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "quizzes",
                 "{{quizId}}"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Submit Quiz Attempt",
+          "name": "Submit Attempt",
           "request": {
             "method": "POST",
             "header": [
@@ -369,26 +504,26 @@
                 "value": "application/json"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"answers\":[{\"questionId\":\"{{quizQuestion1Id}}\",\"answer\":\"Reduce contamination\"},{\"questionId\":\"{{quizQuestion2Id}}\",\"answer\":\"Sort correctly\"},{\"questionId\":\"{{quizQuestion3Id}}\",\"answer\":\"Check guidelines\"}]}"
-            },
             "url": {
               "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
+                "{{apiPrefix}}",
                 "quizzes",
                 "{{quizId}}",
                 "attempts"
               ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {\n    \"{{questionCode}}\": \"PET\"\n  },\n  \"timeSpentSeconds\": 72\n}"
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Get My Progress",
+          "name": "My Attempts",
           "request": {
             "method": "GET",
             "header": [
@@ -398,200 +533,128 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/users/me/progress",
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts/me",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "users",
-                "me",
-                "progress"
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{quizId}}",
+                "attempts",
+                "me"
               ]
             }
-          },
-          "response": []
-        },
-        {
-          "name": "Get My Badges",
-          "request": {
-            "method": "GET",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/users/me/badges",
-              "host": [
-                "{{baseUrl}}{{apiPrefix}}"
-              ],
-              "path": [
-                "users",
-                "me",
-                "badges"
-              ]
-            }
-          },
-          "response": []
+          }
         }
       ]
     },
     {
-      "name": "Admin Flow",
+      "name": "Progress",
       "item": [
         {
-          "name": "Create Mission",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"title\":\"Campus Sorting Drill\",\"description\":\"Sort recyclable items correctly this week.\",\"type\":\"QUANTITY_BASED\",\"startAt\":\"2026-07-01T00:00:00.000Z\",\"endAt\":\"2026-07-31T23:59:59.000Z\",\"submissionCap\":1,\"points\":30,\"autoApprove\":false,\"isActive\":true,\"status\":\"ACTIVE\"}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
-              "host": [
-                "{{baseUrl}}{{apiPrefix}}"
-              ],
-              "path": [
-                "missions"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Submission Queue",
+          "name": "List My Progress",
           "request": {
             "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
+                "value": "Bearer {{studentToken}}"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions?status=PENDING_REVIEW",
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/me",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "submissions"
-              ],
-              "query": [
-                {
-                  "key": "status",
-                  "value": "PENDING_REVIEW"
-                }
+                "{{apiPrefix}}",
+                "progress",
+                "me"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Review Submission",
+          "name": "Get My Content Progress",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "progress",
+                "content",
+                "{{contentId}}",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Mark Content Complete",
           "request": {
             "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "value": "Bearer {{studentToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"status\":\"APPROVED\",\"reviewNote\":\"Approved after evidence review.\"}"
-            },
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/{{submissionId}}/review",
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/complete",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "submissions",
-                "{{submissionId}}",
-                "review"
+                "{{apiPrefix}}",
+                "progress",
+                "content",
+                "{{contentId}}",
+                "complete"
               ]
             }
-          },
-          "response": []
-        },
+          }
+        }
+      ]
+    },
+    {
+      "name": "Badges",
+      "item": [
         {
-          "name": "Create Content",
+          "name": "Badge Progress - Student",
           "request": {
-            "method": "POST",
+            "method": "GET",
             "header": [
               {
                 "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
+                "value": "Bearer {{studentToken}}"
               }
             ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"title\":\"Glass Recycling Safety\",\"body\":\"Handle broken glass carefully and use approved disposal flows.\",\"tags\":[\"glass\",\"safety\"],\"status\":\"PUBLISHED\"}"
-            },
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "content"
+                "{{apiPrefix}}",
+                "badges",
+                "progress"
               ]
             }
-          },
-          "response": []
+          }
         },
         {
-          "name": "Create Badge",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\"name\":\"Mission Starter\",\"description\":\"Complete your first approved mission.\",\"tier\":\"BRONZE\",\"criteriaType\":\"MISSIONS_COMPLETED\",\"criteriaValue\":1,\"isActive\":true}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
-              "host": [
-                "{{baseUrl}}{{apiPrefix}}"
-              ],
-              "path": [
-                "badges"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Analytics Engagement",
+          "name": "List Badges - Admin",
           "request": {
             "method": "GET",
             "header": [
@@ -601,93 +664,203 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/analytics/engagement",
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
               "host": [
-                "{{baseUrl}}{{apiPrefix}}"
+                "{{baseUrl}}"
               ],
               "path": [
-                "analytics",
-                "engagement"
+                "{{apiPrefix}}",
+                "badges"
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Badge - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Approval Badge {{$timestamp}}\",\n  \"description\": \"Receive one approved mission submission.\",\n  \"tier\": \"BRONZE\",\n  \"criteriaType\": \"APPROVED_SUBMISSIONS\",\n  \"criteriaValue\": 1\n}"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Points",
+      "item": [
+        {
+          "name": "My Points - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points",
+                "me"
+              ]
+            }
+          }
+        },
+        {
+          "name": "List Points - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Uploads",
+      "item": [
+        {
+          "name": "Upload Mission Proof",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{testFilePath}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/mission-proof",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "uploads",
+                "mission-proof"
               ]
             }
           },
-          "response": []
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (pm.response.code === 201) pm.collectionVariables.set('uploadId', pm.response.json().data.upload.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Content Image",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{testFilePath}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/content-image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "uploads",
+                "content-image"
+              ]
+            }
+          }
+        },
+        {
+          "name": "My Uploads",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/mine",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "uploads",
+                "mine"
+              ]
+            }
+          }
         }
       ]
-    }
-  ],
-  "variable": [
-    {
-      "key": "baseurl",
-      "value": "http://localhost:5000"
-    },
-    {
-      "key": "apiprefix",
-      "value": "/api/v1"
-    },
-    {
-      "key": "baseUrl",
-      "value": "http://localhost:5000"
-    },
-    {
-      "key": "apiPrefix",
-      "value": "/api/v1"
-    },
-    {
-      "key": "studentToken",
-      "value": ""
-    },
-    {
-      "key": "adminToken",
-      "value": ""
-    },
-    {
-      "key": "missionSlug",
-      "value": "bottle-count-challenge"
-    },
-    {
-      "key": "missionId",
-      "value": ""
-    },
-    {
-      "key": "contentSlug",
-      "value": "plastic-recycling-basics"
-    },
-    {
-      "key": "contentId",
-      "value": ""
-    },
-    {
-      "key": "quizSlug",
-      "value": "plastic-recycling-basics-quiz"
-    },
-    {
-      "key": "quizId",
-      "value": ""
-    },
-    {
-      "key": "quizQuestion1Id",
-      "value": ""
-    },
-    {
-      "key": "quizQuestion2Id",
-      "value": ""
-    },
-    {
-      "key": "quizQuestion3Id",
-      "value": ""
-    },
-    {
-      "key": "submissionId",
-      "value": ""
-    },
-    {
-      "key": "studentUserId",
-      "value": ""
-    },
-    {
-      "key": "adminUserId",
-      "value": ""
     }
   ]
 }

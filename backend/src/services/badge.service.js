@@ -10,9 +10,9 @@ import {
   createBadgeAward,
   findAwardsByBadge,
   countApprovedMissionSubmissions,
+  countCompletedMissions,
   countPassedQuizAttempts,
-  countCompletedLearningProgress,
-  sumActivityMetric
+  countCompletedLearningProgress
 } from "../repositories/badge.repository.js";
 import { slugify } from "../utils/slugify.js";
 import { createWithGeneratedId } from "../utils/idGenerator.js";
@@ -109,16 +109,13 @@ export async function listBadgeAwards(badgeId) {
 async function getCurrentProgress(userId, criteriaType) {
   switch (criteriaType) {
     case "MISSIONS_COMPLETED":
-      return countApprovedMissionSubmissions(userId);
+      return countCompletedMissions(userId);
     case "QUIZZES_PASSED":
       return countPassedQuizAttempts(userId);
     case "CONTENT_COMPLETED":
       return countCompletedLearningProgress(userId);
-    case "ACTIVITY_METRIC":
-      // ACTIVITY_METRIC has no dedicated activity-tracking source yet, so it is treated as a
-      // generic counter derived from LearningProgress completion counts. Revisit once a proper
-      // activity-metric model/definition exists.
-      return sumActivityMetric(userId);
+    case "APPROVED_SUBMISSIONS":
+      return countApprovedMissionSubmissions(userId);
     default:
       return 0;
   }

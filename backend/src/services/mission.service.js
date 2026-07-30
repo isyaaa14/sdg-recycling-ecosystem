@@ -9,6 +9,7 @@ import {
 } from "../repositories/mission.repository.js";
 import { slugify } from "../utils/slugify.js";
 import { createWithGeneratedId } from "../utils/idGenerator.js";
+import { uploadMissionImage as uploadMissionImageFile, UploadServiceError } from "./upload.service.js";
 
 export class MissionServiceError extends Error {
   constructor(statusCode, message) {
@@ -40,6 +41,11 @@ export async function createMission(payload, createdById) {
       slug: slugify(data.title),
       title: data.title,
       description: data.description,
+      ...(data.longDescription !== undefined ? { longDescription: data.longDescription } : {}),
+      ...(data.imageUrl !== undefined ? { imageUrl: data.imageUrl } : {}),
+      ...(data.guide !== undefined ? { guide: data.guide } : {}),
+      ...(data.targetQuantity !== undefined ? { targetQuantity: data.targetQuantity } : {}),
+      ...(data.targetDays !== undefined ? { targetDays: data.targetDays } : {}),
       type: data.type,
       startAt: data.startAt,
       endAt: data.endAt,
@@ -107,6 +113,26 @@ export async function updateMission(id, payload) {
   }
 
   return updateMissionRecord(id, updateData);
+}
+
+export async function uploadMissionImage(id, fileBuffer, meta, userId) {
+  const existing = await findMissionById(id);
+  if (!existing) {
+    throw new MissionServiceError(404, "Mission not found.");
+  }
+
+  let upload;
+  try {
+    upload = await uploadMissionImageFile(fileBuffer, meta, userId);
+  } catch (error) {
+    if (error instanceof UploadServiceError) {
+      throw new MissionServiceError(error.statusCode, error.message);
+    }
+    throw error;
+  }
+
+  const mission = await updateMissionRecord(id, { imageUrl: upload.fileUrl });
+  return { mission, upload };
 }
 
 export async function archiveMission(id) {

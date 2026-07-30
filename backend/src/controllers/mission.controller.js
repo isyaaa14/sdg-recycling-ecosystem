@@ -3,10 +3,11 @@ import {
   listMissions,
   getMissionById,
   updateMission,
+  uploadMissionImage,
   archiveMission,
   MissionServiceError
 } from "../services/mission.service.js";
-import { submitMission, listMissionSubmissions } from "../services/submission.service.js";
+import { joinMission, submitMission, listMissionSubmissions } from "../services/submission.service.js";
 
 function handleError(error, response) {
   if (error instanceof MissionServiceError) {
@@ -52,10 +53,41 @@ export async function updateMissionHandler(request, response) {
   }
 }
 
+export async function uploadMissionImageHandler(request, response) {
+  try {
+    if (!request.file) {
+      return response.status(400).json({ error: { message: "No file provided or unsupported file type." } });
+    }
+
+    const result = await uploadMissionImage(
+      request.params.id,
+      request.file.buffer,
+      {
+        mimeType: request.file.mimetype,
+        fileSize: request.file.size,
+        originalName: request.file.originalname
+      },
+      request.user.id
+    );
+    return response.status(201).json({ data: result });
+  } catch (error) {
+    return handleError(error, response);
+  }
+}
+
 export async function deleteMissionHandler(request, response) {
   try {
     const mission = await archiveMission(request.params.id);
     return response.json({ data: { mission } });
+  } catch (error) {
+    return handleError(error, response);
+  }
+}
+
+export async function joinMissionHandler(request, response) {
+  try {
+    const submission = await joinMission(request.params.id, request.user.id);
+    return response.status(201).json({ data: { submission } });
   } catch (error) {
     return handleError(error, response);
   }

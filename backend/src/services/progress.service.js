@@ -44,21 +44,36 @@ export async function markContentComplete(userId, contentId) {
 
 export async function applyQuizAttemptToProgress(userId, contentId, { passed, score }) {
   const now = new Date();
+  const existingProgress = await findProgress(userId, contentId);
+  const previousBestScore = existingProgress?.bestScore ?? null;
+  const bestScore = Math.max(previousBestScore ?? 0, score);
+  const isNewBestScore = previousBestScore !== null && score > previousBestScore;
+  const wasCompleted = existingProgress?.completed ?? false;
   const updateData = {
     quizAttemptsCount: { increment: 1 },
     latestScore: score,
+    bestScore,
     lastActivityAt: now
   };
   if (passed) {
     updateData.passedQuizCount = { increment: 1 };
+    updateData.completed = true;
+    if (!wasCompleted) {
+      updateData.completionCount = { increment: 1 };
+    }
   }
 
-  return upsertProgress(userId, contentId, updateData, {
+  const progress = await upsertProgress(userId, contentId, updateData, {
+    completed: passed,
+    completionCount: passed ? 1 : 0,
     quizAttemptsCount: 1,
     passedQuizCount: passed ? 1 : 0,
     latestScore: score,
+    bestScore: score,
     lastActivityAt: now
   });
+
+  return { progress, previousBestScore, isNewBestScore };
 }
 
 export function listMyProgress(userId) {
@@ -81,7 +96,8 @@ export async function getMyProgressForContent(userId, contentId) {
       completionCount: 0,
       quizAttemptsCount: 0,
       passedQuizCount: 0,
-      latestScore: null
+      latestScore: null,
+      bestScore: null
     }
   );
 }

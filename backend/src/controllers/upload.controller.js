@@ -1,4 +1,10 @@
-import { uploadMissionProof, getUploadById, listMyUploads, UploadServiceError } from "../services/upload.service.js";
+import {
+  uploadMissionProof,
+  uploadContentImage,
+  getUploadById,
+  listMyUploads,
+  UploadServiceError
+} from "../services/upload.service.js";
 
 function handleError(error, response) {
   if (error instanceof UploadServiceError) {
@@ -15,6 +21,27 @@ export async function uploadMissionProofHandler(request, response) {
     }
 
     const upload = await uploadMissionProof(
+      request.file.buffer,
+      {
+        mimeType: request.file.mimetype,
+        fileSize: request.file.size,
+        originalName: request.file.originalname
+      },
+      request.user.id
+    );
+    return response.status(201).json({ data: { upload } });
+  } catch (error) {
+    return handleError(error, response);
+  }
+}
+
+export async function uploadContentImageHandler(request, response) {
+  try {
+    if (!request.file) {
+      return response.status(400).json({ error: { message: "No file provided or unsupported file type." } });
+    }
+
+    const upload = await uploadContentImage(
       request.file.buffer,
       {
         mimeType: request.file.mimetype,

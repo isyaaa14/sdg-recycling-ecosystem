@@ -11,5 +11,7 @@ export const config = {
   pointsLedgerTimeoutMs: Number(process.env.POINTS_LEDGER_TIMEOUT_MS) || 3000,
   azureStorageConnectionString: process.env.AZURE_STORAGE_CONNECTION_STRING,
   azureStorageContainerMissionProofs: process.env.AZURE_STORAGE_CONTAINER_MISSION_PROOFS,
+  azureStorageContainerContentImages: process.env.AZURE_STORAGE_CONTAINER_CONTENT_IMAGES || "content-images",
+  azureStorageContainerMissionImages: process.env.AZURE_STORAGE_CONTAINER_MISSION_IMAGES || "mission-images",
   azureStorageBlobBaseUrl: process.env.AZURE_STORAGE_BLOB_BASE_URL
 };

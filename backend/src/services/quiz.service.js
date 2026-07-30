@@ -32,11 +32,24 @@ export class QuizServiceError extends Error {
   }
 }
 
+const MIN_QUIZ_QUESTIONS = 5;
+const MAX_QUIZ_QUESTIONS = 10;
+
 function stripAnswers(quiz) {
   return {
     ...quiz,
     questions: quiz.questions.map(({ correctAnswer: _correctAnswer, ...question }) => question)
   };
+}
+
+function assertQuizHasValidQuestionCount(quiz) {
+  const questionCount = quiz.questions.length;
+  if (questionCount < MIN_QUIZ_QUESTIONS || questionCount > MAX_QUIZ_QUESTIONS) {
+    throw new QuizServiceError(400, "Quiz must have 5 to 10 questions.");
+  }
+  if (quiz.passingScore < 1 || quiz.passingScore > questionCount) {
+    throw new QuizServiceError(400, "Quiz passing score must fit the number of questions.");
+  }
 }
 
 async function assertPublishedContentForQuiz(quiz) {
@@ -87,6 +100,12 @@ export async function updateQuiz(id, payload) {
     throw new QuizServiceError(404, "Quiz not found.");
   }
 
+  if (result.data.passingScore !== undefined && existing.questions.length > 0) {
+    if (result.data.passingScore > existing.questions.length) {
+      throw new QuizServiceError(400, "Quiz passing score must fit the number of questions.");
+    }
+  }
+
   return updateQuizRecord(id, result.data);
 }
 
@@ -100,6 +119,9 @@ export async function addQuestion(quizId, payload) {
   if (!quiz) {
     throw new QuizServiceError(404, "Quiz not found.");
   }
+  if (quiz.questions.length >= MAX_QUIZ_QUESTIONS) {
+    throw new QuizServiceError(409, "Quiz cannot have more than 10 questions.");
+  }
 
   const data = result.data;
   const code = `${quiz.slug}-q${quiz.questions.length + 1}`;
@@ -112,7 +134,7 @@ export async function addQuestion(quizId, payload) {
       questionText: data.questionText,
       options: data.options,
       correctAnswer: data.correctAnswer,
-      ...(data.points !== undefined ? { points: data.points } : {})
+      points: 1
     })
   );
 }
@@ -128,7 +150,7 @@ export async function updateQuestion(quizId, questionId, payload) {
     throw new QuizServiceError(404, "Question not found.");
   }
 
-  return updateQuizQuestionRecord(questionId, result.data);
+  return updateQuizQuestionRecord(questionId, { ...result.data, points: 1 });
 }
 
 export async function deleteQuestion(quizId, questionId) {
@@ -148,6 +170,7 @@ export async function getQuizById(id, user) {
 
   if (user?.role !== "ADMIN") {
     await assertPublishedContentForQuiz(quiz);
+    assertQuizHasValidQuestionCount(quiz);
     return stripAnswers(quiz);
   }
 
@@ -171,21 +194,36 @@ export async function submitQuizAttempt(quizId, payload, userId) {
     throw new QuizServiceError(404, "Quiz not found.");
   }
   await assertPublishedContentForQuiz(quiz);
+  assertQuizHasValidQuestionCount(quiz);
 
-  const { answers } = result.data;
+  const { answers, timeSpentSeconds } = result.data;
   let totalPoints = 0;
   let earnedPoints = 0;
   let correctAnswers = 0;
+  const reviewQuestions = [];
 
   for (const question of quiz.questions) {
-    totalPoints += question.points;
-    if (answers[question.code] === question.correctAnswer) {
-      earnedPoints += question.points;
+    totalPoints += 1;
+    const selectedAnswer = answers[question.code] ?? null;
+    const isCorrect = selectedAnswer === question.correctAnswer;
+    if (isCorrect) {
+      earnedPoints += 1;
       correctAnswers += 1;
     }
+    reviewQuestions.push({
+      id: question.id,
+      code: question.code,
+      questionText: question.questionText,
+      options: question.options,
+      correctAnswer: question.correctAnswer,
+      selectedAnswer,
+      isCorrect,
+      wasSkipped: selectedAnswer === null
+    });
   }
 
-  const score = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+  const score = earnedPoints;
+  const accuracy = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
   const passed = score >= quiz.passingScore;
 
   const attempt = await createWithGeneratedId("quizAttempt", "QAT", (id) =>
@@ -197,12 +235,14 @@ export async function submitQuizAttempt(quizId, payload, userId) {
       totalQuestions: quiz.questions.length,
       correctAnswers,
       passed,
-      answers
+      answers,
+      ...(timeSpentSeconds !== undefined ? { timeSpentSeconds } : {})
     })
   );
 
+  let progressResult = null;
   try {
-    await applyQuizAttemptToProgress(userId, quiz.contentId, { passed, score });
+    progressResult = await applyQuizAttemptToProgress(userId, quiz.contentId, { passed, score });
   } catch (error) {
     console.error(error);
   }
@@ -213,7 +253,23 @@ export async function submitQuizAttempt(quizId, payload, userId) {
     console.error(error);
   }
 
-  return attempt;
+  return {
+    attempt,
+    result: {
+      score,
+      totalQuestions: quiz.questions.length,
+      correctAnswers,
+      accuracy,
+      passed,
+      timeSpentSeconds: timeSpentSeconds ?? null,
+      bestScore: progressResult?.progress?.bestScore ?? score,
+      previousBestScore: progressResult?.previousBestScore ?? null,
+      isNewBestScore: progressResult?.isNewBestScore ?? false
+    },
+    review: {
+      questions: reviewQuestions
+    }
+  };
 }
 
 export async function listMyAttempts(quizId, userId) {

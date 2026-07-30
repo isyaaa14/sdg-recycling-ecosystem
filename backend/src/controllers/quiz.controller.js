@@ -85,8 +85,8 @@ export async function listQuizzesHandler(request, response) {
 
 export async function submitAttemptHandler(request, response) {
   try {
-    const attempt = await submitQuizAttempt(request.params.id, request.body, request.user.id);
-    return response.status(201).json({ data: { attempt } });
+    const result = await submitQuizAttempt(request.params.id, request.body, request.user.id);
+    return response.status(201).json({ data: result });
   } catch (error) {
     return handleError(error, response);
   }

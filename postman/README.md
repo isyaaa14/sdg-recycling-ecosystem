@@ -1,64 +1,66 @@
-# SDG Engagement Backend Postman Tests
+# SDG Recycling Backend Postman Tests
 
-This folder is the canonical Postman workspace for the current backend API.
+This folder is the shared Postman workspace for the backend mounted from `backend/src/app.js`.
 
 ## Files
 
-- `postman_collection.json` - Postman collection.
+- `postman_collection.json` - collection for the live `/api/v1` routes.
 - `postman_environment_local.json` - local environment for `http://localhost:5000`.
-- `postman_environment_shared.json` - shared/deployed environment template.
+- `postman_environment_shared.json` - deployed/shared environment template.
 - `sample_payloads.json` - copy-paste request bodies for manual tests.
 
 ## Import
 
-1. Import `postman_collection.json` into Postman.
+1. Import `postman_collection.json`.
 2. Import either `postman_environment_local.json` or `postman_environment_shared.json`.
-3. Select the imported environment before running requests.
-4. Start the backend and seed demo data before running the smoke flow.
+3. Select the imported environment.
+4. Start the backend and seed demo data.
 
-If Postman shows `getaddrinfo ENOTFOUND {{baseurl}}{{apiprefix}}`, the base URL variables did not resolve. Select the imported environment and confirm either `baseUrl`/`apiPrefix` or the lowercase aliases `baseurl`/`apiprefix` are enabled.
+Seeded users all use `Password123!`:
 
-## Active Smoke Order
+- admin: `admin@sdg.local`
+- student: `student1@sdg.local`
+- student: `student2@sdg.local`
+- student: `student3@sdg.local`
 
-Run these requests in order for the currently mounted routes:
+## Recommended Smoke Order
+
+Run these first:
 
 1. `Health / Backend Health`
 2. `Health / Database Check`
 3. `Auth / Login Admin`
 4. `Auth / Login Student 1`
-5. `Student Flow / List Missions`
-6. `Student Flow / Submit Mission`
-7. `Student Flow / List Content`
-8. `Admin Flow / Create Content`
-9. `Admin Flow / Submission Queue`
-10. `Admin Flow / Review Submission`
+5. `Missions / List Missions - Student Active`
+6. `Content / List Content - Student Published`
+7. `Quizzes / List Quizzes`
+8. `Progress / List My Progress`
+9. `Badges / Badge Progress - Student`
+10. `Points / My Points - Student`
 
-## Current Runnable Scope
+Then test the mobile write flow:
 
-The active backend currently mounts:
+1. `Uploads / Upload Mission Proof`
+2. `Missions / Join Mission`
+3. `Missions / Submit Mission`
+4. `Quizzes / Submit Attempt`
 
-- `/api/v1/auth`
-- `/api/v1/missions`
-- `/api/v1/submissions`
-- `/api/v1/content`
+## Current Route Groups
 
-Requests for quizzes, progress, badges, and analytics are left in their original Student/Admin flow locations. They are useful planning references, but they should be expected to return `404` until backend routes are added.
+The collection targets these mounted route groups:
 
-## Test Payloads
+- `/auth`
+- `/missions`
+- `/submissions`
+- `/content`
+- `/quizzes`
+- `/progress`
+- `/badges`
+- `/points`
+- `/uploads`
 
-Use `sample_payloads.json` when you want a different request body. Copy one payload into the matching Postman request body, then run the request.
+## Notes
 
-Recommended manual checks:
-
-- Create a published content item.
-- Create a draft content item.
-- Repeat the duplicate-title content payload to observe the current duplicate slug behavior.
-- Submit a mission with text-only proof.
-- Submit a mission with quantity proof.
-- Approve and reject a submission using the review payloads.
-
-## Known Backend Notes To Fix Later
-
-- `GET /api/v1/content` currently supports `tag`, while an eventual broader search may use `q`.
-- Content update is currently mounted as `PUT /api/v1/content/:id`; README/backend contract should later be reconciled with `PATCH`.
-- Duplicate content titles can generate duplicate slugs. The backend should later return a clean conflict response instead of leaking a Prisma unique constraint failure.
+- Upload testing requires Azurite/Azure storage configuration and `testFilePath` pointing to a local JPEG, PNG, or WebP file.
+- Quiz scoring uses number of correct answers, not percentage. A 5-question quiz with `passingScore: 4` means 4 correct answers are needed to pass.
+- Some create requests can return `409` if a test with the same slug or overlapping mission window has already run.

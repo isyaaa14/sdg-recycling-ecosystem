@@ -51,6 +51,10 @@ export async function updateContent(id, data) {
           version: existing.version,
           title: existing.title,
           body: existing.body,
+          summary: existing.summary,
+          imageUrl: existing.imageUrl,
+          estimatedReadMinutes: existing.estimatedReadMinutes,
+          contentBlocks: existing.contentBlocks,
           tags: existing.tags,
           status: existing.status
         }

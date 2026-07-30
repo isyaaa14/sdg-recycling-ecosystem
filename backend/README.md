@@ -1,38 +1,21 @@
-# SDG Engagement Backend v2
+# SDG Recycling Backend
 
-This backend is the Student 4 service workspace for the SDG recycling ecosystem. It focuses on the scoped backend engines only:
+Node/Express backend for the SDG recycling ecosystem. It exposes the shared `/api/v1` API used by web and mobile.
 
-- missions
-- educational content
-- quizzes and learning progress
-- badges
-- analytics
-- points-event emission to the shared ledger API
+## Included Scope
 
-The service is exposed through `/api/v1` and is designed as a clean backend layer that can later be shifted into the team production-development repo.
-
-## Scope boundaries
-
-Included:
-
-- mission definition, submission, review, and anti-duplicate rules
-- educational content publishing, tagging, and filtering
-- quiz creation, scoring, and learning progress updates
-- badge definition, evaluation, and idempotent issuance
-- analytics for the Student 4 engine scope
+- Auth with JWT and seeded student/admin accounts
+- Missions, mission join, proof submission, review, and points events
+- Educational content with summaries, images, structured content blocks, and tags
+- Quizzes, attempts, learning progress, best score, and result review data
+- Badges and badge progress
+- Mission proof, content image, and mission image uploads through Azurite or Azure Blob Storage
 - Prisma migrations and seed data
-- Postman and Jest test harness
-- optional mission-proof uploads through Azurite or Azure Blob Storage
+- Postman collection/environment files
 
-Excluded:
+Student 3 reward, QR, redemption, and separate ledger modules are not merged here yet.
 
-- rewards and redemptions
-- leaderboards
-- QR security flows
-- Android UI
-- Web UI
-
-## Tech stack
+## Tech Stack
 
 - Node.js + Express
 - Prisma ORM
@@ -40,10 +23,9 @@ Excluded:
 - JWT authentication
 - bcrypt password hashing
 - Zod validation
-- Jest + Supertest
-- Azurite or Azure Blob Storage for mission-proof uploads
+- Azurite or Azure Blob Storage for uploads
 
-## Environment variables
+## Environment Variables
 
 Create `.env` from `.env.example` for local non-Docker work.
 
@@ -57,9 +39,11 @@ Create `.env` from `.env.example` for local non-Docker work.
 - `FRONTEND_URL`
 - `AZURE_STORAGE_CONNECTION_STRING`
 - `AZURE_STORAGE_CONTAINER_MISSION_PROOFS`
+- `AZURE_STORAGE_CONTAINER_CONTENT_IMAGES`
+- `AZURE_STORAGE_CONTAINER_MISSION_IMAGES`
 - `AZURE_STORAGE_BLOB_BASE_URL`
 
-## Local development
+## Local Development
 
 Install dependencies:
 
@@ -67,48 +51,32 @@ Install dependencies:
 npm install
 ```
 
-Start the backend:
+Run checks:
+
+```bash
+npm run lint
+npx prisma validate
+```
+
+Start without Docker:
 
 ```bash
 npm run dev
 ```
 
-Run tests:
+Run migrations and seed:
 
 ```bash
-npm test
-```
-
-Run lint/checks:
-
-```bash
-npm run lint
-```
-
-Generate Prisma client:
-
-```bash
-npm run prisma:generate
-```
-
-Run migrations:
-
-```bash
-npm run prisma:migrate -- --name init
-```
-
-Seed demo data:
-
-```bash
+npx prisma migrate dev
 npm run prisma:seed
 ```
 
-## Docker local stack
+## Docker Local Stack
 
-From `student4-backend-workspace/`:
+From the project root:
 
 ```bash
-docker compose -f docker-compose.local.yml up -d --build
+docker compose up -d --build
 ```
 
 The local Docker setup starts:
@@ -124,7 +92,7 @@ The backend container runs:
 - `npm run prisma:seed`
 - `npm start`
 
-## Seeded login accounts
+## Seeded Login Accounts
 
 All seeded users use this password:
 
@@ -139,7 +107,7 @@ Seeded accounts:
 - student: `student2@sdg.local`
 - student: `student3@sdg.local`
 
-## API overview
+## API Overview
 
 Health and auth:
 
@@ -149,58 +117,63 @@ Health and auth:
 - `POST /api/v1/auth/login`
 - `GET /api/v1/auth/me`
 
-Missions:
+Missions and submissions:
 
 - `POST /api/v1/missions`
 - `GET /api/v1/missions`
 - `GET /api/v1/missions/:id`
 - `PATCH /api/v1/missions/:id`
+- `POST /api/v1/missions/:id/image`
 - `DELETE /api/v1/missions/:id`
+- `POST /api/v1/missions/:id/join`
 - `POST /api/v1/missions/:id/submit`
 - `GET /api/v1/missions/:id/submissions`
 - `GET /api/v1/submissions`
+- `GET /api/v1/submissions/me`
+- `GET /api/v1/submissions/:id`
 - `PATCH /api/v1/submissions/:id/review`
 
-Content and quizzes:
+Content, quizzes, and progress:
 
 - `POST /api/v1/content`
 - `GET /api/v1/content`
 - `GET /api/v1/content/:id`
-- `PATCH /api/v1/content/:id`
+- `PUT /api/v1/content/:id`
 - `DELETE /api/v1/content/:id`
-- `POST /api/v1/content/:contentId/quizzes`
-- `GET /api/v1/content/:contentId/quizzes`
+- `GET /api/v1/content/:id/revisions`
+- `POST /api/v1/quizzes`
+- `GET /api/v1/quizzes`
 - `GET /api/v1/quizzes/:id`
+- `PATCH /api/v1/quizzes/:id`
+- `POST /api/v1/quizzes/:id/questions`
+- `PATCH /api/v1/quizzes/:id/questions/:questionId`
+- `DELETE /api/v1/quizzes/:id/questions/:questionId`
 - `POST /api/v1/quizzes/:id/attempts`
-- `GET /api/v1/users/me/progress`
+- `GET /api/v1/quizzes/:id/attempts/me`
+- `GET /api/v1/quizzes/:id/attempts`
+- `GET /api/v1/progress/me`
 
-Badges and analytics:
+Badges, points, and uploads:
 
 - `POST /api/v1/badges`
 - `GET /api/v1/badges`
+- `GET /api/v1/badges/progress`
 - `GET /api/v1/badges/:id`
 - `PATCH /api/v1/badges/:id`
-- `POST /api/v1/badges/evaluate/:userId`
-- `GET /api/v1/users/me/badges`
-- `GET /api/v1/analytics/engagement`
-- `GET /api/v1/analytics/missions`
-- `GET /api/v1/analytics/learning`
-- `GET /api/v1/analytics/badges`
+- `DELETE /api/v1/badges/:id`
+- `GET /api/v1/badges/:id/awards`
+- `GET /api/v1/points/me`
+- `GET /api/v1/points`
+- `POST /api/v1/uploads/mission-proof`
+- `POST /api/v1/uploads/content-image`
+- `GET /api/v1/uploads/mine`
+- `GET /api/v1/uploads/:id`
 
 ## Postman
 
-Use the files under `../postman/`:
+Use the files under `../postman/` for shared testing:
 
 - `postman_collection.json`
 - `postman_environment_local.json`
 - `postman_environment_shared.json`
-
-The collection covers:
-
-- auth
-- student mission flow
-- admin mission flow
-- content
-- quizzes
-- badges
-- analytics
+- `sample_payloads.json`

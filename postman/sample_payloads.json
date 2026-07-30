@@ -1,133 +1,111 @@
 {
-  "current_runnable": {
-    "create_mission": {
-      "active_quantity_mission": {
-        "title": "Campus Sorting Drill",
-        "description": "Sort recyclable items correctly this week.",
-        "type": "QUANTITY_BASED",
-        "startAt": "2026-07-01T00:00:00.000Z",
-        "endAt": "2026-07-31T23:59:59.000Z",
-        "submissionCap": 1,
-        "points": 30,
-        "autoApprove": false,
-        "isActive": true,
-        "status": "ACTIVE"
-      },
-      "draft_quantity_mission": {
-        "title": "Draft Bin Audit",
-        "description": "Draft test mission for bin-audit planning.",
-        "type": "QUANTITY_BASED",
-        "startAt": "2026-08-01T00:00:00.000Z",
-        "endAt": "2026-08-31T23:59:59.000Z",
-        "submissionCap": 1,
-        "points": 20,
-        "autoApprove": false,
-        "isActive": false,
-        "status": "DRAFT"
-      },
-      "invalid_overlap_test": {
-        "title": "Overlapping Sorting Drill",
-        "description": "Use this after creating another quantity mission with the same date window.",
-        "type": "QUANTITY_BASED",
-        "startAt": "2026-07-15T00:00:00.000Z",
-        "endAt": "2026-07-20T23:59:59.000Z",
-        "submissionCap": 1,
-        "points": 10,
-        "autoApprove": false,
-        "isActive": true,
-        "status": "ACTIVE"
-      }
+  "missions": {
+    "create_quantity_mission": {
+      "title": "Campus Sorting Drill",
+      "description": "Sort recyclable items correctly this week.",
+      "longDescription": "Collect recyclable items, sort them by material, and submit proof of the final sorted batch.",
+      "imageUrl": "",
+      "guide": [
+        {
+          "step": 1,
+          "title": "Collect recyclables",
+          "description": "Gather clean recyclable items from campus bins."
+        },
+        {
+          "step": 2,
+          "title": "Sort materials",
+          "description": "Separate plastic, paper, and e-waste before submitting."
+        }
+      ],
+      "targetQuantity": 10,
+      "targetDays": null,
+      "type": "QUANTITY_BASED",
+      "startAt": "2026-07-01T00:00:00.000Z",
+      "endAt": "2026-12-31T23:59:59.000Z",
+      "submissionCap": 1,
+      "points": 30,
+      "autoApprove": false,
+      "isActive": true,
+      "status": "ACTIVE"
     },
-    "submit_mission": {
-      "text_only_proof": {
-        "proofText": "Collected recyclables from the cafeteria."
-      },
-      "quantity_proof": {
-        "proofText": "Collected recyclables from the cafeteria.",
-        "quantity": 12
-      }
+    "submit_text_or_upload_proof": {
+      "proofText": "Collected and sorted recyclable items from the cafeteria.",
+      "quantity": 10,
+      "uploadId": "{{uploadId}}"
     },
-    "review_submission": {
-      "approve": {
-        "status": "APPROVED",
-        "reviewNote": "Approved after evidence review."
-      },
-      "reject": {
-        "status": "REJECTED",
-        "reviewNote": "Rejected because the evidence was incomplete."
-      }
+    "review_approve": {
+      "status": "APPROVED",
+      "reviewNote": "Approved after evidence review."
     },
-    "create_content": {
-      "published_article": {
-        "title": "Glass Recycling Safety",
-        "body": "Handle broken glass carefully and use approved disposal flows.",
-        "tags": [
-          "glass",
-          "safety"
-        ],
-        "status": "PUBLISHED"
-      },
-      "draft_article": {
-        "title": "Draft Compost Sorting Notes",
-        "body": "Draft notes for a future compost sorting article.",
-        "tags": [
-          "compost",
-          "sorting"
-        ],
-        "status": "DRAFT"
-      },
-      "duplicate_title_conflict_test": {
-        "title": "Glass Recycling Safety",
-        "body": "Run this after creating the published article to test duplicate slug behavior.",
-        "tags": [
-          "glass",
-          "duplicate-test"
-        ],
-        "status": "PUBLISHED"
-      }
+    "review_reject": {
+      "status": "REJECTED",
+      "reviewNote": "Rejected because the evidence was incomplete."
     }
   },
-  "future_examples": {
-    "create_quiz_example": {
-      "note": "Not runnable until quiz routes are mounted.",
-      "body": {
-        "title": "Plastic Recycling Basics Quiz",
-        "passingScore": 70,
-        "questions": [
-          {
-            "questionText": "What is the main goal of sorting plastics?",
-            "options": [
-              "Reduce contamination",
-              "Burn waste",
-              "Ignore labels"
-            ],
-            "correctAnswer": "Reduce contamination",
-            "points": 1
-          }
-        ]
-      }
-    },
-    "submit_quiz_attempt_example": {
-      "note": "Not runnable until quiz attempt routes are mounted.",
-      "body": {
-        "answers": [
-          {
-            "questionId": "{{quizQuestion1Id}}",
-            "answer": "Reduce contamination"
-          }
-        ]
-      }
-    },
-    "create_badge_example": {
-      "note": "Not runnable until badge routes are mounted.",
-      "body": {
-        "name": "Mission Starter",
-        "description": "Complete your first approved mission.",
-        "tier": "BRONZE",
-        "criteriaType": "MISSIONS_COMPLETED",
-        "criteriaValue": 1,
-        "isActive": true
-      }
+  "content": {
+    "create_published_article": {
+      "title": "Plastic Recycling Safety",
+      "summary": "Learn how to clean and sort plastic safely.",
+      "body": "Plastic recycling works best when bottles and containers are empty, rinsed, and sorted by accepted type.",
+      "imageUrl": "",
+      "estimatedReadMinutes": 5,
+      "contentBlocks": [
+        {
+          "type": "paragraph",
+          "text": "Empty and rinse bottles before recycling to reduce contamination."
+        },
+        {
+          "type": "heading",
+          "text": "Check the code"
+        }
+      ],
+      "tags": [
+        "plastic",
+        "sorting",
+        "cleanliness"
+      ],
+      "status": "PUBLISHED"
     }
+  },
+  "quizzes": {
+    "create_quiz": {
+      "contentId": "{{contentId}}",
+      "title": "Plastic Recycling Safety Quiz",
+      "passingScore": 4
+    },
+    "add_question": {
+      "questionText": "What should you do before recycling a plastic bottle?",
+      "options": [
+        "Empty and rinse it",
+        "Leave liquid inside",
+        "Mix it with food waste"
+      ],
+      "correctAnswer": "Empty and rinse it",
+      "points": 1
+    },
+    "submit_attempt": {
+      "answers": {
+        "{{questionCode}}": "Empty and rinse it"
+      },
+      "timeSpentSeconds": 72
+    }
+  },
+  "badges": {
+    "create_badge": {
+      "name": "First Approval",
+      "description": "Receive one approved mission submission.",
+      "tier": "BRONZE",
+      "criteriaType": "APPROVED_SUBMISSIONS",
+      "criteriaValue": 1
+    }
+  },
+  "uploads": {
+    "multipart_file_field": "file",
+    "supported_types": [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ],
+    "max_file_size": "5MB"
   }
 }
