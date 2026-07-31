@@ -5,10 +5,10 @@ Node/Express backend for the SDG recycling ecosystem. It exposes the shared `/ap
 ## Included Scope
 
 - Auth with JWT and seeded student/admin accounts
-- Missions, mission join, proof submission, review, and points events
-- Educational content with summaries, images, structured content blocks, and tags
+- Missions, mission join, proof submission, review, mission-completion points, and badges
+- Educational content with summaries, images, structured content blocks, and fixed tags
 - Quizzes, attempts, learning progress, best score, and result review data
-- Badges and badge progress
+- Badge progress for mission completion, approved submissions, quizzes, and content completion
 - Mission proof, content image, and mission image uploads through Azurite or Azure Blob Storage
 - Prisma migrations and seed data
 - Postman collection/environment files
@@ -23,6 +23,7 @@ Student 3 reward, QR, redemption, and separate ledger modules are not merged her
 - JWT authentication
 - bcrypt password hashing
 - Zod validation
+- Jest + Supertest
 - Azurite or Azure Blob Storage for uploads
 
 ## Environment Variables
@@ -56,6 +57,7 @@ Run checks:
 ```bash
 npm run lint
 npx prisma validate
+npm test
 ```
 
 Start without Docker:
@@ -106,6 +108,20 @@ Seeded accounts:
 - student: `student1@sdg.local`
 - student: `student2@sdg.local`
 - student: `student3@sdg.local`
+
+## Points Model
+
+Active student point totals use `MISSION_COMPLETED` events.
+
+Mission completion rules:
+
+```text
+QUANTITY_BASED - approved quantity total reaches targetQuantity
+STREAK_BASED   - approved submission count reaches targetDays
+TIME_LIMITED   - at least one approved submission
+```
+
+Old `MISSION_APPROVED` events are kept only as compatibility/history data and are not counted by `/api/v1/points/me`.
 
 ## API Overview
 

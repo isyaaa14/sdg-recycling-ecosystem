@@ -57,6 +57,19 @@ export function findAllSubmissions(filters) {
   });
 }
 
+export async function getApprovedMissionProgressForUser(missionId, userId) {
+  const result = await prisma.missionSubmission.aggregate({
+    where: { missionId, userId, status: "APPROVED" },
+    _count: { _all: true },
+    _sum: { quantity: true }
+  });
+
+  return {
+    approvedCount: result._count._all ?? 0,
+    approvedQuantity: result._sum.quantity ?? 0
+  };
+}
+
 export function updateSubmission(id, data) {
   return prisma.missionSubmission.update({ where: { id }, data });
 }

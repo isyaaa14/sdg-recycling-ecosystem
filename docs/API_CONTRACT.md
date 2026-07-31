@@ -160,7 +160,7 @@ Create mission body:
 }
 ```
 
-Join mission response creates a submission with status `ONGOING`. Submit mission changes that submission to `PENDING_REVIEW`, or `APPROVED` when the mission has `autoApprove: true`.
+Join mission response creates a submission with status `ONGOING`. Submit mission changes that submission to `PENDING_REVIEW`, or `APPROVED` when the mission has `autoApprove: true`. Points are awarded only when approved submissions complete the mission target, not merely when any single submission is approved.
 
 Submit mission body:
 
@@ -376,6 +376,18 @@ APPROVED_SUBMISSIONS
   }
 }
 ```
+
+Active student point totals count `MISSION_COMPLETED` point events. Older `MISSION_APPROVED` point events are treated as compatibility/history rows and are not part of the active total.
+
+Mission completion rules:
+
+```text
+QUANTITY_BASED - approved quantity total reaches targetQuantity
+STREAK_BASED   - approved submission count reaches targetDays
+TIME_LIMITED   - at least one approved submission
+```
+
+Each student can receive only one active `MISSION_COMPLETED` point event per mission. For `MISSION_COMPLETED`, `submissionId` refers to the approved submission that completed the mission target.
 
 ## Uploads
 

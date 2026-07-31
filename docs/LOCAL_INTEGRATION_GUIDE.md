@@ -180,7 +180,10 @@ Mobile:
 [ ] protected requests send Bearer token
 [ ] mission join creates ONGOING submission
 [ ] mission proof upload works
-[ ] auto-approved upload submission awards points
+[ ] auto-approved upload submission runs completion checks
+[ ] below-target quantity/streak approval does not award points
+[ ] completing quantity/streak approval awards points once
+[ ] extra approvals after completion do not duplicate points
 [ ] student flow works
 ```
 

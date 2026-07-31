@@ -22,7 +22,7 @@
       "type": "QUANTITY_BASED",
       "startAt": "2026-07-01T00:00:00.000Z",
       "endAt": "2026-12-31T23:59:59.000Z",
-      "submissionCap": 1,
+      "submissionCap": 3,
       "points": 30,
       "autoApprove": false,
       "isActive": true,

@@ -2,24 +2,29 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
+const ACTIVE_POINT_EVENT_TYPES = ["MISSION_COMPLETED"];
+
 export function createPointsEvent(data) {
   return prisma.pointsEvent.create({ data });
 }
 
-export function findPointsEventBySubmissionId(submissionId) {
-  return prisma.pointsEvent.findUnique({ where: { submissionId } });
+
+export function findPointsEventByUserAndMission(userId, missionId, eventType) {
+  return prisma.pointsEvent.findFirst({
+    where: { userId, missionId, eventType }
+  });
 }
 
 export function findPointsEventsByUser(userId) {
   return prisma.pointsEvent.findMany({
-    where: { userId },
+    where: { userId, eventType: { in: ACTIVE_POINT_EVENT_TYPES } },
     orderBy: { createdAt: "desc" }
   });
 }
 
 export async function sumPointsForUser(userId) {
   const result = await prisma.pointsEvent.aggregate({
-    where: { userId },
+    where: { userId, eventType: { in: ACTIVE_POINT_EVENT_TYPES } },
     _sum: { points: true }
   });
   return result._sum.points ?? 0;
@@ -27,7 +32,7 @@ export async function sumPointsForUser(userId) {
 
 export function findAllPointsEvents(filters) {
   return prisma.pointsEvent.findMany({
-    where: filters,
+    where: { ...filters, eventType: filters.eventType ?? { in: ACTIVE_POINT_EVENT_TYPES } },
     orderBy: { createdAt: "desc" },
     include: {
       user: { select: { id: true, name: true, email: true } },
@@ -39,3 +44,4 @@ export function findAllPointsEvents(filters) {
 export function updatePointsEventStatus(id, data) {
   return prisma.pointsEvent.update({ where: { id }, data });
 }
+

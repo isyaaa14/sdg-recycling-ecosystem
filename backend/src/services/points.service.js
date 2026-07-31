@@ -1,6 +1,6 @@
 import {
   createPointsEvent,
-  findPointsEventBySubmissionId,
+  findPointsEventByUserAndMission,
   findPointsEventsByUser,
   sumPointsForUser,
   findAllPointsEvents,
@@ -47,10 +47,12 @@ async function dispatchPointsEvent(event) {
   }
 }
 
-export async function createPointsEventForApproval({ userId, missionId, submissionId, points }) {
-  const existing = await findPointsEventBySubmissionId(submissionId);
-  if (existing) {
-    return existing;
+export async function createPointsEventForMissionCompletion({ userId, missionId, submissionId, points }) {
+  const existingForMission = await findPointsEventByUserAndMission(userId, missionId, "MISSION_COMPLETED");
+  if (existingForMission) {
+    return ["PENDING", "FAILED"].includes(existingForMission.status)
+      ? dispatchPointsEvent(existingForMission)
+      : existingForMission;
   }
 
   const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
@@ -60,7 +62,7 @@ export async function createPointsEventForApproval({ userId, missionId, submissi
       missionId,
       submissionId,
       points,
-      eventType: "MISSION_APPROVED",
+      eventType: "MISSION_COMPLETED",
       status: "PENDING",
       approvedAt: new Date()
     })
@@ -86,3 +88,4 @@ export function listAllPoints(query = {}) {
 
   return findAllPointsEvents(filters);
 }
+
