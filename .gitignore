@@ -20,10 +20,12 @@ backend/prisma/dev.db
 # Local/team scratch copies
 offline/
 mobile-app/
+sdg-recycling-ecosystem-student-3 (1)/
 sdg-recycling-ecosystem-student-3/
 sdg-recycling-ecosystem-android_app_integration/
 azure-static-test-site/
 student3-review.md
+admin_fixed.html
 
 # Manual deployment packages
 *.zip
