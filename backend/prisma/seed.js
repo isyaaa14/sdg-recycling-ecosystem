@@ -605,6 +605,30 @@ async function upsertBadges() {
       tier: "GOLD",
       criteriaType: "APPROVED_SUBMISSIONS",
       criteriaValue: 10
+    },
+    {
+      id: "BDG013",
+      name: "Recycling Starter",
+      description: "Receive one approved recycling submission outside mission proof.",
+      tier: "BRONZE",
+      criteriaType: "RECYCLING_APPROVED",
+      criteriaValue: 1
+    },
+    {
+      id: "BDG014",
+      name: "Recycling Regular",
+      description: "Receive five approved recycling submissions outside mission proof.",
+      tier: "SILVER",
+      criteriaType: "RECYCLING_APPROVED",
+      criteriaValue: 5
+    },
+    {
+      id: "BDG015",
+      name: "Recycling Champion",
+      description: "Receive ten approved recycling submissions outside mission proof.",
+      tier: "GOLD",
+      criteriaType: "RECYCLING_APPROVED",
+      criteriaValue: 10
     }
   ];
 
@@ -616,6 +640,77 @@ async function upsertBadges() {
         ...badge,
         slug: slugify(badge.name)
       }
+    });
+  }
+}
+
+async function upsertPointRates() {
+  const rates = [
+    { material: "Plastic", ratePerKg: 50 },
+    { material: "Paper", ratePerKg: 20 },
+    { material: "Glass", ratePerKg: 30 },
+    { material: "Metal", ratePerKg: 60 }
+  ];
+
+  for (const rate of rates) {
+    await prisma.pointRate.upsert({
+      where: { material: rate.material },
+      update: { ratePerKg: rate.ratePerKg },
+      create: rate
+    });
+  }
+}
+
+async function upsertRewards() {
+  const tiers = [
+    { tier: "small", pointsRequired: 100 },
+    { tier: "medium", pointsRequired: 300 },
+    { tier: "large", pointsRequired: 600 }
+  ];
+
+  const rewards = [
+    {
+      id: 1,
+      name: "Reusable Coffee Cup Voucher",
+      pointsRequired: 100,
+      stock: 30,
+      imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Reusable%20coffee%20cup.jpg",
+      category: "Lifestyle",
+      tier: "small"
+    },
+    {
+      id: 2,
+      name: "Campus Cafe RM5 Voucher",
+      pointsRequired: 300,
+      stock: 20,
+      imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Cafeteria%20meal.jpg",
+      category: "Food",
+      tier: "medium"
+    },
+    {
+      id: 3,
+      name: "Eco Starter Kit",
+      pointsRequired: 600,
+      stock: 10,
+      imageUrl: "https://commons.wikimedia.org/wiki/Special:FilePath/Recycling%20bins.jpg",
+      category: "Eco Gear",
+      tier: "large"
+    }
+  ];
+
+  for (const tier of tiers) {
+    await prisma.rewardTier.upsert({
+      where: { tier: tier.tier },
+      update: { pointsRequired: tier.pointsRequired },
+      create: tier
+    });
+  }
+
+  for (const reward of rewards) {
+    await prisma.reward.upsert({
+      where: { id: reward.id },
+      update: { ...reward, isActive: true },
+      create: { ...reward, isActive: true }
     });
   }
 }
@@ -654,7 +749,7 @@ async function seedSubmissions(missions, students, adminId) {
       submissionId: approvedSubmission.id,
       points: firstMission.points,
       eventType: "MISSION_COMPLETED",
-      status: "SENT",
+      status: "POSTED",
       approvedAt: approvedSubmission.reviewedAt ?? new Date()
     },
     create: {
@@ -664,7 +759,7 @@ async function seedSubmissions(missions, students, adminId) {
       submissionId: approvedSubmission.id,
       points: firstMission.points,
       eventType: "MISSION_COMPLETED",
-      status: "SENT",
+      status: "POSTED",
       approvedAt: approvedSubmission.reviewedAt ?? new Date()
     }
   });
@@ -714,6 +809,8 @@ async function main() {
   const contents = await upsertContent(admin.id);
   await upsertQuizzes(contents);
   await upsertBadges();
+  await upsertPointRates();
+  await upsertRewards();
   await seedSubmissions(missions, students, admin.id);
   await seedProgress(contents, students);
 }

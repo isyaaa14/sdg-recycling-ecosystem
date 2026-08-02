@@ -13,3 +13,10 @@ export function findUserByEmail(email) {
 export function findUserById(id) {
   return prisma.user.findUnique({ where: { id } });
 }
+
+export function updateUser(id, data) {
+  return prisma.user.update({
+    where: { id },
+    data
+  });
+}

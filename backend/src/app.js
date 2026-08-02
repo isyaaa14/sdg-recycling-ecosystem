@@ -11,6 +11,11 @@ import pointsRoutes from "./routes/points.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
 import uploadRoutes from "./routes/upload.routes.js";
+import recyclingRoutes from "./routes/recycling.routes.js";
+import antiGamingRoutes from "./routes/antiGaming.routes.js";
+import rewardRoutes from "./routes/reward.routes.js";
+import leaderboardRoutes from "./routes/leaderboard.routes.js";
+import userRoutes from "./routes/user.routes.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -38,6 +43,7 @@ app.get("/api/v1/db-test", async (_request, response) => {
 });
 
 app.use("/api/v1/auth", authRoutes);
+app.use("/api/v1/users", userRoutes);
 app.use("/api/v1/missions", missionRoutes);
 app.use("/api/v1/submissions", submissionRoutes);
 app.use("/api/v1/content", contentRoutes);
@@ -46,5 +52,9 @@ app.use("/api/v1/points", pointsRoutes);
 app.use("/api/v1/quizzes", quizRoutes);
 app.use("/api/v1/progress", progressRoutes);
 app.use("/api/v1/uploads", uploadRoutes);
+app.use("/api/v1/recycling", recyclingRoutes);
+app.use("/api/v1/anti-gaming", antiGamingRoutes);
+app.use("/api/v1/rewards", rewardRoutes);
+app.use("/api/v1/leaderboard", leaderboardRoutes);
 
 export default app;

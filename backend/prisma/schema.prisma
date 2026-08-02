@@ -48,25 +48,48 @@ enum BadgeCriteriaType {
   QUIZZES_PASSED
   CONTENT_COMPLETED
   APPROVED_SUBMISSIONS
+  RECYCLING_APPROVED
   // Deprecated. Kept for existing dev database rows until they are reseeded/migrated away.
   ACTIVITY_METRIC
 }
 
 enum PointsEventStatus {
   PENDING
-  SENT
+  POSTED
   FAILED
 }
 
 enum PointsEventType {
-  MISSION_APPROVED
   MISSION_COMPLETED
+  RECYCLING_APPROVED
+  REWARD_REDEEMED
+  ADMIN_ADJUSTMENT
+}
+
+enum RecyclingSubmissionStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum RecyclingSubmissionSource {
+  MANUAL
+  QR
+}
+
+enum RecyclingQrStatus {
+  ISSUED
+  CLAIMED
+  EXPIRED
+  INVALIDATED
 }
 
 enum UploadPurpose {
   MISSION_PROOF
   CONTENT_IMAGE
   MISSION_IMAGE
+  RECYCLING_PROOF
+  REWARD_IMAGE
 }
 
 model User {
@@ -75,10 +98,20 @@ model User {
   email            String               @unique
   passwordHash     String
   role             Role                 @default(STUDENT)
+  suspiciousActivityFlagged Boolean     @default(false)
+  lastRecyclingSubmissionAt DateTime?
   createdAt        DateTime             @default(now())
   updatedAt        DateTime             @updatedAt
   submissions      MissionSubmission[]
   reviewedItems    MissionSubmission[]  @relation("SubmissionReviewer")
+  recyclingSubmissions RecyclingSubmission[] @relation("RecyclingSubmitter")
+  reviewedRecyclingSubmissions RecyclingSubmission[] @relation("RecyclingReviewer")
+  issuedRecyclingQrCodes RecyclingQrCode[] @relation("RecyclingQrIssuedBy")
+  claimedRecyclingQrCodes RecyclingQrCode[] @relation("RecyclingQrClaimedBy")
+  invalidatedRecyclingQrCodes RecyclingQrCode[] @relation("RecyclingQrInvalidatedBy")
+  redemptions      Redemption[]
+  redemptionCooldowns RedemptionCooldown[]
+  suspiciousActivities SuspiciousActivityLog[]
   contentCreated   Content[]            @relation("ContentCreator")
   missionCreated   Mission[]            @relation("MissionCreator")
   quizAttempts     QuizAttempt[]
@@ -146,9 +179,11 @@ model PointsEvent {
   // For MISSION_COMPLETED, this is the final approved submission
   // that caused the mission to reach its completion target.
   submissionId   String?
+  recyclingSubmissionId String?
+  redemptionId   String?
   points         Int
   eventType      PointsEventType
-  status         PointsEventStatus @default(PENDING)
+  status         PointsEventStatus @default(POSTED)
   approvedAt     DateTime
   lastAttemptAt  DateTime?
   errorMessage   String?
@@ -157,8 +192,137 @@ model PointsEvent {
   user           User              @relation(fields: [userId], references: [id])
   mission        Mission?          @relation(fields: [missionId], references: [id])
   submission     MissionSubmission? @relation(fields: [submissionId], references: [id])
+  recyclingSubmission RecyclingSubmission? @relation(fields: [recyclingSubmissionId], references: [id])
+  redemption     Redemption?       @relation(fields: [redemptionId], references: [id])
 
   @@index([status, createdAt])
+}
+
+model PointRate {
+  material  String @id
+  ratePerKg Int    @default(0)
+}
+
+model RecyclingQrCode {
+  id              String            @id
+  nonce           String            @unique
+  signature       String
+  status          RecyclingQrStatus @default(ISSUED)
+  expiresAt       DateTime
+  issuedById      String
+  claimedById     String?
+  claimedAt       DateTime?
+  invalidatedById String?
+  invalidatedAt   DateTime?
+  materialType    String?
+  estimatedWeightKg Float?
+  payload         Json
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  issuedBy        User              @relation("RecyclingQrIssuedBy", fields: [issuedById], references: [id])
+  claimedBy       User?             @relation("RecyclingQrClaimedBy", fields: [claimedById], references: [id])
+  invalidatedBy   User?             @relation("RecyclingQrInvalidatedBy", fields: [invalidatedById], references: [id])
+  submissions     RecyclingSubmission[]
+
+  @@index([status, expiresAt])
+  @@index([issuedById, createdAt])
+  @@index([claimedById, claimedAt])
+}
+
+model RecyclingSubmission {
+  id                 String                    @id
+  userId             String
+  source             RecyclingSubmissionSource @default(MANUAL)
+  qrCodeId           String?                   @unique
+  materialType       String
+  quantity           Float
+  proofImageUrl      String?
+  status             RecyclingSubmissionStatus @default(PENDING_REVIEW)
+  pointsAwarded      Int                       @default(0)
+  isDuplicateFlagged Boolean                   @default(false)
+  reviewNote         String?
+  reviewedById       String?
+  submittedAt        DateTime                  @default(now())
+  reviewedAt         DateTime?
+  user               User                      @relation("RecyclingSubmitter", fields: [userId], references: [id])
+  reviewedBy         User?                     @relation("RecyclingReviewer", fields: [reviewedById], references: [id])
+  qrCode             RecyclingQrCode?          @relation(fields: [qrCodeId], references: [id])
+  pointsEvents       PointsEvent[]
+  uploads            UploadedFile[]
+
+  @@index([userId, submittedAt])
+  @@index([status, submittedAt])
+  @@index([materialType])
+  @@index([source, submittedAt])
+}
+
+model RewardTier {
+  tier           String @id
+  pointsRequired Int
+}
+
+model Reward {
+  id             Int                  @id @default(autoincrement())
+  name           String
+  pointsRequired Int
+  stock          Int                  @default(0)
+  imageUrl       String?
+  imageUploadId  String?              @unique
+  category       String?
+  expiresAt      DateTime?
+  isActive       Boolean              @default(true)
+  tier           String               @default("small")
+  createdAt      DateTime             @default(now())
+  redemptions    Redemption[]
+  cooldowns      RedemptionCooldown[]
+  imageUpload    UploadedFile?        @relation("RewardImageUpload", fields: [imageUploadId], references: [id])
+  uploads        UploadedFile[]       @relation("RewardUploads")
+
+  @@index([isActive, tier])
+}
+
+model Redemption {
+  id          String    @id
+  userId      String
+  rewardId    Int?
+  itemName    String
+  pointsSpent Int
+  status      String    @default("claimed")
+  claimedAt   DateTime?
+  expiresAt   DateTime?
+  createdAt   DateTime  @default(now())
+  user        User      @relation(fields: [userId], references: [id])
+  reward      Reward?   @relation(fields: [rewardId], references: [id])
+  pointsEvents PointsEvent[]
+
+  @@index([userId, createdAt])
+  @@index([rewardId])
+}
+
+model RedemptionCooldown {
+  id             Int       @id @default(autoincrement())
+  userId         String
+  rewardId       Int
+  lastRedeemedAt DateTime?
+  countToday     Int       @default(0)
+  countWeek      Int       @default(0)
+  user           User      @relation(fields: [userId], references: [id])
+  reward         Reward    @relation(fields: [rewardId], references: [id])
+
+  @@unique([userId, rewardId])
+}
+
+model SuspiciousActivityLog {
+  id           Int      @id @default(autoincrement())
+  userId       String
+  activityType String
+  severity     String   @default("medium")
+  details      String?
+  detectedAt   DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, detectedAt])
+  @@index([severity, detectedAt])
 }
 
 model Content {
@@ -293,6 +457,8 @@ model UploadedFile {
   id                  String           @id
   userId              String
   missionSubmissionId String?
+  recyclingSubmissionId String?
+  rewardId            Int?
   containerName       String
   blobName            String
   fileUrl             String
@@ -302,5 +468,11 @@ model UploadedFile {
   createdAt           DateTime         @default(now())
   user                User             @relation(fields: [userId], references: [id])
   missionSubmission   MissionSubmission? @relation(fields: [missionSubmissionId], references: [id])
+  recyclingSubmission RecyclingSubmission? @relation(fields: [recyclingSubmissionId], references: [id])
+  reward              Reward?          @relation("RewardUploads", fields: [rewardId], references: [id])
+  rewardImageFor      Reward?          @relation("RewardImageUpload")
+
+  @@index([recyclingSubmissionId])
+  @@index([rewardId])
 }
 

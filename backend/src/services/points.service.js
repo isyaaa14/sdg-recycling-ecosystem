@@ -1,8 +1,11 @@
 import {
   createPointsEvent,
   findPointsEventByUserAndMission,
+  findPointsEventByRecyclingSubmission,
+  findPointsEventByRedemption,
   findPointsEventsByUser,
   sumPointsForUser,
+  sumLifetimePointsForUser,
   findAllPointsEvents,
   updatePointsEventStatus
 } from "../repositories/points.repository.js";
@@ -18,7 +21,9 @@ export class PointsServiceError extends Error {
 
 async function dispatchPointsEvent(event) {
   if (!config.pointsLedgerUrl) {
-    return event;
+    return event.status === "POSTED"
+      ? event
+      : updatePointsEventStatus(event.id, { status: "POSTED", lastAttemptAt: new Date(), errorMessage: null });
   }
 
   try {
@@ -37,7 +42,7 @@ async function dispatchPointsEvent(event) {
       throw new Error(`Ledger responded with status ${response.status}`);
     }
 
-    return updatePointsEventStatus(event.id, { status: "SENT", lastAttemptAt: new Date(), errorMessage: null });
+    return updatePointsEventStatus(event.id, { status: "POSTED", lastAttemptAt: new Date(), errorMessage: null });
   } catch (error) {
     return updatePointsEventStatus(event.id, {
       status: "FAILED",
@@ -63,7 +68,7 @@ export async function createPointsEventForMissionCompletion({ userId, missionId,
       submissionId,
       points,
       eventType: "MISSION_COMPLETED",
-      status: "PENDING",
+      status: config.pointsLedgerUrl ? "PENDING" : "POSTED",
       approvedAt: new Date()
     })
   );
@@ -71,13 +76,68 @@ export async function createPointsEventForMissionCompletion({ userId, missionId,
   return dispatchPointsEvent(event);
 }
 
+export async function createPointsEventForRecyclingApproval({ userId, recyclingSubmissionId, points, approvedAt = new Date() }) {
+  const existing = await findPointsEventByRecyclingSubmission(recyclingSubmissionId);
+  if (existing) {
+    return existing;
+  }
+
+  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+    createPointsEvent({
+      id,
+      userId,
+      recyclingSubmissionId,
+      points,
+      eventType: "RECYCLING_APPROVED",
+      status: config.pointsLedgerUrl ? "PENDING" : "POSTED",
+      approvedAt
+    })
+  );
+  return dispatchPointsEvent(event);
+}
+
+export async function createPointsEventForRewardRedemption({ userId, redemptionId, points, approvedAt = new Date() }) {
+  const existing = await findPointsEventByRedemption(redemptionId);
+  if (existing) {
+    return existing;
+  }
+
+  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+    createPointsEvent({
+      id,
+      userId,
+      redemptionId,
+      points,
+      eventType: "REWARD_REDEEMED",
+      status: config.pointsLedgerUrl ? "PENDING" : "POSTED",
+      approvedAt
+    })
+  );
+  return dispatchPointsEvent(event);
+}
+
+export async function createAdminAdjustment({ userId, points, approvedAt = new Date() }) {
+  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+    createPointsEvent({
+      id,
+      userId,
+      points,
+      eventType: "ADMIN_ADJUSTMENT",
+      status: config.pointsLedgerUrl ? "PENDING" : "POSTED",
+      approvedAt
+    })
+  );
+  return dispatchPointsEvent(event);
+}
+
 export async function listMyPoints(userId) {
-  const [events, total] = await Promise.all([
+  const [events, total, lifetimeTotal] = await Promise.all([
     findPointsEventsByUser(userId),
-    sumPointsForUser(userId)
+    sumPointsForUser(userId),
+    sumLifetimePointsForUser(userId)
   ]);
 
-  return { events, total };
+  return { events, total, lifetimeTotal };
 }
 
 export function listAllPoints(query = {}) {
@@ -85,6 +145,7 @@ export function listAllPoints(query = {}) {
   if (query.status) filters.status = query.status;
   if (query.userId) filters.userId = query.userId;
   if (query.missionId) filters.missionId = query.missionId;
+  if (query.eventType) filters.eventType = query.eventType;
 
   return findAllPointsEvents(filters);
 }
