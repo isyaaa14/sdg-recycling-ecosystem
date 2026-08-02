@@ -1,33 +1,16 @@
-# SDG Recycling Ecosystem
+# React + Vite
 
-Team integration notes are in `docs/`.
+This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
 
-Start here:
+Currently, two official plugins are available:
 
-- `docs/TEAM_HANDOFF.md` - quick sharing note for backend, web, and mobile teammates
-- `docs/API_CONTRACT.md` - shared backend API contract
-- `docs/LOCAL_INTEGRATION_GUIDE.md` - local backend, web, and mobile integration checklist
-- `docs/DEV_TO_AZURE_DEPLOYMENT.md` - simple `dev` to `main` to Azure deployment flow
+- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
+- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
 
-Postman files:
+## React Compiler
 
-- `postman/postman_collection.json`
-- `postman/postman_environment_local.json`
-- `postman/postman_environment_shared.json`
-- `postman/sample_payloads.json`
+The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
 
-The Postman collection is shared across environments. Keep team-safe local and
-shared environment exports in `postman/`. Personal sandbox exports and other
-private testing files can live in ignored `offline/`.
+## Expanding the Oxlint configuration
 
-Backend local base URL:
-
-```text
-http://localhost:5000/api/v1
-```
-
-Android emulator base URL:
-
-```text
-http://10.0.2.2:5000/api/v1
-```
+If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.

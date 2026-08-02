@@ -1,29 +1,24 @@
-# Environment and secrets
-.env
-.env.*
-!.env.example
-
-# Dependencies and build output
-node_modules/
-dist/
-coverage/
-
-# Logs and local databases
+# Logs
+logs
 *.log
-backend/prisma/dev.db
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-# IDE and local workspace files
-.idea/
-.vscode/
-*.code-workspace
+node_modules
+dist
+dist-ssr
+*.local
 
-# Local/team scratch copies
-offline/
-mobile-app/
-sdg-recycling-ecosystem-student-3/
-sdg-recycling-ecosystem-android_app_integration/
-azure-static-test-site/
-student3-review.md
-
-# Manual deployment packages
-*.zip
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
