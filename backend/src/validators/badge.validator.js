@@ -4,7 +4,13 @@ export const createBadgeSchema = z.object({
   name: z.string().min(1),
   description: z.string().min(1),
   tier: z.enum(["BRONZE", "SILVER", "GOLD"]),
-  criteriaType: z.enum(["MISSIONS_COMPLETED", "QUIZZES_PASSED", "CONTENT_COMPLETED", "APPROVED_SUBMISSIONS"]),
+  criteriaType: z.enum([
+    "MISSIONS_COMPLETED",
+    "QUIZZES_PASSED",
+    "CONTENT_COMPLETED",
+    "APPROVED_SUBMISSIONS",
+    "RECYCLING_APPROVED"
+  ]),
   criteriaValue: z.number().int().positive()
 });
 

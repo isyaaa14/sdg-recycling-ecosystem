@@ -10,6 +10,7 @@ import {
   createBadgeAward,
   findAwardsByBadge,
   countApprovedMissionSubmissions,
+  countApprovedRecyclingSubmissions,
   countCompletedMissions,
   countPassedQuizAttempts,
   countCompletedLearningProgress
@@ -116,6 +117,8 @@ async function getCurrentProgress(userId, criteriaType) {
       return countCompletedLearningProgress(userId);
     case "APPROVED_SUBMISSIONS":
       return countApprovedMissionSubmissions(userId);
+    case "RECYCLING_APPROVED":
+      return countApprovedRecyclingSubmissions(userId);
     default:
       return 0;
   }

@@ -60,6 +60,12 @@ export function countApprovedMissionSubmissions(userId) {
   });
 }
 
+export function countApprovedRecyclingSubmissions(userId) {
+  return prisma.recyclingSubmission.count({
+    where: { userId, status: "APPROVED" }
+  });
+}
+
 export async function countCompletedMissions(userId) {
   const approvalStats = await prisma.missionSubmission.groupBy({
     by: ["missionId"],

@@ -107,5 +107,75 @@
       "image/webp"
     ],
     "max_file_size": "5MB"
+  },
+  "recycling": {
+    "issue_qr": {
+      "materialType": "Plastic",
+      "estimatedWeightKg": 2,
+      "expiresInMinutes": 60
+    },
+    "claim_qr": {
+      "payload": {
+        "qrId": "QR001",
+        "nonce": "<copy nonce from issue response>",
+        "type": "recycling-deposit",
+        "materialType": "Plastic",
+        "estimatedWeightKg": 2,
+        "expiresAt": "2026-08-03T09:00:00.000Z"
+      },
+      "signature": "<copy signature from issue response>"
+    },
+    "create_manual_submission": {
+      "materialType": "Paper",
+      "quantity": 3,
+      "uploadId": "{{uploadId}}"
+    },
+    "review_approve": {
+      "status": "APPROVED",
+      "reviewNote": "Approved after evidence review."
+    },
+    "review_reject": {
+      "status": "REJECTED",
+      "reviewNote": "Rejected because the evidence was incomplete."
+    },
+    "update_point_rates": {
+      "rates": [
+        {
+          "material": "Plastic",
+          "ratePerKg": 50
+        },
+        {
+          "material": "Paper",
+          "ratePerKg": 20
+        },
+        {
+          "material": "Glass",
+          "ratePerKg": 30
+        },
+        {
+          "material": "Metal",
+          "ratePerKg": 60
+        }
+      ]
+    }
+  },
+  "rewards": {
+    "create_reward": {
+      "name": "Reusable Water Bottle",
+      "pointsRequired": 150,
+      "stock": 15,
+      "category": "Lifestyle",
+      "tier": "small"
+    },
+    "update_reward": {
+      "stock": 20,
+      "isActive": true
+    },
+    "redeem_reward": {
+      "quantity": 1
+    },
+    "cancel_redemption": {
+      "reason": "Changed my mind."
+    }
   }
 }

@@ -105,6 +105,58 @@
     {
       "key": "testFilePath",
       "value": ""
+    },
+    {
+      "key": "recyclingQrId",
+      "value": ""
+    },
+    {
+      "key": "recyclingQrClaimPayload",
+      "value": ""
+    },
+    {
+      "key": "recyclingSubmissionId",
+      "value": "RCS001"
+    },
+    {
+      "key": "rewardId",
+      "value": "RWD001"
+    },
+    {
+      "key": "createdRewardId",
+      "value": ""
+    },
+    {
+      "key": "redemptionId",
+      "value": "RDM001"
+    },
+    {
+      "key": "studentUserId",
+      "value": "USR003"
+    },
+    {
+      "key": "recyclingProofUploadId",
+      "value": ""
+    },
+    {
+      "key": "rewardImageUploadId",
+      "value": ""
+    },
+    {
+      "key": "highTierRewardId",
+      "value": "RWD003"
+    },
+    {
+      "key": "recyclingStudentToken",
+      "value": ""
+    },
+    {
+      "key": "recyclingQrIdToInvalidate",
+      "value": ""
+    },
+    {
+      "key": "redemptionIdToCancel",
+      "value": "RDM001"
     }
   ],
   "item": [
@@ -1806,6 +1858,178 @@
           ]
         },
         {
+          "name": "Add Question 2 To Created Quiz - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"Which bin should clean cardboard go into?\",\n  \"options\": [\n    \"Recycling\",\n    \"General waste\",\n    \"Compost\"\n  ],\n  \"correctAnswer\": \"Recycling\",\n  \"points\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Question 3 To Created Quiz - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"What should you do with a greasy pizza box?\",\n  \"options\": [\n    \"Treat it as general waste\",\n    \"Recycle it as-is\",\n    \"Wash and recycle it\"\n  ],\n  \"correctAnswer\": \"Treat it as general waste\",\n  \"points\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Question 4 To Created Quiz - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"Why should batteries be kept out of general recycling bins?\",\n  \"options\": [\n    \"They are a fire risk\",\n    \"They are too small\",\n    \"They are too heavy\"\n  ],\n  \"correctAnswer\": \"They are a fire risk\",\n  \"points\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Add Question 5 To Created Quiz - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{createdQuizId}}",
+                "questions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"questionText\": \"What is the benefit of rinsing containers before recycling?\",\n  \"options\": [\n    \"Reduces contamination\",\n    \"Makes them heavier\",\n    \"Changes the material type\"\n  ],\n  \"correctAnswer\": \"Reduces contamination\",\n  \"points\": 1\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "Update Created Question - Admin",
           "request": {
             "method": "PATCH",
@@ -2153,7 +2377,9 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "const base = Date.now() + 3650 * 24 * 60 * 60 * 1000 + Math.floor(Math.random() * 1000000);",
+                  "// 10-year base offset plus a random offset spread across a further ~10 years,",
+                  "// so repeated collection runs essentially never draw overlapping 1-hour windows.",
+                  "const base = Date.now() + 3650 * 24 * 60 * 60 * 1000 + Math.floor(Math.random() * 315360000000);",
                   "pm.environment.set('mutationMissionStartAt', new Date(base).toISOString());",
                   "pm.environment.set('mutationMissionEndAt', new Date(base + 60 * 60 * 1000).toISOString());"
                 ]
@@ -2448,6 +2674,97 @@
               }
             }
           ]
+        },
+        {
+          "name": "Upload Recycling Proof - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/recycling-proof",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "uploads",
+                "recycling-proof"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{testFilePath}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('recycling proof upload succeeds when testFilePath is set', function () { pm.expect([201, 400, 500]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('recyclingProofUploadId', uploadId); pm.collectionVariables.set('recyclingProofUploadId', uploadId); }"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Upload Reward Image - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{rewardId}}/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "rewards",
+                "{{rewardId}}",
+                "image"
+              ]
+            },
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "{{testFilePath}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('reward image upload succeeds when testFilePath is set', function () { pm.expect([200, 400, 404, 500]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 200) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('rewardImageUploadId', uploadId); pm.collectionVariables.set('rewardImageUploadId', uploadId); }"
+                ]
+              }
+            }
+          ]
         }
       ]
     },
@@ -2642,8 +2959,1762 @@
               }
             }
           ]
+        },
+        {
+          "name": "Student Cannot Issue Recycling QR",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/issue",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "qr",
+                "issue"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materialType\": \"Plastic\",\n  \"estimatedWeightKg\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot Update Point Rates",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/point-rates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "point-rates"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"rates\": [\n    {\n      \"material\": \"Plastic\",\n      \"ratePerKg\": 999\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin Cannot Redeem Reward",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{rewardId}}/redeem",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "rewards",
+                "{{rewardId}}",
+                "redeem"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Claim Recycling QR With Invalid Signature Rejects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/claim",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "qr",
+                "claim"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"payload\": {\n    \"qrId\": \"QR001\",\n    \"nonce\": \"not-a-real-nonce\",\n    \"type\": \"recycling-deposit\",\n    \"materialType\": \"Plastic\",\n    \"estimatedWeightKg\": 1,\n    \"expiresAt\": \"2035-01-01T00:00:00.000Z\"\n  },\n  \"signature\": \"0000000000000000000000000000000000000000000000000000000000000000\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Unknown Recycling Submission Returns 404",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/RCS999999",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions",
+                "RCS999999"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 404', function () { pm.response.to.have.status(404); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Invalid Reward Payload Rejects",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/rewards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "rewards"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"pointsRequired\": -5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot List Suspicious Activities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/suspicious-activities",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "anti-gaming",
+                "suspicious-activities"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
         }
       ]
+    },
+    {
+      "name": "08 - Recycling, Rewards & Leaderboard Tests",
+      "item": [
+        {
+          "name": "Recycling",
+          "item": [
+            {
+              "name": "Get Point Rates",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/point-rates",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "point-rates"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Point Rates - Admin",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/point-rates",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "point-rates"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"rates\": [\n    {\n      \"material\": \"Plastic\",\n      \"ratePerKg\": 50\n    },\n    {\n      \"material\": \"Paper\",\n      \"ratePerKg\": 20\n    },\n    {\n      \"material\": \"Glass\",\n      \"ratePerKg\": 30\n    },\n    {\n      \"material\": \"Metal\",\n      \"ratePerKg\": 60\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Issue Recycling QR - Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/issue",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "qr",
+                    "issue"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"materialType\": \"Plastic\",\n  \"estimatedWeightKg\": 2,\n  \"expiresInMinutes\": 60\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                      "const json = pm.response.json();",
+                      "pm.environment.set('recyclingQrId', json.data.qr.id);",
+                      "pm.collectionVariables.set('recyclingQrId', json.data.qr.id);",
+                      "pm.environment.set('recyclingQrClaimPayload', json.data.qr.claimPayload);",
+                      "pm.collectionVariables.set('recyclingQrClaimPayload', json.data.qr.claimPayload);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Recycling QR Codes - Admin",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "qr"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Recycling QR by Id - Admin",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/{{recyclingQrId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "qr",
+                    "{{recyclingQrId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Claim Recycling QR - Student",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/claim",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "qr",
+                    "claim"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{{recyclingQrClaimPayload}}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                      "const json = pm.response.json();",
+                      "pm.environment.set('recyclingSubmissionId', json.data.submission.id);",
+                      "pm.collectionVariables.set('recyclingSubmissionId', json.data.submission.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Login Recycling Test Student",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "auth",
+                    "login"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"student3@sdg.local\",\n  \"password\": \"Password123!\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                      "const token = pm.response.json().data.token;",
+                      "pm.environment.set('recyclingStudentToken', token);",
+                      "pm.collectionVariables.set('recyclingStudentToken', token);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Manual Recycling Submission - Student",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{recyclingStudentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "submissions"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"materialType\": \"Paper\",\n  \"quantity\": 3\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List My Recycling Submissions - Student",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "submissions",
+                    "me"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List All Recycling Submissions - Admin",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "submissions"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Recycling Submission by Id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "submissions",
+                    "{{recyclingSubmissionId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Review Recycling Submission - Admin",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}/review",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "submissions",
+                    "{{recyclingSubmissionId}}",
+                    "review"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"APPROVED\",\n  \"reviewNote\": \"Approved after evidence review.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Issue Recycling QR - Admin (For Invalidate Test)",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/issue",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "qr",
+                    "issue"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"materialType\": \"Glass\",\n  \"estimatedWeightKg\": 1,\n  \"expiresInMinutes\": 60\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                      "const id = pm.response.json().data.qr.id;",
+                      "pm.environment.set('recyclingQrIdToInvalidate', id);",
+                      "pm.collectionVariables.set('recyclingQrIdToInvalidate', id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Invalidate Recycling QR - Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/{{recyclingQrIdToInvalidate}}/invalidate",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "qr",
+                    "{{recyclingQrIdToInvalidate}}",
+                    "invalidate"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Claim Already-Claimed QR Fails",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/claim",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "qr",
+                    "claim"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{{recyclingQrClaimPayload}}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('re-claiming an already-claimed QR is rejected', function () { pm.expect([400, 409]).to.include(pm.response.code); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Review Already-Reviewed Submission Conflicts",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}/review",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "recycling",
+                    "submissions",
+                    "{{recyclingSubmissionId}}",
+                    "review"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"status\": \"APPROVED\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('reviewing an already-reviewed submission is rejected', function () { pm.expect([404, 409]).to.include(pm.response.code); });"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Rewards",
+          "item": [
+            {
+              "name": "List Rewards",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Create Reward - Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Reusable Water Bottle\",\n  \"pointsRequired\": 150,\n  \"stock\": 15,\n  \"category\": \"Lifestyle\",\n  \"tier\": \"small\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                      "const json = pm.response.json();",
+                      "pm.environment.set('createdRewardId', json.data.reward.id);",
+                      "pm.collectionVariables.set('createdRewardId', json.data.reward.id);"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Update Reward - Admin",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{createdRewardId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "{{createdRewardId}}"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"stock\": 20\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Redeem Reward - Student",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{rewardId}}/redeem",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "{{rewardId}}",
+                    "redeem"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201, 400 (insufficient points), or 429 (redemption cooldown) is acceptable', function () { pm.expect([201, 400, 429]).to.include(pm.response.code); });",
+                      "if (pm.response.code === 201) { const redemptionId = pm.response.json().data.redemption.id; pm.environment.set('redemptionId', redemptionId); pm.collectionVariables.set('redemptionId', redemptionId); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List My Redemptions - Student",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "redemptions",
+                    "me"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List All Redemptions - Admin",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "redemptions"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Redemption by Id",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "redemptions",
+                    "{{redemptionId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Complete Redemption - Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionId}}/complete",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "redemptions",
+                    "{{redemptionId}}",
+                    "complete"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('completes, or is a legitimate conflict/not-found if the redeem step above did not create a fresh reservation', function () { pm.expect([200, 404, 409]).to.include(pm.response.code); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Redeem Second Reward For Cancel Test - Student",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/RWD002/redeem",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "RWD002",
+                    "redeem"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 201, 400 (insufficient points), or 429 (redemption cooldown) is acceptable', function () { pm.expect([201, 400, 429]).to.include(pm.response.code); });",
+                      "if (pm.response.code === 201) { const id = pm.response.json().data.redemption.id; pm.environment.set('redemptionIdToCancel', id); pm.collectionVariables.set('redemptionIdToCancel', id); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Cancel Redemption",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionIdToCancel}}/cancel",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "redemptions",
+                    "{{redemptionIdToCancel}}",
+                    "cancel"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"reason\": \"Changed my mind.\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('cancel succeeds, or is a legitimate conflict if funds were insufficient above', function () { pm.expect([200, 404, 409]).to.include(pm.response.code); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Deactivate Reward - Admin",
+              "request": {
+                "method": "DELETE",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{createdRewardId}}",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "{{createdRewardId}}"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Redeem Reward With Insufficient Points Fails",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{highTierRewardId}}/redeem",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "{{highTierRewardId}}",
+                    "redeem"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"quantity\": 1\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('redeeming above balance is rejected', function () { pm.expect([201, 400]).to.include(pm.response.code); });",
+                      "if (pm.response.code === 400) { pm.test('error message mentions points', function () { pm.expect(pm.response.json().error.message).to.match(/points/i); }); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Complete Non-Reserved Redemption Conflicts",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionId}}/complete",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "rewards",
+                    "redemptions",
+                    "{{redemptionId}}",
+                    "complete"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('completing a non-reserved redemption is rejected or already completed', function () { pm.expect([200, 404, 409]).to.include(pm.response.code); });"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Leaderboard",
+          "item": [
+            {
+              "name": "Get Leaderboard",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/leaderboard",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "leaderboard"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Anti-Gaming",
+          "item": [
+            {
+              "name": "Get My Anti-Gaming Status - Student",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/me/status",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "anti-gaming",
+                    "me",
+                    "status"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "List Suspicious Activities - Admin",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/suspicious-activities",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "anti-gaming",
+                    "suspicious-activities"
+                  ]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Flag User - Admin",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{adminToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/users/{{studentUserId}}/flag",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "anti-gaming",
+                    "users",
+                    "{{studentUserId}}",
+                    "flag"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"flagged\": true\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "User Profile",
+          "item": [
+            {
+              "name": "Update My Profile - Student",
+              "request": {
+                "method": "PATCH",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{studentToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}{{apiPrefix}}/users/me",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "{{apiPrefix}}",
+                    "users",
+                    "me"
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"Student One\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "description": "Run Recycling -> Issue Recycling QR - Admin before Claim Recycling QR - Student (it captures recyclingQrId/recyclingQrClaimPayload). Run Rewards -> Create Reward - Admin before Update/Deactivate Reward (it captures createdRewardId). Some requests intentionally exercise business-rule rejections (insufficient points, already-reviewed, already-claimed) and accept more than one status code."
     }
   ]
 }

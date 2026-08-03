@@ -99,8 +99,8 @@ Frontend and mobile should read `error.message` for user-facing error handling.
 ## Roles
 
 ```text
-ADMIN   - manage missions, content, quizzes, badges, submissions, points list
-STUDENT - view content, submit missions, attempt quizzes, view own progress, badges, points
+ADMIN   - manage missions, content, quizzes, badges, submissions, points list, recycling QR/point rates/review, rewards, leaderboard visibility, anti-gaming flags
+STUDENT - view content, submit missions, attempt quizzes, view own progress, badges, points, submit/claim recycling, redeem rewards, view leaderboard
 ```
 
 ## Health
@@ -357,6 +357,7 @@ MISSIONS_COMPLETED
 QUIZZES_PASSED
 CONTENT_COMPLETED
 APPROVED_SUBMISSIONS
+RECYCLING_APPROVED
 ```
 
 ## Points
@@ -366,18 +367,21 @@ APPROVED_SUBMISSIONS
 | GET | `/points/me` | STUDENT | Get my points |
 | GET | `/points` | ADMIN | List points events |
 
-`GET /points/me` returns points events and `total`.
+`GET /points/me` returns points events, `total`, and `lifetimeTotal`.
 
 ```json
 {
   "data": {
     "events": [],
-    "total": 40
+    "total": 40,
+    "lifetimeTotal": 65
   }
 }
 ```
 
-Active student point totals count `MISSION_COMPLETED` point events. Older `MISSION_APPROVED` point events are treated as compatibility/history rows and are not part of the active total.
+`total` is the current spendable balance: it sums all active event types, including reward redemptions (negative) and refunds (positive). `lifetimeTotal` only sums positive-earning event types (`MISSION_COMPLETED`, `RECYCLING_APPROVED`, `ADMIN_ADJUSTMENT`) and is what the leaderboard ranks on — it does not decrease when a reward is redeemed.
+
+Active point event types: `MISSION_COMPLETED`, `RECYCLING_APPROVED`, `REWARD_REDEEMED`, `REWARD_REFUNDED`, `ADMIN_ADJUSTMENT`. Older `MISSION_APPROVED` point events are treated as compatibility/history rows and are not part of the active total.
 
 Mission completion rules:
 
@@ -387,7 +391,7 @@ STREAK_BASED   - approved submission count reaches targetDays
 TIME_LIMITED   - at least one approved submission
 ```
 
-Each student can receive only one active `MISSION_COMPLETED` point event per mission. For `MISSION_COMPLETED`, `submissionId` refers to the approved submission that completed the mission target.
+Each student can receive only one active `MISSION_COMPLETED` point event per mission. For `MISSION_COMPLETED`, `submissionId` refers to the approved submission that completed the mission target. Similarly, each approved recycling submission produces at most one `RECYCLING_APPROVED` event, and each redemption produces at most one `REWARD_REDEEMED` and at most one `REWARD_REFUNDED` event, enforced by database constraints.
 
 ## Uploads
 
@@ -395,10 +399,156 @@ Each student can receive only one active `MISSION_COMPLETED` point event per mis
 | --- | --- | --- | --- |
 | POST | `/uploads/mission-proof` | STUDENT | Upload mission proof file |
 | POST | `/uploads/content-image` | ADMIN | Upload content image |
+| POST | `/uploads/recycling-proof` | STUDENT | Upload recycling submission proof file |
 | GET | `/uploads/mine` | STUDENT | List my uploads |
 | GET | `/uploads/:id` | Any logged-in user | Get upload metadata |
 
-Mission proof, content image, and mission image upload requests use multipart form data. The file field is `file`. Supported image types are JPEG, PNG, and WebP up to 5 MB.
+Mission proof, content image, mission image, recycling proof, and reward image upload requests use multipart form data. The file field is `file`. Supported image types are JPEG, PNG, and WebP up to 5 MB. Reward images are uploaded through `POST /rewards/:id/image`, not the `/uploads` routes.
+
+## Recycling
+
+Recycling submissions can come from two sources: a manual student-entered submission, or scanning an admin-issued QR code. Both land in the same review queue; points are only awarded once an admin approves.
+
+| Method | Path | Role | Purpose |
+| --- | --- | --- | --- |
+| GET | `/recycling/point-rates` | Any logged-in user | List points-per-kg by material |
+| PUT | `/recycling/point-rates` | ADMIN | Update points-per-kg rates |
+| POST | `/recycling/qr/issue` | ADMIN | Issue a signed recycling QR code |
+| GET | `/recycling/qr` | ADMIN | List QR codes |
+| GET | `/recycling/qr/:id` | ADMIN | Get a QR code |
+| POST | `/recycling/qr/claim` | STUDENT | Claim a QR code, creating a pending submission |
+| POST | `/recycling/qr/:id/invalidate` | ADMIN | Invalidate an unclaimed QR code |
+| POST | `/recycling/submissions` | STUDENT | Create a manual recycling submission |
+| GET | `/recycling/submissions/me` | STUDENT | List my recycling submissions |
+| GET | `/recycling/submissions` | ADMIN | List all recycling submissions |
+| GET | `/recycling/submissions/:id` | Owner or ADMIN | Get a recycling submission |
+| PATCH | `/recycling/submissions/:id/review` | ADMIN | Approve or reject a submission |
+
+Issue QR body:
+
+```json
+{
+  "materialType": "Plastic",
+  "estimatedWeightKg": 2,
+  "expiresInMinutes": 60
+}
+```
+
+The issue response includes a `claimPayload` string — pass it straight through as the body of `POST /recycling/qr/claim` (it already contains the signed `payload` and `signature`).
+
+Create manual submission body:
+
+```json
+{
+  "materialType": "Paper",
+  "quantity": 3,
+  "uploadId": "uploaded-file-id"
+}
+```
+
+Review body:
+
+```json
+{
+  "status": "APPROVED",
+  "reviewNote": "Approved after evidence review."
+}
+```
+
+Points for an approved submission are `floor(quantity * ratePerKg)`, capped by a daily per-student recycling point cap. QR codes expire after `expiresInMinutes` (default from `QR_DEFAULT_EXPIRY_MINUTES`) and cannot be reused once claimed.
+
+## Rewards
+
+Redemptions use a reserve-first flow: `POST /rewards/:id/redeem` deducts points immediately and reserves stock (status `RESERVED`); an admin later marks it `COMPLETED` at pickup, or it can be `CANCELLED`, which refunds the points and restores stock.
+
+| Method | Path | Role | Purpose |
+| --- | --- | --- | --- |
+| GET | `/rewards` | Any logged-in user | List active rewards |
+| POST | `/rewards` | ADMIN | Create reward |
+| PATCH | `/rewards/:id` | ADMIN | Update reward |
+| DELETE | `/rewards/:id` | ADMIN | Deactivate reward |
+| POST | `/rewards/:id/image` | ADMIN | Upload reward image |
+| POST | `/rewards/:id/redeem` | STUDENT | Redeem (reserve) a reward |
+| GET | `/rewards/redemptions/me` | STUDENT | List my redemptions |
+| GET | `/rewards/redemptions` | ADMIN | List all redemptions |
+| GET | `/rewards/redemptions/:id` | Owner or ADMIN | Get a redemption |
+| POST | `/rewards/redemptions/:id/complete` | ADMIN | Mark a reserved redemption fulfilled |
+| POST | `/rewards/redemptions/:id/cancel` | Owner or ADMIN | Cancel a reserved redemption and refund points |
+
+Create reward body:
+
+```json
+{
+  "name": "Reusable Water Bottle",
+  "pointsRequired": 150,
+  "stock": 15,
+  "category": "Lifestyle",
+  "tier": "small"
+}
+```
+
+Redeem body:
+
+```json
+{
+  "quantity": 1
+}
+```
+
+Cooldown between redemptions of the same reward by the same student is 24 hours (72 hours for `large` tier rewards). Redeeming fails with `400` if the student's current point balance is below `pointsRequired * quantity`.
+
+## Leaderboard
+
+| Method | Path | Role | Purpose |
+| --- | --- | --- | --- |
+| GET | `/leaderboard` | Any logged-in user | Get the all-time points leaderboard |
+
+Ranks students by `lifetimeTotal` (see Points above), so redeeming a reward does not change rank.
+
+```json
+{
+  "data": {
+    "timeframe": "all_time",
+    "generated_at": "2026-08-03T07:06:27.555Z",
+    "minimumApprovedRecyclingSubmissions": 3,
+    "entries": [
+      {
+        "rank": 1,
+        "full_name": "Student One",
+        "lifetime_points": 225,
+        "total_points": 225,
+        "user_id": "USR002",
+        "approved_recycling_submissions": 1
+      }
+    ]
+  }
+}
+```
+
+## Anti-Gaming
+
+| Method | Path | Role | Purpose |
+| --- | --- | --- | --- |
+| GET | `/anti-gaming/me/status` | STUDENT | Get my daily/hourly recycling submission limits and remaining points |
+| GET | `/anti-gaming/suspicious-activities` | ADMIN | List logged suspicious activity |
+| PATCH | `/anti-gaming/users/:userId/flag` | ADMIN | Manually flag or unflag a user |
+
+Flag body:
+
+```json
+{
+  "flagged": true,
+  "reason": "Manual review requested."
+}
+```
+
+Recycling submissions are rate-limited per student (max submissions per hour, cooldown between submissions, and a daily recycling point cap). A flagged user (`suspiciousActivityFlagged: true`) is blocked from further recycling submissions until an admin unflags them.
+
+## User Profile
+
+| Method | Path | Role | Purpose |
+| --- | --- | --- | --- |
+| PATCH | `/users/me` | Any logged-in user | Update my own profile (currently `name` only) |
 
 ## Environment Variables
 
@@ -410,11 +560,15 @@ JWT_SECRET=use-a-real-secret
 JWT_EXPIRES_IN=1d
 POINTS_LEDGER_URL=
 POINTS_LEDGER_TIMEOUT_MS=3000
+QR_SIGNING_SECRET=use-a-real-secret
+QR_DEFAULT_EXPIRY_MINUTES=15
 FRONTEND_URL=http://localhost:9999
 AZURE_STORAGE_CONNECTION_STRING=
 AZURE_STORAGE_CONTAINER_MISSION_PROOFS=mission-proofs
 AZURE_STORAGE_CONTAINER_CONTENT_IMAGES=content-images
 AZURE_STORAGE_CONTAINER_MISSION_IMAGES=mission-images
+AZURE_STORAGE_CONTAINER_RECYCLING_PROOFS=recycling-proofs
+AZURE_STORAGE_CONTAINER_REWARD_IMAGES=reward-images
 AZURE_STORAGE_BLOB_BASE_URL=
 ```
 
