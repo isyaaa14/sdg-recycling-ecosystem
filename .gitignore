@@ -18,11 +18,9 @@ backend/prisma/dev.db
 *.code-workspace
 
 # Local/team scratch copies
-offline/
 mobile-app/
-sdg-recycling-ecosystem-student-3 (1)/
-sdg-recycling-ecosystem-student-3/
-sdg-recycling-ecosystem-android_app_integration/
+sdg-recycling-ecosystem-Full-Integration/
+sdg-recycling-ecosystem-Full-Integration(1)/
 azure-static-test-site/
 student3-review.md
 admin_fixed.html
