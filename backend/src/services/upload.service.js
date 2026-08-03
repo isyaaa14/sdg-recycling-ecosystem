@@ -76,6 +76,20 @@ export function uploadMissionImage(fileBuffer, meta, userId) {
   });
 }
 
+export function uploadRecyclingProof(fileBuffer, meta, userId) {
+  return uploadToBlobStorage(fileBuffer, meta, userId, {
+    containerName: config.azureStorageContainerRecyclingProofs,
+    purpose: "RECYCLING_PROOF"
+  });
+}
+
+export function uploadRewardImage(fileBuffer, meta, userId) {
+  return uploadToBlobStorage(fileBuffer, meta, userId, {
+    containerName: config.azureStorageContainerRewardImages,
+    purpose: "REWARD_IMAGE"
+  });
+}
+
 export async function getUploadById(id, user) {
   const upload = await findUploadedFileById(id);
   if (!upload) {
@@ -124,7 +138,7 @@ function blobUrl(containerName, blobName) {
   return `${config.azureStorageBlobBaseUrl}/${containerName}/${encodedBlobName}`;
 }
 
-export function createMissionProofReadUrl(upload, expiresInMinutes = 60) {
+function createBlobReadUrl(upload, expiresInMinutes = 60) {
   const credential = getSharedKeyCredential();
   if (!credential || !config.azureStorageBlobBaseUrl || !upload?.containerName || !upload?.blobName) {
     return upload?.fileUrl ?? null;
@@ -144,4 +158,16 @@ export function createMissionProofReadUrl(upload, expiresInMinutes = 60) {
   ).toString();
 
   return `${blobUrl(upload.containerName, upload.blobName)}?${sas}`;
+}
+
+export function createMissionProofReadUrl(upload, expiresInMinutes = 60) {
+  return createBlobReadUrl(upload, expiresInMinutes);
+}
+
+export function createRecyclingProofReadUrl(upload, expiresInMinutes = 60) {
+  return createBlobReadUrl(upload, expiresInMinutes);
+}
+
+export function createRewardImageReadUrl(upload, expiresInMinutes = 60) {
+  return createBlobReadUrl(upload, expiresInMinutes);
 }

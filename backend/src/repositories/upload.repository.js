@@ -23,3 +23,10 @@ export function attachUploadToSubmission(uploadId, submissionId) {
     data: { missionSubmissionId: submissionId }
   });
 }
+
+export function attachUploadToRecyclingSubmission(uploadId, recyclingSubmissionId) {
+  return prisma.uploadedFile.update({
+    where: { id: uploadId },
+    data: { recyclingSubmissionId }
+  });
+}

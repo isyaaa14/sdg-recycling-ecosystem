@@ -48,6 +48,7 @@ enum BadgeCriteriaType {
   QUIZZES_PASSED
   CONTENT_COMPLETED
   APPROVED_SUBMISSIONS
+  RECYCLING_APPROVED
   // Deprecated. Kept for existing dev database rows until they are reseeded/migrated away.
   ACTIVITY_METRIC
 }
@@ -61,77 +62,117 @@ enum PointsEventStatus {
 enum PointsEventType {
   MISSION_APPROVED
   MISSION_COMPLETED
+  RECYCLING_APPROVED
+  REWARD_REDEEMED
+  REWARD_REFUNDED
+  ADMIN_ADJUSTMENT
+}
+
+enum RedemptionStatus {
+  RESERVED
+  COMPLETED
+  CANCELLED
+}
+
+enum RecyclingSubmissionStatus {
+  PENDING_REVIEW
+  APPROVED
+  REJECTED
+}
+
+enum RecyclingSubmissionSource {
+  MANUAL
+  QR
+}
+
+enum RecyclingQrStatus {
+  ISSUED
+  CLAIMED
+  EXPIRED
+  INVALIDATED
 }
 
 enum UploadPurpose {
   MISSION_PROOF
   CONTENT_IMAGE
   MISSION_IMAGE
+  RECYCLING_PROOF
+  REWARD_IMAGE
 }
 
 model User {
-  id               String               @id
-  name             String
-  email            String               @unique
-  passwordHash     String
-  role             Role                 @default(STUDENT)
-  createdAt        DateTime             @default(now())
-  updatedAt        DateTime             @updatedAt
-  submissions      MissionSubmission[]
-  reviewedItems    MissionSubmission[]  @relation("SubmissionReviewer")
-  contentCreated   Content[]            @relation("ContentCreator")
-  missionCreated   Mission[]            @relation("MissionCreator")
-  quizAttempts     QuizAttempt[]
-  badgeAwards      BadgeAward[]
-  progressRecords  LearningProgress[]
-  pointsEvents     PointsEvent[]
-  uploads          UploadedFile[]
+  id                           String                  @id
+  name                         String
+  email                        String                  @unique
+  passwordHash                 String
+  role                         Role                    @default(STUDENT)
+  suspiciousActivityFlagged    Boolean                 @default(false)
+  lastRecyclingSubmissionAt    DateTime?
+  createdAt                    DateTime                @default(now())
+  updatedAt                    DateTime                @updatedAt
+  submissions                  MissionSubmission[]
+  reviewedItems                MissionSubmission[]     @relation("SubmissionReviewer")
+  recyclingSubmissions         RecyclingSubmission[]   @relation("RecyclingSubmitter")
+  reviewedRecyclingSubmissions RecyclingSubmission[]   @relation("RecyclingReviewer")
+  issuedRecyclingQrCodes       RecyclingQrCode[]       @relation("RecyclingQrIssuedBy")
+  claimedRecyclingQrCodes      RecyclingQrCode[]       @relation("RecyclingQrClaimedBy")
+  invalidatedRecyclingQrCodes  RecyclingQrCode[]       @relation("RecyclingQrInvalidatedBy")
+  redemptions                  Redemption[]
+  redemptionCooldowns          RedemptionCooldown[]
+  suspiciousActivities         SuspiciousActivityLog[]
+  contentCreated               Content[]               @relation("ContentCreator")
+  missionCreated               Mission[]               @relation("MissionCreator")
+  quizAttempts                 QuizAttempt[]
+  badgeAwards                  BadgeAward[]
+  progressRecords              LearningProgress[]
+  pointsEvents                 PointsEvent[]
+  uploads                      UploadedFile[]
 }
 
 model Mission {
-  id             String               @id
-  slug           String               @unique
-  title          String
-  description    String
+  id              String              @id
+  slug            String              @unique
+  title           String
+  description     String
   longDescription String?
-  imageUrl       String?
-  guide          Json?
-  targetQuantity Int?
-  targetDays     Int?
-  type           MissionType
-  startAt        DateTime
-  endAt          DateTime
-  submissionCap  Int?
-  points         Int
-  autoApprove    Boolean              @default(false)
-  isActive       Boolean              @default(true)
-  status         MissionStatus        @default(DRAFT)
-  createdById    String
-  createdAt      DateTime             @default(now())
-  updatedAt      DateTime             @updatedAt
-  createdBy      User                 @relation("MissionCreator", fields: [createdById], references: [id])
-  submissions    MissionSubmission[]
-  pointsEvents   PointsEvent[]
+  imageUrl        String?
+  guide           Json?
+  targetQuantity  Int?
+  targetDays      Int?
+  type            MissionType
+  startAt         DateTime
+  endAt           DateTime
+  submissionCap   Int?
+  points          Int
+  autoApprove     Boolean             @default(false)
+  isActive        Boolean             @default(true)
+  status          MissionStatus       @default(DRAFT)
+  createdById     String
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  createdBy       User                @relation("MissionCreator", fields: [createdById], references: [id])
+  submissions     MissionSubmission[]
+  pointsEvents    PointsEvent[]
 
   @@index([status, startAt, endAt])
   @@index([isActive])
 }
 
 model MissionSubmission {
-  id            String            @id
+  id            String           @id
   missionId     String
   userId        String
   proofText     String?
   proofImageUrl String?
   quantity      Int?
-  status        SubmissionStatus  @default(PENDING_REVIEW)
+  status        SubmissionStatus @default(PENDING_REVIEW)
   reviewNote    String?
   reviewedById  String?
-  submittedAt   DateTime          @default(now())
+  submittedAt   DateTime         @default(now())
   reviewedAt    DateTime?
-  mission       Mission           @relation(fields: [missionId], references: [id])
-  user          User              @relation(fields: [userId], references: [id])
-  reviewedBy    User?             @relation("SubmissionReviewer", fields: [reviewedById], references: [id])
+  mission       Mission          @relation(fields: [missionId], references: [id])
+  user          User             @relation(fields: [userId], references: [id])
+  reviewedBy    User?            @relation("SubmissionReviewer", fields: [reviewedById], references: [id])
   pointsEvents  PointsEvent[]
   uploads       UploadedFile[]
 
@@ -140,77 +181,218 @@ model MissionSubmission {
 }
 
 model PointsEvent {
-  id             String            @id
-  userId         String
-  missionId      String?
+  id                    String               @id
+  userId                String
+  missionId             String?
   // For MISSION_COMPLETED, this is the final approved submission
   // that caused the mission to reach its completion target.
-  submissionId   String?
-  points         Int
-  eventType      PointsEventType
-  status         PointsEventStatus @default(PENDING)
-  approvedAt     DateTime
-  lastAttemptAt  DateTime?
-  errorMessage   String?
-  createdAt      DateTime          @default(now())
-  updatedAt      DateTime          @updatedAt
-  user           User              @relation(fields: [userId], references: [id])
-  mission        Mission?          @relation(fields: [missionId], references: [id])
-  submission     MissionSubmission? @relation(fields: [submissionId], references: [id])
+  submissionId          String?
+  recyclingSubmissionId String?
+  redemptionId          String?
+  points                Int
+  eventType             PointsEventType
+  status                PointsEventStatus    @default(PENDING)
+  approvedAt            DateTime
+  lastAttemptAt         DateTime?
+  errorMessage          String?
+  createdAt             DateTime             @default(now())
+  updatedAt             DateTime             @updatedAt
+  user                  User                 @relation(fields: [userId], references: [id])
+  mission               Mission?             @relation(fields: [missionId], references: [id])
+  submission            MissionSubmission?   @relation(fields: [submissionId], references: [id])
+  recyclingSubmission   RecyclingSubmission? @relation(fields: [recyclingSubmissionId], references: [id])
+  redemption            Redemption?          @relation(fields: [redemptionId], references: [id])
 
   @@index([status, createdAt])
+  @@index([userId, eventType])
+  @@index([userId, createdAt])
+}
+
+model PointRate {
+  material  String @id
+  ratePerKg Int    @default(0)
+}
+
+model RecyclingQrCode {
+  id                String                @id
+  nonce             String                @unique
+  signature         String
+  status            RecyclingQrStatus     @default(ISSUED)
+  expiresAt         DateTime
+  issuedById        String
+  claimedById       String?
+  claimedAt         DateTime?
+  invalidatedById   String?
+  invalidatedAt     DateTime?
+  materialType      String?
+  estimatedWeightKg Float?
+  payload           Json
+  createdAt         DateTime              @default(now())
+  updatedAt         DateTime              @updatedAt
+  issuedBy          User                  @relation("RecyclingQrIssuedBy", fields: [issuedById], references: [id])
+  claimedBy         User?                 @relation("RecyclingQrClaimedBy", fields: [claimedById], references: [id])
+  invalidatedBy     User?                 @relation("RecyclingQrInvalidatedBy", fields: [invalidatedById], references: [id])
+  submissions       RecyclingSubmission[]
+
+  @@index([status, expiresAt])
+  @@index([issuedById, createdAt])
+  @@index([claimedById, claimedAt])
+}
+
+model RecyclingSubmission {
+  id                 String                    @id
+  userId             String
+  source             RecyclingSubmissionSource @default(MANUAL)
+  qrCodeId           String?                   @unique
+  materialType       String
+  quantity           Float
+  proofImageUrl      String?
+  status             RecyclingSubmissionStatus @default(PENDING_REVIEW)
+  pointsAwarded      Int                       @default(0)
+  isDuplicateFlagged Boolean                   @default(false)
+  reviewNote         String?
+  reviewedById       String?
+  submittedAt        DateTime                  @default(now())
+  reviewedAt         DateTime?
+  user               User                      @relation("RecyclingSubmitter", fields: [userId], references: [id])
+  reviewedBy         User?                     @relation("RecyclingReviewer", fields: [reviewedById], references: [id])
+  qrCode             RecyclingQrCode?          @relation(fields: [qrCodeId], references: [id])
+  pointsEvents       PointsEvent[]
+  uploads            UploadedFile[]
+
+  @@index([userId, submittedAt])
+  @@index([status, submittedAt])
+  @@index([materialType])
+  @@index([source, submittedAt])
+}
+
+model RewardTier {
+  tier           String @id
+  pointsRequired Int
+}
+
+model Reward {
+  id             String               @id
+  name           String
+  pointsRequired Int
+  stock          Int                  @default(0)
+  imageUrl       String?
+  imageUploadId  String?              @unique
+  category       String?
+  expiresAt      DateTime?
+  isActive       Boolean              @default(true)
+  tier           String               @default("small")
+  createdAt      DateTime             @default(now())
+  redemptions    Redemption[]
+  cooldowns      RedemptionCooldown[]
+  imageUpload    UploadedFile?        @relation("RewardImageUpload", fields: [imageUploadId], references: [id])
+  uploads        UploadedFile[]       @relation("RewardUploads")
+
+  @@index([isActive, tier])
+  @@index([isActive, pointsRequired])
+}
+
+// Reserve-first redemption flow: RESERVED (points deducted, pickup pending)
+// -> COMPLETED (admin fulfills at pickup) or CANCELLED (refund PointsEvent).
+model Redemption {
+  id           String           @id
+  userId       String
+  rewardId     String?
+  itemName     String
+  quantity     Int              @default(1)
+  pointsSpent  Int
+  status       RedemptionStatus @default(RESERVED)
+  reservedAt   DateTime         @default(now())
+  expiresAt    DateTime?
+  completedAt  DateTime?
+  cancelledAt  DateTime?
+  cancelReason String?
+  createdAt    DateTime         @default(now())
+  user         User             @relation(fields: [userId], references: [id])
+  reward       Reward?          @relation(fields: [rewardId], references: [id])
+  pointsEvents PointsEvent[]
+
+  @@index([userId, createdAt])
+  @@index([rewardId])
+  @@index([status])
+}
+
+model RedemptionCooldown {
+  id             String    @id
+  userId         String
+  rewardId       String
+  lastRedeemedAt DateTime?
+  countToday     Int       @default(0)
+  countWeek      Int       @default(0)
+  user           User      @relation(fields: [userId], references: [id])
+  reward         Reward    @relation(fields: [rewardId], references: [id])
+
+  @@unique([userId, rewardId])
+}
+
+model SuspiciousActivityLog {
+  id           String   @id
+  userId       String
+  activityType String
+  severity     String   @default("medium")
+  details      String?
+  detectedAt   DateTime @default(now())
+  user         User     @relation(fields: [userId], references: [id])
+
+  @@index([userId, detectedAt])
+  @@index([severity, detectedAt])
 }
 
 model Content {
-  id              String             @id
-  slug            String             @unique
-  title           String
-  body            String
-  summary         String?
-  imageUrl        String?
-  estimatedReadMinutes Int           @default(5)
-  contentBlocks   Json?
-  tags            String[]
-  status          ContentStatus      @default(DRAFT)
-  version         Int                @default(1)
-  createdById     String
-  createdAt       DateTime           @default(now())
-  updatedAt       DateTime           @updatedAt
-  createdBy       User               @relation("ContentCreator", fields: [createdById], references: [id])
-  quizzes         Quiz[]
-  revisions       ContentRevision[]
-  progressRecords LearningProgress[]
+  id                   String             @id
+  slug                 String             @unique
+  title                String
+  body                 String
+  summary              String?
+  imageUrl             String?
+  estimatedReadMinutes Int                @default(5)
+  contentBlocks        Json?
+  tags                 String[]
+  status               ContentStatus      @default(DRAFT)
+  version              Int                @default(1)
+  createdById          String
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  createdBy            User               @relation("ContentCreator", fields: [createdById], references: [id])
+  quizzes              Quiz[]
+  revisions            ContentRevision[]
+  progressRecords      LearningProgress[]
 }
 
 model ContentRevision {
-  id          String   @id
-  contentId   String
-  version     Int
-  title       String
-  body        String
-  summary     String?
-  imageUrl    String?
+  id                   String        @id
+  contentId            String
+  version              Int
+  title                String
+  body                 String
+  summary              String?
+  imageUrl             String?
   estimatedReadMinutes Int?
-  contentBlocks Json?
-  tags        String[]
-  status      ContentStatus
-  createdAt   DateTime @default(now())
-  content     Content  @relation(fields: [contentId], references: [id])
+  contentBlocks        Json?
+  tags                 String[]
+  status               ContentStatus
+  createdAt            DateTime      @default(now())
+  content              Content       @relation(fields: [contentId], references: [id])
 
   @@index([contentId, version])
 }
 
 model Quiz {
-  id             String        @id
-  contentId      String
-  slug           String        @unique
-  title          String
-  passingScore   Int           @default(4)
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  content        Content       @relation(fields: [contentId], references: [id])
-  questions      QuizQuestion[]
-  attempts       QuizAttempt[]
+  id           String         @id
+  contentId    String
+  slug         String         @unique
+  title        String
+  passingScore Int            @default(4)
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  content      Content        @relation(fields: [contentId], references: [id])
+  questions    QuizQuestion[]
+  attempts     QuizAttempt[]
 }
 
 model QuizQuestion {
@@ -225,25 +407,25 @@ model QuizQuestion {
 }
 
 model QuizAttempt {
-  id             String   @id
-  quizId         String
-  userId         String
-  score          Int
-  totalQuestions Int
-  correctAnswers Int
-  passed         Boolean
-  answers        Json
+  id               String   @id
+  quizId           String
+  userId           String
+  score            Int
+  totalQuestions   Int
+  correctAnswers   Int
+  passed           Boolean
+  answers          Json
   timeSpentSeconds Int?
-  attemptedAt    DateTime @default(now())
-  quiz           Quiz     @relation(fields: [quizId], references: [id])
-  user           User     @relation(fields: [userId], references: [id])
+  attemptedAt      DateTime @default(now())
+  quiz             Quiz     @relation(fields: [quizId], references: [id])
+  user             User     @relation(fields: [userId], references: [id])
 
   @@index([userId, attemptedAt])
 }
 
 model Badge {
-  id                  String             @id
-  slug                String             @unique
+  id                  String            @id
+  slug                String            @unique
   name                String
   description         String
   tier                BadgeTier
@@ -251,56 +433,63 @@ model Badge {
   criteriaValue       Int
   criteriaReferenceId String?
   criteriaReference   String?
-  isActive            Boolean            @default(true)
-  createdAt           DateTime           @default(now())
-  updatedAt           DateTime           @updatedAt
+  isActive            Boolean           @default(true)
+  createdAt           DateTime          @default(now())
+  updatedAt           DateTime          @updatedAt
   awards              BadgeAward[]
 }
 
 model BadgeAward {
-  id         String   @id
-  userId     String
-  badgeId    String
-  awardedAt  DateTime @default(now())
-  user       User     @relation(fields: [userId], references: [id])
-  badge      Badge    @relation(fields: [badgeId], references: [id])
+  id        String   @id
+  userId    String
+  badgeId   String
+  awardedAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id])
+  badge     Badge    @relation(fields: [badgeId], references: [id])
 
   @@unique([userId, badgeId])
   @@index([userId, awardedAt])
 }
 
 model LearningProgress {
-  id                  String   @id
-  userId              String
-  contentId           String
-  completed           Boolean  @default(false)
-  completionCount     Int      @default(0)
-  quizAttemptsCount   Int      @default(0)
-  passedQuizCount     Int      @default(0)
-  latestScore         Int?
-  bestScore           Int?
-  lastActivityAt      DateTime @default(now())
-  createdAt           DateTime @default(now())
-  updatedAt           DateTime @updatedAt
-  user                User     @relation(fields: [userId], references: [id])
-  content             Content  @relation(fields: [contentId], references: [id])
+  id                String   @id
+  userId            String
+  contentId         String
+  completed         Boolean  @default(false)
+  completionCount   Int      @default(0)
+  quizAttemptsCount Int      @default(0)
+  passedQuizCount   Int      @default(0)
+  latestScore       Int?
+  bestScore         Int?
+  lastActivityAt    DateTime @default(now())
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  user              User     @relation(fields: [userId], references: [id])
+  content           Content  @relation(fields: [contentId], references: [id])
 
   @@unique([userId, contentId])
   @@index([userId, lastActivityAt])
 }
 
 model UploadedFile {
-  id                  String           @id
-  userId              String
-  missionSubmissionId String?
-  containerName       String
-  blobName            String
-  fileUrl             String
-  mimeType            String
-  fileSize            Int
-  purpose             UploadPurpose
-  createdAt           DateTime         @default(now())
-  user                User             @relation(fields: [userId], references: [id])
-  missionSubmission   MissionSubmission? @relation(fields: [missionSubmissionId], references: [id])
-}
+  id                    String               @id
+  userId                String
+  missionSubmissionId   String?
+  recyclingSubmissionId String?
+  rewardId              String?
+  containerName         String
+  blobName              String
+  fileUrl               String
+  mimeType              String
+  fileSize              Int
+  purpose               UploadPurpose
+  createdAt             DateTime             @default(now())
+  user                  User                 @relation(fields: [userId], references: [id])
+  missionSubmission     MissionSubmission?   @relation(fields: [missionSubmissionId], references: [id])
+  recyclingSubmission   RecyclingSubmission? @relation(fields: [recyclingSubmissionId], references: [id])
+  reward                Reward?              @relation("RewardUploads", fields: [rewardId], references: [id])
+  rewardImageFor        Reward?              @relation("RewardImageUpload")
 
+  @@index([recyclingSubmissionId])
+  @@index([rewardId])
+}

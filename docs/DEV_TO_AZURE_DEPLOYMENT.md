@@ -50,11 +50,15 @@ JWT_SECRET=use-a-real-secret
 JWT_EXPIRES_IN=1d
 POINTS_LEDGER_URL=
 POINTS_LEDGER_TIMEOUT_MS=3000
+QR_SIGNING_SECRET=use-a-real-secret
+QR_DEFAULT_EXPIRY_MINUTES=15
 FRONTEND_URL=https://YOUR_FRONTEND_DOMAIN
 AZURE_STORAGE_CONNECTION_STRING=YOUR_AZURE_STORAGE_CONNECTION_STRING
 AZURE_STORAGE_CONTAINER_MISSION_PROOFS=mission-proofs
 AZURE_STORAGE_CONTAINER_CONTENT_IMAGES=content-images
 AZURE_STORAGE_CONTAINER_MISSION_IMAGES=mission-images
+AZURE_STORAGE_CONTAINER_RECYCLING_PROOFS=recycling-proofs
+AZURE_STORAGE_CONTAINER_REWARD_IMAGES=reward-images
 AZURE_STORAGE_BLOB_BASE_URL=https://YOUR_STORAGE_ACCOUNT.blob.core.windows.net
 ```
 
@@ -63,9 +67,9 @@ Important:
 ```text
 Do not use local PostgreSQL credentials in Azure.
 Do not commit real Azure secrets into Git.
-JWT_SECRET must be different from the example value.
+JWT_SECRET and QR_SIGNING_SECRET must each be different from the example value.
 FRONTEND_URL must match the deployed web URL for CORS.
-Create the mission proof, content image, and mission image containers before testing uploads.
+Create the mission proof, content image, mission image, recycling proof, and reward image containers before testing uploads.
 ```
 
 ## Azure Start Command
@@ -99,6 +103,9 @@ GET  /api/v1/quizzes
 GET  /api/v1/progress/me
 GET  /api/v1/badges/progress
 GET  /api/v1/points/me
+GET  /api/v1/recycling/point-rates
+GET  /api/v1/rewards
+GET  /api/v1/leaderboard
 ```
 
 Then point web and mobile to:
