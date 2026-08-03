@@ -29,3 +29,14 @@ sdg-recycling-ecosystem-Full-Integration/
 
 # Manual deployment packages
 *.zip
+.env
+
+node_modules/
+
+dist/
+
+*.log
+
+backend/prisma/dev.db
+
+postman/
