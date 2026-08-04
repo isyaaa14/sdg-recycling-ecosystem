@@ -23,6 +23,43 @@ git push origin main
 
 If your deployment is connected to GitHub, Azure should deploy from `main`.
 
+## Production GitHub Actions Setup
+
+The production workflow is `.github/workflows/azure-app-service-production.yml`.
+It builds and tests only the `backend/` application, then deploys a clean
+Linux package without local environment files or seed execution.
+
+The repository owner must create a GitHub environment named `production` and
+configure these OIDC secrets:
+
+```text
+AZURE_CLIENT_ID
+AZURE_TENANT_ID
+AZURE_SUBSCRIPTION_ID
+```
+
+The owner must also configure this GitHub Actions variable with the exact Azure
+App Service resource name, not its full URL:
+
+```text
+AZURE_WEBAPP_NAME
+```
+
+Configure the Linux App Service once with Node.js 24 and this startup command:
+
+```bash
+npx prisma generate && npx prisma migrate deploy && npm start
+```
+
+The workflow excludes `node_modules` from the deployment package. Set
+`SCM_DO_BUILD_DURING_DEPLOYMENT=true` so App Service installs Linux-compatible
+production dependencies. Keep `prisma` in production dependencies because the
+startup command uses its generation and migration CLI.
+
+The Azure app's environment variables stay in Azure App Service configuration.
+Do not copy Azure credentials, database passwords, JWT secrets, or QR signing
+secrets into the workflow or repository.
+
 ## Deployment Readiness
 
 Before merging `dev` to `main`, confirm:
