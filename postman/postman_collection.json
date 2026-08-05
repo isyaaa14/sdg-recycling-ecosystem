@@ -20,7 +20,7 @@
     },
     {
       "key": "adminEmail",
-      "value": "admin@sdg.local"
+      "value": "admin@uow.edu.my"
     },
     {
       "key": "adminPassword",
@@ -28,7 +28,7 @@
     },
     {
       "key": "studentEmail",
-      "value": "student1@sdg.local"
+      "value": "student1@student.uow.edu.my"
     },
     {
       "key": "studentPassword",
@@ -157,6 +157,10 @@
     {
       "key": "redemptionIdToCancel",
       "value": "RDM001"
+    },
+    {
+      "key": "firstNotificationId",
+      "value": ""
     }
   ],
   "item": [
@@ -3551,7 +3555,7 @@
                 },
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n  \"email\": \"student3@sdg.local\",\n  \"password\": \"Password123!\"\n}",
+                  "raw": "{\n  \"email\": \"student3@student.uow.edu.my\",\n  \"password\": \"Password123!\"\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -4715,6 +4719,462 @@
         }
       ],
       "description": "Run Recycling -> Issue Recycling QR - Admin before Claim Recycling QR - Student (it captures recyclingQrId/recyclingQrClaimPayload). Run Rewards -> Create Reward - Admin before Update/Deactivate Reward (it captures createdRewardId). Some requests intentionally exercise business-rule rejections (insufficient points, already-reviewed, already-claimed) and accept more than one status code."
+    },
+    {
+      "name": "09 - Domain Restriction & Account Lifecycle Tests",
+      "description": "Covers the student.uow.edu.my / uow.edu.my registration domain restriction, and the 3-day recycling-inactivity auto-deactivation feature (admin notifications, on-demand sweep trigger, and reactivation). Register requests embed {{$timestamp}} in the email so this folder can be re-run without 409 email conflicts. The sweep is safe to run repeatedly against freshly seeded data since newly seeded/created users are never 3+ days old.",
+      "item": [
+        {
+          "name": "Register Accepts Student Domain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Student {{$timestamp}}\",\n  \"email\": \"postman.student.{{$timestamp}}@student.uow.edu.my\",\n  \"password\": \"Password123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('role is STUDENT', function () { pm.expect(pm.response.json().data.user.role).to.eql('STUDENT'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Accepts Staff Domain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Postman Staff {{$timestamp}}\",\n  \"email\": \"postman.staff.{{$timestamp}}@uow.edu.my\",\n  \"password\": \"Password123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('role is STUDENT', function () { pm.expect(pm.response.json().data.user.role).to.eql('STUDENT'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Rejects Non-UOW Email",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rejected\",\n  \"email\": \"postman.rejected.{{$timestamp}}@gmail.com\",\n  \"password\": \"Password123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Rejects Prefix-Spoofed Domain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Spoof\",\n  \"email\": \"postman.spoof.{{$timestamp}}@notstudent.uow.edu.my\",\n  \"password\": \"Password123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Register Rejects Suffix-Spoofed Domain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Spoof2\",\n  \"email\": \"postman.spoof2.{{$timestamp}}@student.uow.edu.my.evil.com\",\n  \"password\": \"Password123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Run Inactivity Sweep - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/admin/run-inactivity-sweep",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "run-inactivity-sweep"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('deactivatedCount is a number', function () { pm.expect(pm.response.json().data.deactivatedCount).to.be.a('number'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot Run Inactivity Sweep",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/admin/run-inactivity-sweep",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "run-inactivity-sweep"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Admin Notifications - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/admin/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "notifications"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const notifications = pm.response.json().data.notifications;",
+                  "pm.test('notifications array', function () { pm.expect(notifications).to.be.an('array'); });",
+                  "const firstId = (notifications[0] && notifications[0].id) || '';",
+                  "pm.environment.set('firstNotificationId', firstId);",
+                  "pm.collectionVariables.set('firstNotificationId', firstId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot Access Admin Notifications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/admin/notifications",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "notifications"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mark Admin Notification Read - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/admin/notifications/read",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "notifications",
+                "read"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"notificationIds\": [\"{{firstNotificationId}}\"]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('updatedCount is a number', function () { pm.expect(pm.response.json().data.updatedCount).to.be.a('number'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reactivate Already-Active Student Rejects - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "users",
+                "{{studentUserId}}",
+                "reactivate"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400 (already active)', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot Reactivate User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "users",
+                "{{studentUserId}}",
+                "reactivate"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

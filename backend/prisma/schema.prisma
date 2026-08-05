@@ -108,8 +108,12 @@ model User {
   role                         Role                    @default(STUDENT)
   suspiciousActivityFlagged    Boolean                 @default(false)
   lastRecyclingSubmissionAt    DateTime?
+  isActive                     Boolean                 @default(true)
+  deactivatedAt                DateTime?
+  deactivationReason           String?
   createdAt                    DateTime                @default(now())
   updatedAt                    DateTime                @updatedAt
+  receivedAdminNotifications   AdminNotification[]     @relation("NotificationTargetUser")
   submissions                  MissionSubmission[]
   reviewedItems                MissionSubmission[]     @relation("SubmissionReviewer")
   recyclingSubmissions         RecyclingSubmission[]   @relation("RecyclingSubmitter")
@@ -341,6 +345,21 @@ model SuspiciousActivityLog {
 
   @@index([userId, detectedAt])
   @@index([severity, detectedAt])
+}
+
+model AdminNotification {
+  id           String    @id
+  type         String
+  targetUserId String
+  message      String
+  isRead       Boolean   @default(false)
+  readAt       DateTime?
+  readById     String?
+  createdAt    DateTime  @default(now())
+  targetUser   User      @relation("NotificationTargetUser", fields: [targetUserId], references: [id])
+
+  @@index([isRead, createdAt])
+  @@index([targetUserId])
 }
 
 model Content {

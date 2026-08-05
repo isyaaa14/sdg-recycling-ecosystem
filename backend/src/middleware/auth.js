@@ -21,6 +21,10 @@ export async function authenticate(request, response, next) {
     return response.status(401).json({ error: { message: "User no longer exists." } });
   }
 
+  if (!user.isActive) {
+    return response.status(403).json({ error: { message: "This account has been deactivated. Please contact an administrator." } });
+  }
+
   request.user = user;
   next();
 }

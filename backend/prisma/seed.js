@@ -12,10 +12,10 @@ const PASSWORD = "Password123!";
 async function upsertUsers() {
   const passwordHash = await bcrypt.hash(PASSWORD, 10);
   const users = [
-    { id: "USR001", email: "admin@sdg.local", name: "Admin User", role: "ADMIN" },
-    { id: "USR002", email: "student1@sdg.local", name: "Student One", role: "STUDENT" },
-    { id: "USR003", email: "student2@sdg.local", name: "Student Two", role: "STUDENT" },
-    { id: "USR004", email: "student3@sdg.local", name: "Student Three", role: "STUDENT" }
+    { id: "USR001", email: "admin@uow.edu.my", name: "Admin User", role: "ADMIN" },
+    { id: "USR002", email: "student1@student.uow.edu.my", name: "Student One", role: "STUDENT" },
+    { id: "USR003", email: "student2@student.uow.edu.my", name: "Student Two", role: "STUDENT" },
+    { id: "USR004", email: "student3@student.uow.edu.my", name: "Student Three", role: "STUDENT" }
   ];
 
   const created = [];
