@@ -62,6 +62,10 @@ export async function login(payload) {
     throw new AuthServiceError(401, "Invalid email or password.");
   }
 
+  if (!user.isActive) {
+    throw new AuthServiceError(403, "This account has been deactivated. Please contact an administrator.");
+  }
+
   const token = signToken({ sub: user.id, role: user.role });
   return { token, user: sanitizeUser(user) };
 }
