@@ -1,0 +1,44 @@
+name: Azure Static Web Apps - Production Frontend
+
+on:
+  workflow_dispatch:
+  # Enable this after the real frontend source is committed to web-interface/.
+  # push:
+  #   branches:
+  #     - main
+  #   paths:
+  #     - "web-interface/**"
+  #     - ".github/workflows/azure-static-web-app-production.yml"
+
+concurrency:
+  group: production-frontend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Validate frontend source
+        shell: bash
+        run: |
+          test -s web-interface/index.html || {
+            echo "web-interface/index.html is empty. Commit the real frontend before deploying.";
+            exit 1;
+          }
+
+      - name: Deploy frontend
+        uses: Azure/static-web-apps-deploy@v1
+        with:
+          azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN }}
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          action: upload
+          app_location: /web-interface
+          api_location: ""
+          output_location: ""
+          skip_app_build: true
