@@ -26,6 +26,8 @@ student3-review.md
 admin_fixed.html
 docs/generated/
 sdg-recycling-ecosystem-Full-Integration/
+sdg-recycling-ecosystem-main/
+static-deploy/
 
 # Manual deployment packages
 *.zip
