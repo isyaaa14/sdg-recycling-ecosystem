@@ -11,7 +11,9 @@ import {
   findAllSubmissions,
   findSubmissionById,
   getApprovedMissionProgressForUser,
-  updateSubmission
+  updateSubmission,
+  updateSubmissionIfPending,
+  runInTransaction
 } from "../repositories/submission.repository.js";
 import { findUploadedFileById, attachUploadToSubmission } from "../repositories/upload.repository.js";
 import { createWithGeneratedId } from "../utils/idGenerator.js";
@@ -36,21 +38,30 @@ function isMissionCompletedByProgress(mission, progress) {
   }
 }
 
-async function applyApprovalSideEffects({ userId, mission, submissionId }) {
-  try {
-    const progress = await getApprovedMissionProgressForUser(mission.id, userId);
-    if (isMissionCompletedByProgress(mission, progress)) {
-      await createPointsEventForMissionCompletion({
-        userId,
-        missionId: mission.id,
-        submissionId,
-        points: mission.points
-      });
-    }
-  } catch (error) {
-    console.error(error);
+// `client` lets this run inside the caller's `$transaction` so the points
+// award commits/rolls back atomically with the submission's status update -
+// deliberately NOT try/caught here: a failure must abort the whole
+// transaction instead of leaving the submission permanently APPROVED with no
+// matching points ever awarded (mirrors recycling.service.js's
+// reviewRecyclingSubmission).
+async function applyApprovalSideEffects({ userId, mission, submissionId, client }) {
+  const progress = await getApprovedMissionProgressForUser(mission.id, userId, client);
+  if (isMissionCompletedByProgress(mission, progress)) {
+    await createPointsEventForMissionCompletion({
+      userId,
+      missionId: mission.id,
+      submissionId,
+      points: mission.points,
+      client
+    });
   }
+}
 
+// Badges are evaluated after the approval transaction has committed, and
+// failures here are non-fatal (logged only) - unlike points, a badge is not
+// the primary reward, so it's not worth failing an otherwise-successful
+// approval over (mirrors recycling.service.js's reviewRecyclingSubmission).
+async function evaluateBadgesSafely(userId) {
   try {
     await evaluateAndIssueBadges(userId);
   } catch (error) {
@@ -170,16 +181,36 @@ export async function submitMission(missionId, payload, userId) {
     }
   }
 
-  const submission = existingSubmission
-    ? await updateSubmission(existingSubmission.id, submissionData)
-    : await createWithGeneratedId("missionSubmission", "SUB", (id) =>
-        createSubmission({
-          id,
-          missionId: mission.id,
-          userId,
-          ...submissionData
-        })
-      );
+  // The write and the auto-approval points award run inside one transaction
+  // so they commit or roll back together (mirrors reviewSubmission below) -
+  // otherwise a failure creating the PointsEvent would leave the submission
+  // permanently APPROVED with no matching points ever awarded.
+  const submission = await runInTransaction(async (tx) => {
+    const created = existingSubmission
+      ? await updateSubmission(existingSubmission.id, submissionData, tx)
+      : await createWithGeneratedId("missionSubmission", "SUB", (id) =>
+          createSubmission(
+            {
+              id,
+              missionId: mission.id,
+              userId,
+              ...submissionData
+            },
+            tx
+          )
+        );
+
+    if (autoApproved) {
+      await applyApprovalSideEffects({
+        userId,
+        mission,
+        submissionId: created.id,
+        client: tx
+      });
+    }
+
+    return created;
+  });
 
   let responseSubmission = submission;
   if (data.uploadId) {
@@ -188,11 +219,7 @@ export async function submitMission(missionId, payload, userId) {
   }
 
   if (autoApproved) {
-    await applyApprovalSideEffects({
-      userId,
-      mission,
-      submissionId: submission.id
-    });
+    await evaluateBadgesSafely(userId);
   }
 
   return withMissionProofReadUrl(responseSubmission);
@@ -256,22 +283,44 @@ export async function reviewSubmission(submissionId, payload, reviewerId) {
   }
 
   const { status, reviewNote } = result.data;
+  const reviewedAt = new Date();
 
-  const updated = await updateSubmission(submissionId, {
-    status,
-    reviewNote,
-    reviewedById: reviewerId,
-    reviewedAt: new Date()
+  // Atomic guard (mirrors recycling.service.js's reviewRecyclingSubmission):
+  // the `status: "PENDING_REVIEW"` condition in `where` makes this update a
+  // no-op for a submission a concurrent/duplicate review request already
+  // flipped, instead of the findUnique-then-update race above that let two
+  // reviews both pass the earlier status check.
+  //
+  // The status update and the points award run inside one transaction so
+  // they commit or roll back together - otherwise a failure creating the
+  // PointsEvent would leave the submission permanently APPROVED with no
+  // matching points ever awarded.
+  await runInTransaction(async (tx) => {
+    const reviewResult = await updateSubmissionIfPending(submissionId, {
+      status,
+      reviewNote,
+      reviewedById: reviewerId,
+      reviewedAt
+    }, tx);
+
+    if (reviewResult.count !== 1) {
+      throw new MissionServiceError(409, "This submission has already been reviewed.");
+    }
+
+    if (status === "APPROVED") {
+      const mission = await findMissionById(submission.missionId);
+      await applyApprovalSideEffects({
+        userId: submission.userId,
+        mission,
+        submissionId: submission.id,
+        client: tx
+      });
+    }
   });
 
   if (status === "APPROVED") {
-    const mission = await findMissionById(submission.missionId);
-    await applyApprovalSideEffects({
-      userId: submission.userId,
-      mission,
-      submissionId: submission.id
-    });
+    await evaluateBadgesSafely(submission.userId);
   }
 
-  return updated;
+  return getSubmissionById(submissionId, { id: reviewerId, role: "ADMIN" });
 }

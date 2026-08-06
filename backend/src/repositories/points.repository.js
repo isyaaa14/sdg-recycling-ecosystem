@@ -17,8 +17,8 @@ export function createPointsEvent(data, client = prisma) {
 }
 
 
-export function findPointsEventByUserAndMission(userId, missionId, eventType) {
-  return prisma.pointsEvent.findFirst({
+export function findPointsEventByUserAndMission(userId, missionId, eventType, client = prisma) {
+  return client.pointsEvent.findFirst({
     where: { userId, missionId, eventType }
   });
 }

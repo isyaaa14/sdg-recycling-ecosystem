@@ -10,7 +10,7 @@ import {
   findAllPointsEvents,
   updatePointsEventStatus
 } from "../repositories/points.repository.js";
-import { createWithGeneratedId } from "../utils/idGenerator.js";
+import { createPointsEventWithGeneratedId } from "../utils/idGenerator.js";
 import { config } from "../utils/config.js";
 
 export class PointsServiceError extends Error {
@@ -53,15 +53,18 @@ async function dispatchPointsEvent(event) {
   }
 }
 
-export async function createPointsEventForMissionCompletion({ userId, missionId, submissionId, points }) {
-  const existingForMission = await findPointsEventByUserAndMission(userId, missionId, "MISSION_COMPLETED");
+// `client` lets this run inside a caller's `$transaction` (submission.service.js's
+// reviewSubmission does, so the points award commits/rolls back atomically
+// with the submission's status update instead of as a separate write after).
+export async function createPointsEventForMissionCompletion({ userId, missionId, submissionId, points, client }) {
+  const existingForMission = await findPointsEventByUserAndMission(userId, missionId, "MISSION_COMPLETED", client);
   if (existingForMission) {
     return ["PENDING", "FAILED"].includes(existingForMission.status)
       ? dispatchPointsEvent(existingForMission)
       : existingForMission;
   }
 
-  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+  const event = await createPointsEventWithGeneratedId((id) =>
     createPointsEvent({
       id,
       userId,
@@ -71,7 +74,7 @@ export async function createPointsEventForMissionCompletion({ userId, missionId,
       eventType: "MISSION_COMPLETED",
       status: config.pointsLedgerUrl ? "PENDING" : "SENT",
       approvedAt: new Date()
-    })
+    }, client)
   );
 
   return dispatchPointsEvent(event);
@@ -87,7 +90,7 @@ export async function createPointsEventForRecyclingApproval({ userId, recyclingS
     return existing;
   }
 
-  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+  const event = await createPointsEventWithGeneratedId((id) =>
     createPointsEvent({
       id,
       userId,
@@ -110,7 +113,7 @@ export async function createPointsEventForRewardRedemption({ userId, redemptionI
     return existing;
   }
 
-  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+  const event = await createPointsEventWithGeneratedId((id) =>
     createPointsEvent({
       id,
       userId,
@@ -130,7 +133,7 @@ export async function createPointsEventForRewardRefund({ userId, redemptionId, p
     return existing;
   }
 
-  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+  const event = await createPointsEventWithGeneratedId((id) =>
     createPointsEvent({
       id,
       userId,
@@ -145,7 +148,7 @@ export async function createPointsEventForRewardRefund({ userId, redemptionId, p
 }
 
 export async function createAdminAdjustment({ userId, points, approvedAt = new Date() }) {
-  const event = await createWithGeneratedId("pointsEvent", "PEV", (id) =>
+  const event = await createPointsEventWithGeneratedId((id) =>
     createPointsEvent({
       id,
       userId,

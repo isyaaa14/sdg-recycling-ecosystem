@@ -2,8 +2,8 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export function createSubmission(data) {
-  return prisma.missionSubmission.create({ data });
+export function createSubmission(data, client = prisma) {
+  return client.missionSubmission.create({ data });
 }
 
 export function findSubmissionById(id) {
@@ -57,8 +57,8 @@ export function findAllSubmissions(filters) {
   });
 }
 
-export async function getApprovedMissionProgressForUser(missionId, userId) {
-  const result = await prisma.missionSubmission.aggregate({
+export async function getApprovedMissionProgressForUser(missionId, userId, client = prisma) {
+  const result = await client.missionSubmission.aggregate({
     where: { missionId, userId, status: "APPROVED" },
     _count: { _all: true },
     _sum: { quantity: true }
@@ -70,6 +70,22 @@ export async function getApprovedMissionProgressForUser(missionId, userId) {
   };
 }
 
-export function updateSubmission(id, data) {
-  return prisma.missionSubmission.update({ where: { id }, data });
+export function updateSubmission(id, data, client = prisma) {
+  return client.missionSubmission.update({ where: { id }, data });
+}
+
+// Atomic guard (mirrors recycling.repository.js's updateRecyclingSubmissionIfPending):
+// the `status: "PENDING_REVIEW"` condition makes this a no-op (count: 0) for a
+// submission a concurrent/duplicate review request already flipped, instead of
+// the findUnique-then-update race that would let two reviews both pass an
+// earlier status check.
+export function updateSubmissionIfPending(id, data, client = prisma) {
+  return client.missionSubmission.updateMany({
+    where: { id, status: "PENDING_REVIEW" },
+    data
+  });
+}
+
+export function runInTransaction(callback) {
+  return prisma.$transaction(callback);
 }

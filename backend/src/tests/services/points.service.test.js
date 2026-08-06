@@ -24,9 +24,9 @@ jest.unstable_mockModule("../../repositories/points.repository.js", () => ({
   updatePointsEventStatus: mockUpdatePointsEventStatus
 }));
 
-const mockCreateWithGeneratedId = jest.fn((model, prefix, createFn) => createFn(`${prefix}-TEST`));
+const mockCreatePointsEventWithGeneratedId = jest.fn((createFn) => createFn("PEV-TEST"));
 jest.unstable_mockModule("../../utils/idGenerator.js", () => ({
-  createWithGeneratedId: mockCreateWithGeneratedId
+  createPointsEventWithGeneratedId: mockCreatePointsEventWithGeneratedId
 }));
 
 const { createAdminAdjustment, createPointsEventForMissionCompletion, listMyPoints } = await import(
@@ -50,10 +50,28 @@ describe("createPointsEventForMissionCompletion", () => {
     });
 
     expect(mockCreatePointsEvent).toHaveBeenCalledWith(
-      expect.objectContaining({ userId: "USR001", missionId: "MSN001", eventType: "MISSION_COMPLETED", status: "SENT" })
+      expect.objectContaining({ userId: "USR001", missionId: "MSN001", eventType: "MISSION_COMPLETED", status: "SENT" }),
+      undefined
     );
     expect(result.status).toBe("SENT");
     expect(mockUpdatePointsEventStatus).not.toHaveBeenCalled();
+  });
+
+  it("threads a caller-supplied client through to both the lookup and the create call", async () => {
+    const fakeTx = { __tx: true };
+    mockFindPointsEventByUserAndMission.mockResolvedValue(null);
+    mockCreatePointsEvent.mockResolvedValue({ id: "PEV-TEST", status: "SENT" });
+
+    await createPointsEventForMissionCompletion({
+      userId: "USR001",
+      missionId: "MSN001",
+      submissionId: "SUB001",
+      points: 20,
+      client: fakeTx
+    });
+
+    expect(mockFindPointsEventByUserAndMission).toHaveBeenCalledWith("USR001", "MSN001", "MISSION_COMPLETED", fakeTx);
+    expect(mockCreatePointsEvent).toHaveBeenCalledWith(expect.objectContaining({ userId: "USR001" }), fakeTx);
   });
 
   it("returns the existing SENT event without creating a duplicate", async () => {
@@ -139,7 +157,7 @@ describe("dispatchPointsEvent with an external points ledger configured", () => 
       updatePointsEventStatus: mockUpdatePointsEventStatusLedger
     }));
     jest.unstable_mockModule("../../utils/idGenerator.js", () => ({
-      createWithGeneratedId: jest.fn((model, prefix, createFn) => createFn(`${prefix}-LEDGER`))
+      createPointsEventWithGeneratedId: jest.fn((createFn) => createFn("PEV-LEDGER"))
     }));
     jest.unstable_mockModule("../../utils/config.js", () => ({
       config: { pointsLedgerUrl: "http://fake-ledger.test", pointsLedgerTimeoutMs: 1000 }
