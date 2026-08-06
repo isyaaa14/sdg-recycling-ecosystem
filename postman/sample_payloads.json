@@ -1,0 +1,181 @@
+{
+  "missions": {
+    "create_quantity_mission": {
+      "title": "Campus Sorting Drill",
+      "description": "Sort recyclable items correctly this week.",
+      "longDescription": "Collect recyclable items, sort them by material, and submit proof of the final sorted batch.",
+      "imageUrl": "",
+      "guide": [
+        {
+          "step": 1,
+          "title": "Collect recyclables",
+          "description": "Gather clean recyclable items from campus bins."
+        },
+        {
+          "step": 2,
+          "title": "Sort materials",
+          "description": "Separate plastic, paper, and e-waste before submitting."
+        }
+      ],
+      "targetQuantity": 10,
+      "targetDays": null,
+      "type": "QUANTITY_BASED",
+      "startAt": "2026-07-01T00:00:00.000Z",
+      "endAt": "2026-12-31T23:59:59.000Z",
+      "submissionCap": 3,
+      "points": 30,
+      "autoApprove": false,
+      "isActive": true,
+      "status": "ACTIVE"
+    },
+    "submit_text_or_upload_proof": {
+      "proofText": "Collected and sorted recyclable items from the cafeteria.",
+      "quantity": 10,
+      "uploadId": "{{uploadId}}"
+    },
+    "review_approve": {
+      "status": "APPROVED",
+      "reviewNote": "Approved after evidence review."
+    },
+    "review_reject": {
+      "status": "REJECTED",
+      "reviewNote": "Rejected because the evidence was incomplete."
+    }
+  },
+  "content": {
+    "create_published_article": {
+      "title": "Plastic Recycling Safety",
+      "summary": "Learn how to clean and sort plastic safely.",
+      "body": "Plastic recycling works best when bottles and containers are empty, rinsed, and sorted by accepted type.",
+      "imageUrl": "",
+      "estimatedReadMinutes": 5,
+      "contentBlocks": [
+        {
+          "type": "paragraph",
+          "text": "Empty and rinse bottles before recycling to reduce contamination."
+        },
+        {
+          "type": "heading",
+          "text": "Check the code"
+        }
+      ],
+      "tags": [
+        "plastic",
+        "sorting",
+        "cleanliness"
+      ],
+      "status": "PUBLISHED"
+    }
+  },
+  "quizzes": {
+    "create_quiz": {
+      "contentId": "{{contentId}}",
+      "title": "Plastic Recycling Safety Quiz",
+      "passingScore": 4
+    },
+    "add_question": {
+      "questionText": "What should you do before recycling a plastic bottle?",
+      "options": [
+        "Empty and rinse it",
+        "Leave liquid inside",
+        "Mix it with food waste"
+      ],
+      "correctAnswer": "Empty and rinse it",
+      "points": 1
+    },
+    "submit_attempt": {
+      "answers": {
+        "{{questionCode}}": "Empty and rinse it"
+      },
+      "timeSpentSeconds": 72
+    }
+  },
+  "badges": {
+    "create_badge": {
+      "name": "First Approval",
+      "description": "Receive one approved mission submission.",
+      "tier": "BRONZE",
+      "criteriaType": "APPROVED_SUBMISSIONS",
+      "criteriaValue": 1
+    }
+  },
+  "uploads": {
+    "multipart_file_field": "file",
+    "supported_types": [
+      "image/jpeg",
+      "image/png",
+      "image/webp"
+    ],
+    "max_file_size": "5MB"
+  },
+  "recycling": {
+    "issue_qr": {
+      "materialType": "Plastic",
+      "estimatedWeightKg": 2,
+      "expiresInMinutes": 60
+    },
+    "claim_qr": {
+      "payload": {
+        "qrId": "QR001",
+        "nonce": "<copy nonce from issue response>",
+        "type": "recycling-deposit",
+        "materialType": "Plastic",
+        "estimatedWeightKg": 2,
+        "expiresAt": "2026-08-03T09:00:00.000Z"
+      },
+      "signature": "<copy signature from issue response>"
+    },
+    "create_manual_submission": {
+      "materialType": "Paper",
+      "quantity": 3,
+      "uploadId": "{{uploadId}}"
+    },
+    "review_approve": {
+      "status": "APPROVED",
+      "reviewNote": "Approved after evidence review."
+    },
+    "review_reject": {
+      "status": "REJECTED",
+      "reviewNote": "Rejected because the evidence was incomplete."
+    },
+    "update_point_rates": {
+      "rates": [
+        {
+          "material": "Plastic",
+          "ratePerKg": 50
+        },
+        {
+          "material": "Paper",
+          "ratePerKg": 20
+        },
+        {
+          "material": "Glass",
+          "ratePerKg": 30
+        },
+        {
+          "material": "Metal",
+          "ratePerKg": 60
+        }
+      ]
+    }
+  },
+  "rewards": {
+    "create_reward": {
+      "name": "Reusable Water Bottle",
+      "pointsRequired": 150,
+      "stock": 15,
+      "category": "Lifestyle",
+      "tier": "small"
+    },
+    "update_reward": {
+      "stock": 20,
+      "isActive": true
+    },
+    "redeem_reward": {
+      "quantity": 1
+    },
+    "cancel_redemption": {
+      "reason": "Changed my mind."
+    }
+  }
+}
