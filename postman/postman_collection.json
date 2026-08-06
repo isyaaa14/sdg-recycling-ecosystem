@@ -161,6 +161,14 @@
     {
       "key": "firstNotificationId",
       "value": ""
+    },
+    {
+      "key": "uatSubmissionId",
+      "value": ""
+    },
+    {
+      "key": "uatStudentUserId",
+      "value": ""
     }
   ],
   "item": [
@@ -5169,6 +5177,752 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "10 - UAT Demo Walkthrough (Questionnaire-Aligned)",
+      "description": "Aligned to the 'User Acceptance Testing (UAT) Questionnaire - SDG Recycling Ecosystem Backend'. Each request name references the questionnaire's task/section (e.g. TC-01-001, 4.1 Mission Processing). Run this folder top-to-bottom in one pass via Collection Runner to walk through every scenario a UAT tester needs to observe before filling out the form. Safe for MULTIPLE testers to run independently (including repeated runs by the same tester): the 'Setup: Register Unique Demo Student' step creates a brand-new student account per run (via {{$guid}}) instead of logging into a shared seeded account, so MIS003's per-user submissionCap of 1 never collides between runs -- no reseeding needed between demo sessions. The one shared account still reused across runs is the seeded ADMIN login, which is fine since none of the admin-side steps here are subject to a per-run cap. Caveat: if two testers run this folder at the exact same moment against a genuinely shared/synced Postman cloud environment (not separate local copies), the uatSubmissionId/uatStudentUserId variables could race between each other's Setup and later steps -- for true concurrent testers, have each import their own local copy of the environment rather than running against one live shared environment simultaneously. TC-08-001 (API documentation) is best reviewed via docs/API_CONTRACT.md in the repository; the request in that step just re-confirms the API is reachable.",
+      "item": [
+        {
+          "name": "Setup: Login Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "login"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.token;",
+                  "pm.expect(value, 'adminToken').to.be.a('string');",
+                  "pm.environment.set('adminToken', value);",
+                  "pm.collectionVariables.set('adminToken', value);",
+                  "pm.test('Security: password hash not exposed in login response', function () { pm.expect(json.data.user).to.not.have.property('passwordHash'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup: Register Unique Demo Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "register"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"UAT Tester {{$guid}}\",\n  \"email\": \"uat.tester.{{$guid}}@student.uow.edu.my\",\n  \"password\": \"Password123!\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const value = json && json.data && json.data.token;",
+                  "pm.expect(value, 'studentToken').to.be.a('string');",
+                  "pm.environment.set('studentToken', value);",
+                  "pm.collectionVariables.set('studentToken', value);",
+                  "const userId = json && json.data && json.data.user && json.data.user.id;",
+                  "pm.environment.set('uatStudentUserId', userId);",
+                  "pm.collectionVariables.set('uatStudentUserId', userId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-01-001: Submit Mission Entry - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS003/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "MIS003",
+                "submit"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proofText\": \"UAT TC-01-001: submitting e-waste drive participation proof.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201 - system responded to submission', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const submissionId = json && json.data && json.data.submission && json.data.submission.id;",
+                  "pm.expect(submissionId, 'uatSubmissionId').to.be.a('string');",
+                  "pm.environment.set('uatSubmissionId', submissionId);",
+                  "pm.collectionVariables.set('uatSubmissionId', submissionId);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-02-001: Duplicate Mission Submission Rejected - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS003/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "MIS003",
+                "submit"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proofText\": \"UAT TC-02-001: duplicate submission attempt, should be rejected.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 409 - duplicate submission rejected', function () { pm.response.to.have.status(409); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-03-001a: Approve Mission Submission - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/{{uatSubmissionId}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions",
+                "{{uatSubmissionId}}",
+                "review"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"reviewNote\": \"Approved during UAT demo (TC-03-001).\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('submission marked APPROVED', function () { pm.expect(pm.response.json().data.submission.status).to.eql('APPROVED'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-03-001b: Verify Points Emitted To Ledger - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const events = pm.response.json().data.events;",
+                  "const completionEvent = events.find(function (e) { return e.missionId === 'MIS003' && e.eventType === 'MISSION_COMPLETED'; });",
+                  "pm.test('MISSION_COMPLETED points event recorded for MIS003', function () { pm.expect(completionEvent).to.be.an('object'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "API Quality: Response Time & Reliability - Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "health"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('responds within 1000ms', function () { pm.expect(pm.response.responseTime).to.be.below(1000); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-04-001: Retrieve Content By Tag - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=plastic",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ],
+              "query": [
+                {
+                  "key": "tag",
+                  "value": "plastic"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('tag-based search returns matching content', function () { pm.expect(pm.response.json().data.content.length).to.be.above(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "4.2 Content Versioning Check - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}/revisions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content",
+                "{{contentId}}",
+                "revisions"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('previous revisions preserved', function () { pm.expect(pm.response.json().data.revisions.length).to.be.above(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-05-001a: Submit Quiz Attempt - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "quizzes",
+                "{{quizId}}",
+                "attempts"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"answers\": {\n    \"{{questionCode}}\": \"PET\"\n  },\n  \"timeSpentSeconds\": 60\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('scoring result returned', function () { pm.expect(pm.response.json().data.attempt.score).to.be.a('number'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-05-001b: Review My Content Progress - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "progress",
+                "content",
+                "{{contentId}}",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "pm.test('quiz attempt reflected in learning progress', function () { pm.expect(pm.response.json().data.progress.quizAttemptsCount).to.be.above(0); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-07-001a: Trigger Badge Eligibility (1st Check) - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges",
+                "progress"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const earned = pm.response.json().data.earned;",
+                  "pm.test('Mission Finisher badge earned', function () { pm.expect(earned.some(function (b) { return b.badgeId === 'BDG001'; })).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-07-001b: Trigger Badge Eligibility (2nd Check, Repeat) - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges",
+                "progress"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const earned = pm.response.json().data.earned;",
+                  "pm.test('badge eligibility still shows earned on repeat trigger', function () { pm.expect(earned.some(function (b) { return b.badgeId === 'BDG001'; })).to.be.true; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-07-001c: Verify Single Badge Award (No Duplicates) - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges/BDG001/awards",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges",
+                "BDG001",
+                "awards"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const awards = pm.response.json().data.awards;",
+                  "const studentId = pm.environment.get('uatStudentUserId') || pm.collectionVariables.get('uatStudentUserId');",
+                  "const matching = awards.filter(function (a) { return a.userId === studentId; });",
+                  "pm.test('badge awarded exactly once despite repeated triggers', function () { pm.expect(matching.length).to.eql(1); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-08-001: API Documentation Reachability Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": []
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 - API reachable for documentation review', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ],
+          "description": "The written API documentation this questionnaire item refers to is docs/API_CONTRACT.md in the repository, plus this collection's own request/folder descriptions. This request just confirms the API is live before reviewing that documentation against real behavior."
+        },
+        {
+          "name": "Security: Unauthenticated Request Rejected",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 401 - unauthenticated request rejected', function () { pm.response.to.have.status(401); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Security: Invalid Input Returns Clear Error Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"\",\n  \"description\": \"\",\n  \"tier\": \"WOOD\",\n  \"criteriaType\": \"UNKNOWN\",\n  \"criteriaValue\": 0\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400 - invalid input rejected', function () { pm.response.to.have.status(400); });",
+                  "pm.test('clear error message returned', function () { pm.expect(pm.response.json().error.message).to.be.a('string').and.not.empty; });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Integrity: Manual Recycling Submission - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materialType\": \"Metal\",\n  \"quantity\": 2\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Integrity: Immediate Repeat Rejected (Rapid Request Consistency) - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"materialType\": \"Metal\",\n  \"quantity\": 2\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 429 - rapid repeated submission rejected', function () { pm.response.to.have.status(429); });"
                 ]
               }
             }
