@@ -38,12 +38,14 @@ Run these first:
 9. `Badges / Badge Progress - Student`
 10. `Points / My Points - Student`
 
-Then test the mobile write flow:
+Then test the mobile write flows:
 
 1. `Uploads / Upload Mission Proof`
 2. `Missions / Join Mission`
 3. `Missions / Submit Mission`
 4. `Quizzes / Submit Attempt`
+5. `Recycling / Create Manual Recycling Submission - Student`
+6. `Recycling / Review Recycling Submission - Admin`
 
 ## Current Route Groups
 
@@ -58,6 +60,11 @@ The collection targets these mounted route groups:
 - `/badges`
 - `/points`
 - `/uploads`
+- `/recycling`
+- `/rewards`
+- `/leaderboard`
+- `/anti-gaming`
+- `/users`
 
 ## Notes
 

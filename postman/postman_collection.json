@@ -169,6 +169,10 @@
     {
       "key": "uatStudentUserId",
       "value": ""
+    },
+    {
+      "key": "uatRecyclingSubmissionId",
+      "value": ""
     }
   ],
   "item": [
@@ -3627,7 +3631,13 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                      "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                      "const json = pm.response.json();",
+                      "const submission = json && json.data && json.data.submission;",
+                      "pm.expect(submission && submission.id, 'recyclingSubmissionId').to.be.a('string');",
+                      "pm.environment.set('recyclingSubmissionId', submission.id);",
+                      "pm.collectionVariables.set('recyclingSubmissionId', submission.id);",
+                      "pm.test('manual recycling submission is pending review', function () { pm.expect(submission.status).to.eql('PENDING_REVIEW'); });"
                     ]
                   }
                 }
@@ -3780,7 +3790,8 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                      "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                      "pm.test('recycling submission marked APPROVED', function () { pm.expect(pm.response.json().data.submission.status).to.eql('APPROVED'); });"
                     ]
                   }
                 }
@@ -5923,7 +5934,151 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('status 201', function () { pm.response.to.have.status(201); });"
+                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const submission = json && json.data && json.data.submission;",
+                  "pm.expect(submission && submission.id, 'uatRecyclingSubmissionId').to.be.a('string');",
+                  "pm.environment.set('uatRecyclingSubmissionId', submission.id);",
+                  "pm.collectionVariables.set('uatRecyclingSubmissionId', submission.id);",
+                  "pm.test('recycling submission enters review queue', function () { pm.expect(submission.status).to.eql('PENDING_REVIEW'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Integrity: Approve Recycling Submission - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{uatRecyclingSubmissionId}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions",
+                "{{uatRecyclingSubmissionId}}",
+                "review"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\",\n  \"reviewNote\": \"Approved during UAT data-integrity recycling flow.\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submission = pm.response.json().data.submission;",
+                  "pm.test('recycling submission marked APPROVED', function () { pm.expect(submission.status).to.eql('APPROVED'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Integrity: Verify Recycling Approval Points - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submissionId = pm.environment.get('uatRecyclingSubmissionId') || pm.collectionVariables.get('uatRecyclingSubmissionId');",
+                  "const events = pm.response.json().data.events;",
+                  "const approvalEvent = events.find(function (e) { return e.recyclingSubmissionId === submissionId && e.eventType === 'RECYCLING_APPROVED'; });",
+                  "pm.test('RECYCLING_APPROVED points event recorded for approved recycling submission', function () { pm.expect(approvalEvent).to.be.an('object'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Integrity: Duplicate Recycling Review Rejected - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{uatRecyclingSubmissionId}}/review",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions",
+                "{{uatRecyclingSubmissionId}}",
+                "review"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"APPROVED\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('reviewing an already-reviewed recycling submission is rejected', function () { pm.expect([404, 409]).to.include(pm.response.code); });"
                 ]
               }
             }
