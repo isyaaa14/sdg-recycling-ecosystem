@@ -1,0 +1,1 @@
+ALTER TYPE "UploadPurpose" ADD VALUE 'MISSION_IMAGE';

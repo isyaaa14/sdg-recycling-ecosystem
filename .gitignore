@@ -1,0 +1,44 @@
+# Environment and secrets
+.env
+.env.*
+!.env.example
+
+# Dependencies and build output
+node_modules/
+dist/
+coverage/
+
+# Logs and local databases
+*.log
+backend/prisma/dev.db
+
+# IDE and local workspace files
+.idea/
+.vscode/
+*.code-workspace
+
+# Local/team scratch copies
+mobile-app/
+sdg-recycling-ecosystem-Full-Integration/
+sdg-recycling-ecosystem-Full-Integration(1)/
+azure-static-test-site/
+student3-review.md
+admin_fixed.html
+docs/generated/
+sdg-recycling-ecosystem-Full-Integration/
+sdg-recycling-ecosystem-main/
+static-deploy/
+
+# Manual deployment packages
+*.zip
+.env
+
+node_modules/
+
+dist/
+
+*.log
+
+backend/prisma/dev.db
+
+postman/
