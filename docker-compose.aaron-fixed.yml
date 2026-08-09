@@ -1,0 +1,6 @@
+services:
+  backend:
+    build:
+      context: ./aaron-backend-fixed
+    env_file:
+      - ./aaron-backend-fixed/.env.docker

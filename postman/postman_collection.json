@@ -12,7 +12,7 @@
     },
     {
       "key": "apiPrefix",
-      "value": "/api/v1"
+      "value": "api/v1"
     },
     {
       "key": "frontendUrl",
@@ -211,7 +211,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/health",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/health",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -240,7 +240,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/db-test",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/db-test",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -279,7 +279,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -323,7 +323,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -367,7 +367,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -402,7 +402,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -437,7 +437,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -471,7 +471,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -510,7 +510,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -544,7 +544,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/{{missionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -579,7 +579,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -613,7 +613,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=plastic",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content?tag=plastic",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -652,7 +652,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content/{{contentId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -687,7 +687,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -721,7 +721,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{quizId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -756,7 +756,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/progress/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -790,7 +790,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/progress/content/{{contentId}}/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -826,7 +826,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/progress",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -861,7 +861,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/points/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -895,7 +895,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -929,7 +929,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/mine",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/uploads/mine",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -968,7 +968,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1001,7 +1001,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions?status=ACTIVE",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions?status=ACTIVE",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1040,7 +1040,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1073,7 +1073,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions?status=PENDING_REVIEW",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions?status=PENDING_REVIEW",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1112,7 +1112,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/{{submissionId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions/{{submissionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1146,7 +1146,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submissions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/{{missionId}}/submissions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1181,7 +1181,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1214,7 +1214,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content?status=DRAFT",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content?status=DRAFT",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1253,7 +1253,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}/revisions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content/{{contentId}}/revisions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1288,7 +1288,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1321,7 +1321,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{badgeId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/{{badgeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1355,7 +1355,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{badgeId}}/awards",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/{{badgeId}}/awards",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1390,7 +1390,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/points",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/points",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1423,7 +1423,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{quizId}}/attempts",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1458,7 +1458,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/progress/content/{{contentId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1477,6 +1477,74 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "List Audit Logs - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/audit-logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "audit-logs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json().data;",
+                  "pm.test('audit logs shape', function () { pm.expect(data.logs).to.be.an('array'); pm.expect(data.pagination).to.be.an('object'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot List Audit Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/audit-logs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "audit-logs"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
                 ]
               }
             }
@@ -1503,7 +1571,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{quizId}}/attempts",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1543,7 +1611,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{quizId}}/attempts/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1579,7 +1647,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/complete",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/progress/content/{{contentId}}/complete",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1619,7 +1687,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{missionId}}/submit",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/{{missionId}}/submit",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1669,7 +1737,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1715,7 +1783,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{createdContentId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content/{{createdContentId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1753,7 +1821,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{createdContentId}}/revisions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content/{{createdContentId}}/revisions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1792,7 +1860,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1838,7 +1906,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1888,7 +1956,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1931,7 +1999,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -1974,7 +2042,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2017,7 +2085,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}/questions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2060,7 +2128,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/questions/{{createdQuestionId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}/questions/{{createdQuestionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2100,7 +2168,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2138,7 +2206,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{createdQuizId}}/attempts",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{createdQuizId}}/attempts",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2177,7 +2245,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{createdContentId}}/complete",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/progress/content/{{createdContentId}}/complete",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2213,7 +2281,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{createdContentId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content/{{createdContentId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2251,7 +2319,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2262,7 +2330,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"Postman Approval Badge {{$timestamp}}\",\n  \"description\": \"Receive one approved mission submission.\",\n  \"tier\": \"BRONZE\",\n  \"criteriaType\": \"APPROVED_SUBMISSIONS\",\n  \"criteriaValue\": 1\n}"
+              "raw": "{\n  \"name\": \"Postman Approval Badge {{$timestamp}}\",\n  \"description\": \"Receive one approved mission submission.\",\n  \"tier\": \"BRONZE\",\n  \"criteriaType\": \"APPROVED_SUBMISSIONS\",\n  \"criteriaValue\": 1,\n  \"rewardPoints\": 25\n}"
             }
           },
           "event": [
@@ -2276,7 +2344,8 @@
                   "const value = json && json.data && json.data.badge && json.data.badge.id;",
                   "pm.expect(value, 'createdBadgeId').to.be.a('string');",
                   "pm.environment.set('createdBadgeId', value);",
-                  "pm.collectionVariables.set('createdBadgeId', value);"
+                  "pm.collectionVariables.set('createdBadgeId', value);",
+                  "pm.test('rewardPoints saved on badge', function () { pm.expect(json.data.badge.rewardPoints).to.eql(25); });"
                 ]
               }
             }
@@ -2297,7 +2366,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{createdBadgeId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/{{createdBadgeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2335,7 +2404,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/{{createdBadgeId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/{{createdBadgeId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2373,7 +2442,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2428,7 +2497,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{createdMissionId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/{{createdMissionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2466,7 +2535,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{createdMissionId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/{{createdMissionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2504,7 +2573,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{createdMissionId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/{{createdMissionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2544,7 +2613,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/mission-proof",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/uploads/mission-proof",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2571,7 +2640,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('upload succeeds when testFilePath is set', function () { pm.expect([201, 400, 500]).to.include(pm.response.code); });",
+                  "pm.test('upload succeeds when testFilePath is set, or 503 if Azure Blob Storage is not configured', function () { pm.expect([201, 400, 503]).to.include(pm.response.code); });",
                   "if (pm.response.code === 201) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('uploadId', uploadId); pm.collectionVariables.set('uploadId', uploadId); }"
                 ]
               }
@@ -2589,7 +2658,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/{{uploadId}}",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/uploads/{{uploadId}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2623,7 +2692,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/content-image",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/uploads/content-image",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2650,7 +2719,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('content image upload succeeds when testFilePath is set', function () { pm.expect([201, 400, 500]).to.include(pm.response.code); });",
+                  "pm.test('content image upload succeeds when testFilePath is set, or 503 if Azure Blob Storage is not configured', function () { pm.expect([201, 400, 503]).to.include(pm.response.code); });",
                   "if (pm.response.code === 201) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('contentImageUploadId', uploadId); pm.collectionVariables.set('contentImageUploadId', uploadId); }"
                 ]
               }
@@ -2668,7 +2737,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/mine",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/uploads/mine",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2702,7 +2771,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/uploads/recycling-proof",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/uploads/recycling-proof",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2729,7 +2798,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('recycling proof upload succeeds when testFilePath is set', function () { pm.expect([201, 400, 500]).to.include(pm.response.code); });",
+                  "pm.test('recycling proof upload succeeds when testFilePath is set, or 503 if Azure Blob Storage is not configured', function () { pm.expect([201, 400, 503]).to.include(pm.response.code); });",
                   "if (pm.response.code === 201) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('recyclingProofUploadId', uploadId); pm.collectionVariables.set('recyclingProofUploadId', uploadId); }"
                 ]
               }
@@ -2747,7 +2816,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{rewardId}}/image",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/{{rewardId}}/image",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2775,8 +2844,8 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('reward image upload succeeds when testFilePath is set', function () { pm.expect([200, 400, 404, 500]).to.include(pm.response.code); });",
-                  "if (pm.response.code === 200) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('rewardImageUploadId', uploadId); pm.collectionVariables.set('rewardImageUploadId', uploadId); }"
+                  "pm.test('reward image upload succeeds when testFilePath is set, or 503 if Azure Blob Storage is not configured', function () { pm.expect([201, 400, 404, 503]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) { const uploadId = pm.response.json().data.upload.id; pm.environment.set('rewardImageUploadId', uploadId); pm.collectionVariables.set('rewardImageUploadId', uploadId); }"
                 ]
               }
             }
@@ -2802,7 +2871,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2839,7 +2908,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/points/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2873,7 +2942,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=not-a-tag",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content?tag=not-a-tag",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2912,7 +2981,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS999999",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/MIS999999",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2950,7 +3019,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -2991,7 +3060,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/issue",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/issue",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -3039,7 +3108,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/point-rates",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/point-rates",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -3086,7 +3155,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{rewardId}}/redeem",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/{{rewardId}}/redeem",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -3134,7 +3203,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/claim",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/claim",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -3178,7 +3247,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/RCS999999",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions/RCS999999",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -3217,7 +3286,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/rewards",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/rewards",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -3259,7 +3328,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/suspicious-activities",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/anti-gaming/suspicious-activities",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -3301,7 +3370,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/point-rates",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/point-rates",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3339,7 +3408,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/point-rates",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/point-rates",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3386,7 +3455,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/issue",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/issue",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3435,7 +3504,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3469,7 +3538,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/{{recyclingQrId}}",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/{{recyclingQrId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3508,7 +3577,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/claim",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/claim",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3555,7 +3624,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/auth/login",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3605,7 +3674,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3654,7 +3723,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/me",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions/me",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3689,7 +3758,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3723,7 +3792,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3762,7 +3831,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}/review",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}/review",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3812,7 +3881,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/issue",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/issue",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3859,7 +3928,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/{{recyclingQrIdToInvalidate}}/invalidate",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/{{recyclingQrIdToInvalidate}}/invalidate",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3899,7 +3968,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/qr/claim",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/qr/claim",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3947,7 +4016,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}/review",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions/{{recyclingSubmissionId}}/review",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -3997,7 +4066,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4034,7 +4103,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4083,7 +4152,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{createdRewardId}}",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/{{createdRewardId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4130,7 +4199,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{rewardId}}/redeem",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/{{rewardId}}/redeem",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4175,7 +4244,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/me",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/redemptions/me",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4210,7 +4279,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/redemptions",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4244,7 +4313,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionId}}",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/redemptions/{{redemptionId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4279,7 +4348,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionId}}/complete",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/redemptions/{{redemptionId}}/complete",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4319,7 +4388,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/RWD002/redeem",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/RWD002/redeem",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4368,7 +4437,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionIdToCancel}}/cancel",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/redemptions/{{redemptionIdToCancel}}/cancel",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4413,7 +4482,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{createdRewardId}}",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/{{createdRewardId}}",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4451,7 +4520,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/{{highTierRewardId}}/redeem",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/{{highTierRewardId}}/redeem",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4478,7 +4547,7 @@
                   "script": {
                     "type": "text/javascript",
                     "exec": [
-                      "pm.test('redeeming above balance is rejected', function () { pm.expect([201, 400]).to.include(pm.response.code); });",
+                      "pm.test('redeeming above balance is rejected, or 429 if this reward is still on cooldown from a prior run', function () { pm.expect([201, 400, 429]).to.include(pm.response.code); });",
                       "if (pm.response.code === 400) { pm.test('error message mentions points', function () { pm.expect(pm.response.json().error.message).to.match(/points/i); }); }"
                     ]
                   }
@@ -4496,7 +4565,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/rewards/redemptions/{{redemptionId}}/complete",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/rewards/redemptions/{{redemptionId}}/complete",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4537,7 +4606,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/leaderboard",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/leaderboard",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4575,7 +4644,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/me/status",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/anti-gaming/me/status",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4610,7 +4679,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/suspicious-activities",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/anti-gaming/suspicious-activities",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4648,7 +4717,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/anti-gaming/users/{{studentUserId}}/flag",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/anti-gaming/users/{{studentUserId}}/flag",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4702,7 +4771,7 @@
                   }
                 ],
                 "url": {
-                  "raw": "{{baseUrl}}{{apiPrefix}}/users/me",
+                  "raw": "{{baseUrl}}/{{apiPrefix}}/users/me",
                   "host": [
                     "{{baseUrl}}"
                   ],
@@ -4754,7 +4823,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -4793,7 +4862,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -4832,7 +4901,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -4870,7 +4939,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -4908,7 +4977,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -4946,7 +5015,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/admin/run-inactivity-sweep",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/run-inactivity-sweep",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -4981,7 +5050,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/admin/run-inactivity-sweep",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/run-inactivity-sweep",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5015,7 +5084,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/admin/notifications",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/notifications",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5054,7 +5123,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/admin/notifications",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/notifications",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5092,7 +5161,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/admin/notifications/read",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/notifications/read",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5132,7 +5201,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5168,7 +5237,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5210,7 +5279,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5254,7 +5323,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/register",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5304,7 +5373,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS003/submit",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/MIS003/submit",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5352,7 +5421,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS003/submit",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/MIS003/submit",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5395,7 +5464,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/{{uatSubmissionId}}/review",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions/{{uatSubmissionId}}/review",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5439,7 +5508,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/{{uatSubmissionId}}/review",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions/{{uatSubmissionId}}/review",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5478,7 +5547,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/points/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5510,7 +5579,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/health",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/health",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5544,7 +5613,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content?tag=plastic",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content?tag=plastic",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5584,7 +5653,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/content/{{contentId}}/revisions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content/{{contentId}}/revisions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5624,7 +5693,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/quizzes/{{quizId}}/attempts",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/quizzes/{{quizId}}/attempts",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5664,7 +5733,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/progress/content/{{contentId}}/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/progress/content/{{contentId}}/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5701,7 +5770,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/progress",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5737,7 +5806,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/progress",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/progress",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5773,7 +5842,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges/BDG001/awards",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges/BDG001/awards",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5833,7 +5902,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/auth/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5871,7 +5940,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/badges",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5913,7 +5982,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -5961,7 +6030,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{uatRecyclingSubmissionId}}/review",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions/{{uatRecyclingSubmissionId}}/review",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -6008,7 +6077,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/points/me",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -6050,7 +6119,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/{{uatRecyclingSubmissionId}}/review",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions/{{uatRecyclingSubmissionId}}/review",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -6099,7 +6168,7 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/recycling/submissions",
               "host": [
                 "{{baseUrl}}"
               ],

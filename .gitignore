@@ -28,6 +28,7 @@ docs/generated/
 sdg-recycling-ecosystem-Full-Integration/
 sdg-recycling-ecosystem-main/
 static-deploy/
+aaron-backend-fixed/
 
 # Manual deployment packages
 *.zip
