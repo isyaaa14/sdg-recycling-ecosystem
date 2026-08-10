@@ -36,17 +36,6 @@ export function findMissionById(id) {
   });
 }
 
-export function findOverlappingMission(type, startAt, endAt, excludeId) {
-  return prisma.mission.findFirst({
-    where: {
-      type,
-      startAt: { lt: endAt },
-      endAt: { gt: startAt },
-      ...(excludeId ? { id: { not: excludeId } } : {})
-    }
-  });
-}
-
 export function findActiveMissions() {
   return prisma.mission.findMany({
     where: {

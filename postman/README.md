@@ -134,7 +134,7 @@ uatMissionEndAt=now plus 30 days
 
 The response test stores the generated mission ID into `uatMissionId`, which the rest of folder 10 uses. One mission is enough for one UAT session because it proves student submission, duplicate prevention, admin review, points update, and live list visibility.
 
-If mission creation returns `409`, another active mission of the same type overlaps that date window. For the session, either archive the conflicting UAT mission, change the type/window, or manually set `uatMissionId` to an already-created active UAT mission that accepts submissions now.
+Mission creation should be allowed even when another active mission of the same type already exists. The live backup already contains overlapping active missions, so the backend permits this instead of treating overlap as an error. If mission creation still returns `409`, confirm the deployed backend includes the overlap-rule fix, then check for a duplicate title/slug or manually set `uatMissionId` to an already-created active UAT mission that accepts submissions now.
 
 ### How Folder 10 Sticks To One Tester
 

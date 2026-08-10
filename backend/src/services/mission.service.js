@@ -1,7 +1,6 @@
 import { createMissionSchema, updateMissionSchema } from "../validators/mission.validator.js";
 import {
   createMission as createMissionRecord,
-  findOverlappingMission,
   findMissionById,
   findActiveMissions,
   findAllMissions,
@@ -28,11 +27,6 @@ export async function createMission(payload, createdById) {
   
   if (data.endAt <= data.startAt) {
     throw new MissionServiceError(400, "Invalid time window.");
-  }
-
-  const overlapping = await findOverlappingMission(data.type, data.startAt, data.endAt);
-  if (overlapping) {
-    throw new MissionServiceError(409, "Mission time window overlaps with an existing mission of this type.");
   }
 
   return createWithGeneratedId("mission", "MIS", (id) =>
@@ -94,17 +88,11 @@ export async function updateMission(id, payload) {
   }
 
   const data = result.data;
-  const effectiveType = data.type ?? existing.type;
   const effectiveStartAt = data.startAt ?? existing.startAt;
   const effectiveEndAt = data.endAt ?? existing.endAt;
 
   if (effectiveEndAt <= effectiveStartAt) {
     throw new MissionServiceError(400, "Invalid time window.");
-  }
-
-  const overlapping = await findOverlappingMission(effectiveType, effectiveStartAt, effectiveEndAt, id);
-  if (overlapping) {
-    throw new MissionServiceError(409, "Mission time window overlaps with an existing mission of this type.");
   }
 
   const updateData = { ...data };
