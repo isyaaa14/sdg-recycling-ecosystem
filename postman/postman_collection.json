@@ -173,6 +173,78 @@
     {
       "key": "uatRecyclingSubmissionId",
       "value": ""
+    },
+    {
+      "key": "uatTesterEmail",
+      "value": ""
+    },
+    {
+      "key": "uatTesterPassword",
+      "value": ""
+    },
+    {
+      "key": "uatTesterDisplayName",
+      "value": ""
+    },
+    {
+      "key": "uatTesterEmailResolved",
+      "value": ""
+    },
+    {
+      "key": "uatSessionCode",
+      "value": ""
+    },
+    {
+      "key": "uatMissionId",
+      "value": ""
+    },
+    {
+      "key": "uatMissionTitle",
+      "value": ""
+    },
+    {
+      "key": "uatMissionStartAt",
+      "value": ""
+    },
+    {
+      "key": "uatMissionEndAt",
+      "value": ""
+    },
+    {
+      "key": "uatBaselinePoints",
+      "value": ""
+    },
+    {
+      "key": "uatLatestPoints",
+      "value": ""
+    },
+    {
+      "key": "uatBaselinePointEventCount",
+      "value": ""
+    },
+    {
+      "key": "uatLatestPointEventCount",
+      "value": ""
+    },
+    {
+      "key": "uatBaselineMissionSubmissionCount",
+      "value": ""
+    },
+    {
+      "key": "uatLatestMissionSubmissionCount",
+      "value": ""
+    },
+    {
+      "key": "uatBaselineRecyclingSubmissionCount",
+      "value": ""
+    },
+    {
+      "key": "uatLatestRecyclingSubmissionCount",
+      "value": ""
+    },
+    {
+      "key": "uatMissionSubmissionCreatedThisSession",
+      "value": ""
     }
   ],
   "item": [
@@ -5197,7 +5269,7 @@
     },
     {
       "name": "10 - UAT Demo Walkthrough (Questionnaire-Aligned)",
-      "description": "Aligned to the 'User Acceptance Testing (UAT) Questionnaire - SDG Recycling Ecosystem Backend'. Each request name references the questionnaire's task/section (e.g. TC-01-001, 4.1 Mission Processing). Run this folder top-to-bottom in one pass via Collection Runner to walk through every scenario a UAT tester needs to observe before filling out the form. Safe for MULTIPLE testers to run independently (including repeated runs by the same tester): the 'Setup: Register Unique Demo Student' step creates a brand-new student account per run (via {{$guid}}) instead of logging into a shared seeded account, so MIS003's per-user submissionCap of 1 never collides between runs -- no reseeding needed between demo sessions. The one shared account still reused across runs is the seeded ADMIN login, which is fine since none of the admin-side steps here are subject to a per-run cap. Caveat: if two testers run this folder at the exact same moment against a genuinely shared/synced Postman cloud environment (not separate local copies), the uatSubmissionId/uatStudentUserId variables could race between each other's Setup and later steps -- for true concurrent testers, have each import their own local copy of the environment rather than running against one live shared environment simultaneously. TC-08-001 (API documentation) is best reviewed via docs/API_CONTRACT.md in the repository; the request in that step just re-confirms the API is reachable.",
+      "description": "Aligned to the 'User Acceptance Testing (UAT) Questionnaire - SDG Recycling Ecosystem Backend'. Run this folder top-to-bottom for one UAT session using a real live tester account instead of creating throwaway demo users. Before the session, set uatTesterEmail and uatTesterPassword in the active Postman environment. The setup step logs in that tester, stores studentToken and uatStudentUserId, and guards against accidentally switching tester IDs mid-session. Create or choose one dedicated active UAT mission, then set uatMissionId; the included 'Setup: Create Dedicated UAT Mission - Admin' request is a sample you can run once at the start of a session. The folder captures baseline points/submissions, performs student/admin actions, and then reads fresh API data back so the UAT evidence reflects real-time state changes. If the same tester reruns the same one-submission mission, duplicate submission checks may correctly return 409; use a fresh UAT mission or clear the tester's UAT submission for a fully fresh submit-and-approve walkthrough.",
       "item": [
         {
           "name": "Setup: Login Admin",
@@ -5244,7 +5316,77 @@
           ]
         },
         {
-          "name": "Setup: Register Unique Demo Student",
+          "name": "Setup: Create Dedicated UAT Mission - Admin (Run Once Per Session)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"UAT Recycling Mission {{uatSessionCode}}\",\n  \"description\": \"Dedicated mission for live UAT tester walkthrough. Created from Postman folder 10.\",\n  \"longDescription\": \"Used during UAT sessions to verify student mission submission, duplicate prevention, admin review, points ledger updates, and live data visibility using one real tester account.\",\n  \"type\": \"TIME_LIMITED\",\n  \"startAt\": \"{{uatMissionStartAt}}\",\n  \"endAt\": \"{{uatMissionEndAt}}\",\n  \"submissionCap\": 1,\n  \"points\": 10,\n  \"autoApprove\": false,\n  \"status\": \"ACTIVE\",\n  \"isActive\": true,\n  \"guide\": [\n    {\n      \"step\": 1,\n      \"title\": \"Prepare recyclable item\",\n      \"description\": \"Tester prepares one recyclable or e-waste item for the UAT proof.\"\n    },\n    {\n      \"step\": 2,\n      \"title\": \"Submit proof\",\n      \"description\": \"Tester submits text proof through the mission endpoint.\"\n    },\n    {\n      \"step\": 3,\n      \"title\": \"Admin review\",\n      \"description\": \"Admin approves the pending submission during the UAT walkthrough.\"\n    }\n  ]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.environment.get('uatSessionCode')) {",
+                  "  pm.environment.set('uatSessionCode', String(Date.now()));",
+                  "}",
+                  "if (!pm.environment.get('uatMissionStartAt')) {",
+                  "  pm.environment.set('uatMissionStartAt', new Date(Date.now() - 5 * 60 * 1000).toISOString());",
+                  "}",
+                  "if (!pm.environment.get('uatMissionEndAt')) {",
+                  "  pm.environment.set('uatMissionEndAt', new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString());",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 201 - UAT mission created', function () { pm.response.to.have.status(201); });",
+                  "const json = pm.response.json();",
+                  "const mission = json && json.data && json.data.mission;",
+                  "pm.expect(mission && mission.id, 'uatMissionId').to.be.a('string');",
+                  "pm.environment.set('uatMissionId', mission.id);",
+                  "pm.collectionVariables.set('uatMissionId', mission.id);",
+                  "pm.environment.set('uatMissionTitle', mission.title || '');",
+                  "pm.test('UAT mission is active and manual-review', function () {",
+                  "  pm.expect(mission.status).to.eql('ACTIVE');",
+                  "  pm.expect(mission.isActive).to.eql(true);",
+                  "  pm.expect(mission.autoApprove).to.eql(false);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Sample UAT mission setup. Run once per testing session after admin login, then keep the returned uatMissionId for the rest of folder 10. If this returns 409 because an active mission of the same type overlaps, either choose a non-overlapping window, archive the conflicting UAT mission, or manually set uatMissionId to an already-created active UAT mission."
+        },
+        {
+          "name": "Setup: Login Live UAT Tester",
           "request": {
             "method": "POST",
             "header": [
@@ -5254,19 +5396,19 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/auth/register",
+              "raw": "{{baseUrl}}{{apiPrefix}}/auth/login",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
                 "auth",
-                "register"
+                "login"
               ]
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"UAT Tester {{$guid}}\",\n  \"email\": \"uat.tester.{{$guid}}@student.uow.edu.my\",\n  \"password\": \"Password123!\"\n}"
+              "raw": "{\n  \"email\": \"{{uatTesterEmail}}\",\n  \"password\": \"{{uatTesterPassword}}\"\n}"
             }
           },
           "event": [
@@ -5275,15 +5417,197 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('status 201', function () { pm.response.to.have.status(201); });",
+                  "pm.test('uatTesterEmail is configured', function () { pm.expect(pm.environment.get('uatTesterEmail'), 'uatTesterEmail').to.be.a('string').and.not.empty; });",
+                  "pm.test('uatTesterPassword is configured', function () { pm.expect(pm.environment.get('uatTesterPassword'), 'uatTesterPassword').to.be.a('string').and.not.empty; });",
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
                   "const json = pm.response.json();",
-                  "const value = json && json.data && json.data.token;",
-                  "pm.expect(value, 'studentToken').to.be.a('string');",
-                  "pm.environment.set('studentToken', value);",
-                  "pm.collectionVariables.set('studentToken', value);",
-                  "const userId = json && json.data && json.data.user && json.data.user.id;",
-                  "pm.environment.set('uatStudentUserId', userId);",
-                  "pm.collectionVariables.set('uatStudentUserId', userId);"
+                  "const token = json && json.data && json.data.token;",
+                  "const user = json && json.data && json.data.user;",
+                  "pm.expect(token, 'studentToken').to.be.a('string');",
+                  "pm.expect(user && user.id, 'uatStudentUserId').to.be.a('string');",
+                  "pm.test('logged-in UAT tester is a student', function () { pm.expect(user.role).to.eql('STUDENT'); });",
+                  "const existingUatStudentUserId = pm.environment.get('uatStudentUserId');",
+                  "if (existingUatStudentUserId && existingUatStudentUserId !== user.id) {",
+                  "  throw new Error('Environment is already bound to ' + existingUatStudentUserId + ', but login returned ' + user.id + '. Clear uatStudentUserId only if changing tester.');",
+                  "}",
+                  "pm.environment.set('studentToken', token);",
+                  "pm.collectionVariables.set('studentToken', token);",
+                  "pm.environment.set('uatStudentUserId', user.id);",
+                  "pm.collectionVariables.set('uatStudentUserId', user.id);",
+                  "pm.environment.set('uatTesterDisplayName', user.name || '');",
+                  "pm.environment.set('uatTesterEmailResolved', user.email || '');",
+                  "pm.test('Security: password hash not exposed in login response', function () { pm.expect(user).to.not.have.property('passwordHash'); });"
+                ]
+              }
+            }
+          ],
+          "description": "Uses the tester email/password entered once in the active Postman environment. This request binds the rest of folder 10 to the returned live student user ID."
+        },
+        {
+          "name": "Setup: Verify Dedicated UAT Mission - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{uatMissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "{{uatMissionId}}"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('uatMissionId is configured', function () { pm.expect(pm.environment.get('uatMissionId') || pm.collectionVariables.get('uatMissionId'), 'uatMissionId').to.be.a('string').and.not.empty; });",
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const mission = pm.response.json().data.mission;",
+                  "pm.test('UAT mission accepts submissions now', function () {",
+                  "  const now = Date.now();",
+                  "  pm.expect(mission.status).to.eql('ACTIVE');",
+                  "  pm.expect(mission.isActive).to.eql(true);",
+                  "  pm.expect(new Date(mission.startAt).getTime()).to.be.below(now + 1000);",
+                  "  pm.expect(new Date(mission.endAt).getTime()).to.be.above(now);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "description": "Confirms the session has a real active mission ID before student submission tests run."
+        },
+        {
+          "name": "Setup: Capture Baseline Points - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/points/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "points",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const data = pm.response.json().data;",
+                  "const total = data.totalPoints || data.total || 0;",
+                  "const events = data.events || [];",
+                  "pm.environment.set('uatBaselinePoints', total);",
+                  "pm.environment.set('uatBaselinePointEventCount', events.length);",
+                  "pm.test('baseline points captured for this live tester', function () { pm.expect(total).to.be.a('number'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup: Capture Baseline Mission Submissions - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/me?missionId={{uatMissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions",
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "missionId",
+                  "value": "{{uatMissionId}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submissions = pm.response.json().data.submissions || [];",
+                  "pm.environment.set('uatBaselineMissionSubmissionCount', submissions.length);",
+                  "const pending = submissions.find(function (s) { return s.status === 'PENDING_REVIEW'; });",
+                  "if (pending) {",
+                  "  pm.environment.set('uatSubmissionId', pending.id);",
+                  "  pm.collectionVariables.set('uatSubmissionId', pending.id);",
+                  "}",
+                  "pm.test('mission submission baseline captured for UAT mission', function () { pm.expect(submissions).to.be.an('array'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup: Capture Baseline Recycling Submissions - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submissions = pm.response.json().data.submissions || [];",
+                  "pm.environment.set('uatBaselineRecyclingSubmissionCount', submissions.length);",
+                  "pm.test('recycling submission baseline captured', function () { pm.expect(submissions).to.be.an('array'); });"
                 ]
               }
             }
@@ -5304,14 +5628,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS003/submit",
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{uatMissionId}}/submit",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
                 "missions",
-                "MIS003",
+                "{{uatMissionId}}",
                 "submit"
               ]
             },
@@ -5326,16 +5650,24 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('status 201 - system responded to submission', function () { pm.response.to.have.status(201); });",
-                  "const json = pm.response.json();",
-                  "const submissionId = json && json.data && json.data.submission && json.data.submission.id;",
-                  "pm.expect(submissionId, 'uatSubmissionId').to.be.a('string');",
-                  "pm.environment.set('uatSubmissionId', submissionId);",
-                  "pm.collectionVariables.set('uatSubmissionId', submissionId);"
+                  "pm.test('status 201 new submission or 409 existing submission cap', function () { pm.expect([201, 409]).to.include(pm.response.code); });",
+                  "if (pm.response.code === 201) {",
+                  "  const json = pm.response.json();",
+                  "  const submissionId = json && json.data && json.data.submission && json.data.submission.id;",
+                  "  pm.expect(submissionId, 'uatSubmissionId').to.be.a('string');",
+                  "  pm.environment.set('uatSubmissionId', submissionId);",
+                  "  pm.collectionVariables.set('uatSubmissionId', submissionId);",
+                  "  pm.environment.set('uatMissionSubmissionCreatedThisSession', 'true');",
+                  "}",
+                  "if (pm.response.code === 409) {",
+                  "  pm.environment.set('uatMissionSubmissionCreatedThisSession', 'false');",
+                  "  pm.test('duplicate response explains existing mission state', function () { pm.expect(pm.response.json().error.message).to.be.a('string').and.not.empty; });",
+                  "}"
                 ]
               }
             }
-          ]
+          ],
+          "description": "Submits to the dedicated UAT mission stored in uatMissionId. A fresh mission/tester should return 201. If the same tester reruns the same one-cap mission, 409 is accepted as proof that duplicate prevention is working."
         },
         {
           "name": "TC-02-001: Duplicate Mission Submission Rejected - Student",
@@ -5352,14 +5684,14 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}{{apiPrefix}}/missions/MIS003/submit",
+              "raw": "{{baseUrl}}{{apiPrefix}}/missions/{{uatMissionId}}/submit",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
                 "missions",
-                "MIS003",
+                "{{uatMissionId}}",
                 "submit"
               ]
             },
@@ -5378,7 +5710,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "description": "Confirms the dedicated UAT mission blocks an immediate duplicate submission for the same live tester."
         },
         {
           "name": "TC-03-001a: Approve Mission Submission - Admin",
@@ -5422,7 +5755,8 @@
                 ]
               }
             }
-          ]
+          ],
+          "description": "Approves the pending UAT mission submission captured as uatSubmissionId. For a smooth top-to-bottom UAT, use a fresh UAT mission/tester pair so TC-01 created a pending submission this session."
         },
         {
           "name": "TC-03-001c: Reject Duplicate Mission Submission Review - Admin",
@@ -5496,9 +5830,108 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('status 200', function () { pm.response.to.have.status(200); });",
-                  "const events = pm.response.json().data.events;",
-                  "const completionEvent = events.find(function (e) { return e.missionId === 'MIS003' && e.eventType === 'MISSION_COMPLETED'; });",
-                  "pm.test('MISSION_COMPLETED points event recorded for MIS003', function () { pm.expect(completionEvent).to.be.an('object'); });"
+                  "const missionId = pm.environment.get('uatMissionId') || pm.collectionVariables.get('uatMissionId');",
+                  "const data = pm.response.json().data;",
+                  "const total = data.totalPoints || data.total || 0;",
+                  "const events = data.events || [];",
+                  "const completionEvent = events.find(function (e) { return e.missionId === missionId && e.eventType === 'MISSION_COMPLETED'; });",
+                  "pm.environment.set('uatLatestPoints', total);",
+                  "pm.environment.set('uatLatestPointEventCount', events.length);",
+                  "pm.test('MISSION_COMPLETED points event recorded for UAT mission', function () { pm.expect(completionEvent).to.be.an('object'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-03-001d: Verify UAT Submission In Student History - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions/me?missionId={{uatMissionId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions",
+                "me"
+              ],
+              "query": [
+                {
+                  "key": "missionId",
+                  "value": "{{uatMissionId}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submissionId = pm.environment.get('uatSubmissionId') || pm.collectionVariables.get('uatSubmissionId');",
+                  "const submissions = pm.response.json().data.submissions || [];",
+                  "pm.environment.set('uatLatestMissionSubmissionCount', submissions.length);",
+                  "const matching = submissions.find(function (s) { return s.id === submissionId; });",
+                  "pm.test('UAT mission submission appears in live student history', function () { pm.expect(matching).to.be.an('object'); });",
+                  "pm.test('UAT mission submission status is updated live', function () { pm.expect(['APPROVED', 'PENDING_REVIEW']).to.include(matching.status); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "TC-03-001e: Verify UAT Submission In Admin List - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/submissions?missionId={{uatMissionId}}&userId={{uatStudentUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "missionId",
+                  "value": "{{uatMissionId}}"
+                },
+                {
+                  "key": "userId",
+                  "value": "{{uatStudentUserId}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submissionId = pm.environment.get('uatSubmissionId') || pm.collectionVariables.get('uatSubmissionId');",
+                  "const submissions = pm.response.json().data.submissions || [];",
+                  "const matching = submissions.find(function (s) { return s.id === submissionId; });",
+                  "pm.test('UAT mission submission appears in live admin list', function () { pm.expect(matching).to.be.an('object'); });",
+                  "pm.test('admin list is for the bound live tester', function () { pm.expect(matching.userId).to.eql(pm.environment.get('uatStudentUserId') || pm.collectionVariables.get('uatStudentUserId')); });"
                 ]
               }
             }
@@ -6027,9 +6460,99 @@
                 "exec": [
                   "pm.test('status 200', function () { pm.response.to.have.status(200); });",
                   "const submissionId = pm.environment.get('uatRecyclingSubmissionId') || pm.collectionVariables.get('uatRecyclingSubmissionId');",
-                  "const events = pm.response.json().data.events;",
+                  "const data = pm.response.json().data;",
+                  "const total = data.totalPoints || data.total || 0;",
+                  "const events = data.events || [];",
                   "const approvalEvent = events.find(function (e) { return e.recyclingSubmissionId === submissionId && e.eventType === 'RECYCLING_APPROVED'; });",
+                  "pm.environment.set('uatLatestPoints', total);",
+                  "pm.environment.set('uatLatestPointEventCount', events.length);",
                   "pm.test('RECYCLING_APPROVED points event recorded for approved recycling submission', function () { pm.expect(approvalEvent).to.be.an('object'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Integrity: Verify Recycling Submission In Student History - Student",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions",
+                "me"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submissionId = pm.environment.get('uatRecyclingSubmissionId') || pm.collectionVariables.get('uatRecyclingSubmissionId');",
+                  "const submissions = pm.response.json().data.submissions || [];",
+                  "pm.environment.set('uatLatestRecyclingSubmissionCount', submissions.length);",
+                  "const matching = submissions.find(function (s) { return s.id === submissionId; });",
+                  "pm.test('approved UAT recycling submission appears in live student history', function () { pm.expect(matching).to.be.an('object'); });",
+                  "pm.test('student history reflects approved recycling status', function () { pm.expect(matching.status).to.eql('APPROVED'); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Data Integrity: Verify Recycling Submission In Admin List - Admin",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}{{apiPrefix}}/recycling/submissions?userId={{uatStudentUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "recycling",
+                "submissions"
+              ],
+              "query": [
+                {
+                  "key": "userId",
+                  "value": "{{uatStudentUserId}}"
+                }
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const submissionId = pm.environment.get('uatRecyclingSubmissionId') || pm.collectionVariables.get('uatRecyclingSubmissionId');",
+                  "const submissions = pm.response.json().data.submissions || [];",
+                  "const matching = submissions.find(function (s) { return s.id === submissionId; });",
+                  "pm.test('approved UAT recycling submission appears in live admin list', function () { pm.expect(matching).to.be.an('object'); });",
+                  "pm.test('admin list is for the bound live tester', function () { pm.expect(matching.userId).to.eql(pm.environment.get('uatStudentUserId') || pm.collectionVariables.get('uatStudentUserId')); });"
                 ]
               }
             }

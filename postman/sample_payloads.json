@@ -1,5 +1,35 @@
 {
   "missions": {
+    "create_uat_session_mission": {
+      "title": "UAT Recycling Mission {{uatSessionCode}}",
+      "description": "Dedicated mission for live UAT tester walkthrough. Created from Postman folder 10.",
+      "longDescription": "Used during UAT sessions to verify student mission submission, duplicate prevention, admin review, points ledger updates, and live data visibility using one real tester account.",
+      "type": "TIME_LIMITED",
+      "startAt": "{{uatMissionStartAt}}",
+      "endAt": "{{uatMissionEndAt}}",
+      "submissionCap": 1,
+      "points": 10,
+      "autoApprove": false,
+      "status": "ACTIVE",
+      "isActive": true,
+      "guide": [
+        {
+          "step": 1,
+          "title": "Prepare recyclable item",
+          "description": "Tester prepares one recyclable or e-waste item for the UAT proof."
+        },
+        {
+          "step": 2,
+          "title": "Submit proof",
+          "description": "Tester submits text proof through the mission endpoint."
+        },
+        {
+          "step": 3,
+          "title": "Admin review",
+          "description": "Admin approves the pending submission during the UAT walkthrough."
+        }
+      ]
+    },
     "create_quantity_mission": {
       "title": "Campus Sorting Drill",
       "description": "Sort recyclable items correctly this week.",
