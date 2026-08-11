@@ -207,6 +207,7 @@ describe("submitMission auto-approve", () => {
   it("wraps creation and the points award in the same transaction", async () => {
     mockFindMissionById.mockResolvedValue(autoApproveMission);
     mockFindUserSubmissionForMissionByStatuses.mockResolvedValue(null);
+    mockFindActiveUserSubmissionForMission.mockResolvedValue(null);
     mockCreateSubmission.mockResolvedValue({ id: "SUB-TEST", userId: "USR001", missionId: "MIS002" });
     mockGetApprovedMissionProgressForUser.mockResolvedValue({ approvedCount: 1, approvedQuantity: 0 });
     mockCreatePointsEventForMissionCompletion.mockResolvedValue({ id: "PEV002" });
@@ -223,6 +224,7 @@ describe("submitMission auto-approve", () => {
   it("aborts submission creation entirely when the points award fails", async () => {
     mockFindMissionById.mockResolvedValue(autoApproveMission);
     mockFindUserSubmissionForMissionByStatuses.mockResolvedValue(null);
+    mockFindActiveUserSubmissionForMission.mockResolvedValue(null);
     mockCreateSubmission.mockResolvedValue({ id: "SUB-TEST", userId: "USR001", missionId: "MIS002" });
     mockGetApprovedMissionProgressForUser.mockResolvedValue({ approvedCount: 1, approvedQuantity: 0 });
     mockCreatePointsEventForMissionCompletion.mockRejectedValue(new Error("db exploded"));
@@ -231,5 +233,42 @@ describe("submitMission auto-approve", () => {
 
     await expect(submitMission("MIS002", {}, "USR001")).rejects.toThrow("db exploded");
     expect(mockEvaluateAndIssueBadges).not.toHaveBeenCalled();
+  });
+
+  it("rejects with 429 when resubmitting an auto-approve mission within the cooldown window", async () => {
+    mockFindMissionById.mockResolvedValue(autoApproveMission);
+    mockFindUserSubmissionForMissionByStatuses.mockResolvedValue(null);
+    mockFindActiveUserSubmissionForMission.mockResolvedValue({
+      id: "SUB-PRIOR",
+      submittedAt: new Date(Date.now() - 10 * 1000)
+    });
+
+    await expect(submitMission("MIS002", {}, "USR001")).rejects.toMatchObject({ statusCode: 429 });
+    expect(mockCreateSubmission).not.toHaveBeenCalled();
+  });
+
+  it("allows resubmitting an auto-approve mission once the cooldown window has passed", async () => {
+    mockFindMissionById.mockResolvedValue(autoApproveMission);
+    mockFindUserSubmissionForMissionByStatuses.mockResolvedValue(null);
+    mockFindActiveUserSubmissionForMission.mockResolvedValue({
+      id: "SUB-PRIOR",
+      submittedAt: new Date(Date.now() - 61 * 1000)
+    });
+    mockCreateSubmission.mockResolvedValue({ id: "SUB-TEST", userId: "USR001", missionId: "MIS002" });
+    mockGetApprovedMissionProgressForUser.mockResolvedValue({ approvedCount: 1, approvedQuantity: 0 });
+    mockCreatePointsEventForMissionCompletion.mockResolvedValue({ id: "PEV003" });
+    mockEvaluateAndIssueBadges.mockResolvedValue([]);
+
+    await expect(submitMission("MIS002", {}, "USR001")).resolves.toBeDefined();
+    expect(mockCreateSubmission).toHaveBeenCalled();
+  });
+
+  it("does not apply the cooldown to manual-review missions", async () => {
+    mockFindMissionById.mockResolvedValue({ ...autoApproveMission, autoApprove: false });
+    mockFindUserSubmissionForMissionByStatuses.mockResolvedValue(null);
+    mockCreateSubmission.mockResolvedValue({ id: "SUB-TEST", userId: "USR001", missionId: "MIS002" });
+
+    await expect(submitMission("MIS002", {}, "USR001")).resolves.toBeDefined();
+    expect(mockFindActiveUserSubmissionForMission).not.toHaveBeenCalled();
   });
 });

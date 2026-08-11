@@ -21,6 +21,15 @@ import { createPointsEventForMissionCompletion } from "./points.service.js";
 import { evaluateAndIssueBadges } from "./badge.service.js";
 import { createMissionProofReadUrl } from "./upload.service.js";
 
+// Auto-approved submissions never pass through PENDING_REVIEW, so unlike a
+// manual-review mission there is no window where a second submit attempt
+// gets caught by the pendingSubmission check below. Missions with
+// submissionCap > 1 (e.g. quantity/streak missions) would otherwise let a
+// student resubmit instantly, back-to-back, up to the cap, each one
+// auto-approved and awarding points (mirrors the "too soon" cooldown pattern
+// in antiGaming.service.js's validateRecyclingSubmission).
+const MISSION_RESUBMIT_COOLDOWN_SECONDS = 60;
+
 function isMissionCompletedByProgress(mission, progress) {
   switch (mission.type) {
     case "QUANTITY_BASED":
@@ -155,6 +164,21 @@ export async function submitMission(missionId, payload, userId) {
   }
   if (existingSubmission && existingSubmission.status !== "ONGOING") {
     throw new MissionServiceError(409, "This mission has already been submitted.");
+  }
+
+  if (!existingSubmission && mission.autoApprove) {
+    const lastSubmission = await findActiveUserSubmissionForMission(mission.id, userId);
+    if (lastSubmission) {
+      const secondsSinceLastSubmission = Math.floor(
+        (now.getTime() - new Date(lastSubmission.submittedAt).getTime()) / 1000
+      );
+      if (secondsSinceLastSubmission < MISSION_RESUBMIT_COOLDOWN_SECONDS) {
+        throw new MissionServiceError(
+          429,
+          `Too soon. Please wait ${MISSION_RESUBMIT_COOLDOWN_SECONDS - secondsSinceLastSubmission}s before submitting to this mission again.`
+        );
+      }
+    }
   }
 
   if (!existingSubmission && mission.submissionCap) {

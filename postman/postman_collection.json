@@ -5775,42 +5775,33 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "pm.test('status 409 - duplicate submission rejected', function () { pm.response.to.have.status(409); });"
+                  "pm.test('status 409 (manual-review missions) or 429 (auto-approve missions, resubmit cooldown) - duplicate submission rejected', function () { pm.expect([409, 429]).to.include(pm.response.code); });"
                 ]
               }
             }
           ],
-          "description": "Confirms the dedicated UAT mission blocks an immediate duplicate submission for the same live tester."
+          "description": "Confirms the dedicated UAT mission blocks an immediate duplicate submission for the same live tester. Manual-review missions reject via the pending-review guard (409). Auto-approve missions reject via the 60s resubmit cooldown (429), since the first submission is approved instantly and never sits in PENDING_REVIEW."
         },
         {
-          "name": "TC-03-001a: Approve Mission Submission - Admin",
+          "name": "TC-03-001a: Verify Mission Submission Auto-Approved - Admin",
           "request": {
-            "method": "PATCH",
+            "method": "GET",
             "header": [
               {
                 "key": "Authorization",
                 "value": "Bearer {{adminToken}}"
-              },
-              {
-                "key": "Content-Type",
-                "value": "application/json"
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions/{{uatSubmissionId}}/review",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/submissions/{{uatSubmissionId}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
                 "submissions",
-                "{{uatSubmissionId}}",
-                "review"
+                "{{uatSubmissionId}}"
               ]
-            },
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"status\": \"APPROVED\",\n  \"reviewNote\": \"Approved during UAT demo (TC-03-001).\"\n}"
             }
           },
           "event": [
@@ -5820,12 +5811,12 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('submission marked APPROVED', function () { pm.expect(pm.response.json().data.submission.status).to.eql('APPROVED'); });"
+                  "pm.test('submission auto-approved (mission has autoApprove enabled)', function () { pm.expect(pm.response.json().data.submission.status).to.eql('APPROVED'); });"
                 ]
               }
             }
           ],
-          "description": "Approves the pending UAT mission submission captured as uatSubmissionId. For a smooth top-to-bottom UAT, use a fresh UAT mission/tester pair so TC-01 created a pending submission this session."
+          "description": "All production missions currently have autoApprove enabled, so submissions skip PENDING_REVIEW and are approved immediately at TC-01-001. This step just verifies the submission captured as uatSubmissionId reflects that, rather than calling PATCH /review (which would now correctly return 409 'already reviewed' since there is nothing left to manually approve)."
         },
         {
           "name": "TC-03-001c: Reject Duplicate Mission Submission Review - Admin",
