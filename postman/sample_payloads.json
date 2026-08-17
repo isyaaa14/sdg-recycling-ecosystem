@@ -207,5 +207,10 @@
     "cancel_redemption": {
       "reason": "Changed my mind."
     }
+  },
+  "account_lifecycle": {
+    "deactivate_student": {
+      "reason": "Deactivated upon the student's request."
+    }
   }
 }

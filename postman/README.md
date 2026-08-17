@@ -18,10 +18,10 @@ This folder is the shared Postman workspace for the backend mounted from `backen
 
 Seeded users all use `Password123!`:
 
-- admin: `admin@sdg.local`
-- student: `student1@sdg.local`
-- student: `student2@sdg.local`
-- student: `student3@sdg.local`
+- admin: `admin@uow.edu.my`
+- student: `student1@student.uow.edu.my`
+- student: `student2@student.uow.edu.my`
+- student: `student3@student.uow.edu.my`
 
 ## Recommended Smoke Order
 
@@ -46,6 +46,26 @@ Then test the mobile write flows:
 4. `Quizzes / Submit Attempt`
 5. `Recycling / Create Manual Recycling Submission - Student`
 6. `Recycling / Review Recycling Submission - Admin`
+
+## Account Lifecycle Tests
+
+Folder `09 - Domain Restriction & Manual Account Lifecycle Tests` replaces the removed inactivity-sweep tests. Run it top-to-bottom after logging in as the seeded admin and student.
+
+The lifecycle sequence uses `studentUserId` as its target and:
+
+1. Ensures the target student starts active.
+2. Deactivates the student as an admin with `accountDeactivationReason`.
+3. Confirms a student cannot deactivate accounts.
+4. Reactivates the target student as an admin.
+5. Confirms repeated activation and student-role attempts are rejected.
+
+The default `studentUserId` is `USR003`, while `studentToken` belongs to `USR002`. This keeps the permission checks usable while the target account is deactivated.
+
+## Reward Reservation Expiry
+
+`Rewards / Redeem Reward - Student` checks that a new redemption is `RESERVED` and that `expiresAt` is exactly `rewardCollectionWindowDays` (currently 3) after `reservedAt`.
+
+The minute-based automatic cancellation cannot be exercised during a normal collection run without waiting three days. To test the cancellation itself, use an expired reservation fixture or a time-controlled test database, then verify that its status becomes `CANCELLED`, its points are refunded, and its quantity returns to reward stock.
 
 ## Folder 10 UAT Session Guide
 
@@ -227,6 +247,7 @@ The collection targets these mounted route groups:
 - `/leaderboard`
 - `/anti-gaming`
 - `/users`
+- `/admin`
 
 ## Notes
 

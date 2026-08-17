@@ -245,6 +245,14 @@
     {
       "key": "uatMissionSubmissionCreatedThisSession",
       "value": ""
+    },
+    {
+      "key": "accountDeactivationReason",
+      "value": "Deactivated upon the student's request."
+    },
+    {
+      "key": "rewardCollectionWindowDays",
+      "value": "3"
     }
   ],
   "item": [
@@ -4290,7 +4298,8 @@
                       "language": "json"
                     }
                   }
-                }
+                },
+                "description": "Creates a RESERVED redemption. The response expiresAt must be exactly rewardCollectionWindowDays after reservedAt."
               },
               "event": [
                 {
@@ -4299,7 +4308,16 @@
                     "type": "text/javascript",
                     "exec": [
                       "pm.test('status 201, 400 (insufficient points), or 429 (redemption cooldown) is acceptable', function () { pm.expect([201, 400, 429]).to.include(pm.response.code); });",
-                      "if (pm.response.code === 201) { const redemptionId = pm.response.json().data.redemption.id; pm.environment.set('redemptionId', redemptionId); pm.collectionVariables.set('redemptionId', redemptionId); }"
+                      "if (pm.response.code === 201) {",
+                      "  const redemption = pm.response.json().data.redemption;",
+                      "  pm.environment.set('redemptionId', redemption.id);",
+                      "  pm.collectionVariables.set('redemptionId', redemption.id);",
+                      "  pm.test('redemption is reserved with a three-day collection deadline', function () {",
+                      "    const expectedWindowMs = Number(pm.variables.get('rewardCollectionWindowDays')) * 24 * 60 * 60 * 1000;",
+                      "    pm.expect(redemption.status).to.eql('RESERVED');",
+                      "    pm.expect(new Date(redemption.expiresAt).getTime() - new Date(redemption.reservedAt).getTime()).to.eql(expectedWindowMs);",
+                      "  });",
+                      "}"
                     ]
                   }
                 }
@@ -4662,7 +4680,8 @@
                 }
               ]
             }
-          ]
+          ],
+          "description": "Reward reservations deduct points and reserve stock immediately. RESERVED redemptions expire after three days; the backend scheduler then cancels them, refunds points, and restores stock."
         },
         {
           "name": "Leaderboard",
@@ -4881,8 +4900,8 @@
       "description": "Run Recycling -> Issue Recycling QR - Admin before Claim Recycling QR - Student (it captures recyclingQrId/recyclingQrClaimPayload). Run Rewards -> Create Reward - Admin before Update/Deactivate Reward (it captures createdRewardId). Some requests intentionally exercise business-rule rejections (insufficient points, already-reviewed, already-claimed) and accept more than one status code."
     },
     {
-      "name": "09 - Domain Restriction & Account Lifecycle Tests",
-      "description": "Covers the student.uow.edu.my / uow.edu.my registration domain restriction, and the 3-day recycling-inactivity auto-deactivation feature (admin notifications, on-demand sweep trigger, and reactivation). Register requests embed {{$timestamp}} in the email so this folder can be re-run without 409 email conflicts. The sweep is safe to run repeatedly against freshly seeded data since newly seeded/created users are never 3+ days old.",
+      "name": "09 - Domain Restriction & Manual Account Lifecycle Tests",
+      "description": "Covers registration domain restrictions and admin-controlled student account activation/deactivation. There is no inactivity sweep: accounts remain active until an admin changes their status. The lifecycle sequence is rerunnable and uses studentUserId as the target account.",
       "item": [
         {
           "name": "Register Accepts Student Domain",
@@ -5077,9 +5096,9 @@
           ]
         },
         {
-          "name": "Run Inactivity Sweep - Admin",
+          "name": "Ensure Lifecycle Student Active - Admin",
           "request": {
-            "method": "POST",
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -5087,14 +5106,156 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/run-inactivity-sweep",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
                 "admin",
-                "run-inactivity-sweep"
+                "users",
+                "{{studentUserId}}",
+                "reactivate"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200 (reactivated) or 400 (already active)', function () { pm.expect([200, 400]).to.include(pm.response.code); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Deactivate Student - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/deactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "users",
+                "{{studentUserId}}",
+                "deactivate"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"{{accountDeactivationReason}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 200', function () { pm.response.to.have.status(200); });",
+                  "const user = pm.response.json().data.user;",
+                  "pm.test('student is deactivated with the requested reason', function () {",
+                  "  pm.expect(user.isActive).to.eql(false);",
+                  "  pm.expect(user.deactivationReason).to.eql(pm.variables.get('accountDeactivationReason'));",
+                  "  pm.expect(user.deactivatedAt).to.be.a('string');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot Deactivate User",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/deactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "users",
+                "{{studentUserId}}",
+                "deactivate"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Unauthorized request\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Reactivate Student - Admin",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "users",
+                "{{studentUserId}}",
+                "reactivate"
               ]
             }
           },
@@ -5105,16 +5266,57 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('status 200', function () { pm.response.to.have.status(200); });",
-                  "pm.test('deactivatedCount is a number', function () { pm.expect(pm.response.json().data.deactivatedCount).to.be.a('number'); });"
+                  "const user = pm.response.json().data.user;",
+                  "pm.test('student is active and deactivation metadata is cleared', function () {",
+                  "  pm.expect(user.isActive).to.eql(true);",
+                  "  pm.expect(user.deactivatedAt).to.eql(null);",
+                  "  pm.expect(user.deactivationReason).to.eql(null);",
+                  "});"
                 ]
               }
             }
           ]
         },
         {
-          "name": "Student Cannot Run Inactivity Sweep",
+          "name": "Reactivate Already-Active Student Rejects - Admin",
           "request": {
-            "method": "POST",
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "admin",
+                "users",
+                "{{studentUserId}}",
+                "reactivate"
+              ]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400 (already active)', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Student Cannot Reactivate User",
+          "request": {
+            "method": "PATCH",
             "header": [
               {
                 "key": "Authorization",
@@ -5122,14 +5324,16 @@
               }
             ],
             "url": {
-              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/run-inactivity-sweep",
+              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "{{apiPrefix}}",
                 "admin",
-                "run-inactivity-sweep"
+                "users",
+                "{{studentUserId}}",
+                "reactivate"
               ]
             }
           },
@@ -5257,78 +5461,6 @@
                 "exec": [
                   "pm.test('status 200', function () { pm.response.to.have.status(200); });",
                   "pm.test('updatedCount is a number', function () { pm.expect(pm.response.json().data.updatedCount).to.be.a('number'); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Reactivate Already-Active Student Rejects - Admin",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{adminToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "admin",
-                "users",
-                "{{studentUserId}}",
-                "reactivate"
-              ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 400 (already active)', function () { pm.response.to.have.status(400); });"
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "name": "Student Cannot Reactivate User",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Authorization",
-                "value": "Bearer {{studentToken}}"
-              }
-            ],
-            "url": {
-              "raw": "{{baseUrl}}/{{apiPrefix}}/admin/users/{{studentUserId}}/reactivate",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "{{apiPrefix}}",
-                "admin",
-                "users",
-                "{{studentUserId}}",
-                "reactivate"
-              ]
-            }
-          },
-          "event": [
-            {
-              "listen": "test",
-              "script": {
-                "type": "text/javascript",
-                "exec": [
-                  "pm.test('status 403', function () { pm.response.to.have.status(403); });"
                 ]
               }
             }
