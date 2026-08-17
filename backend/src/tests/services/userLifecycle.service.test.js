@@ -1,32 +1,21 @@
 import { jest, describe, it, expect, beforeEach } from "@jest/globals";
 
-const mockFindInactiveStudentCandidates = jest.fn();
 const mockDeactivateUser = jest.fn();
 const mockReactivateUser = jest.fn();
 const mockFindUserById = jest.fn();
-const mockCreateAdminNotification = jest.fn();
 const mockFindUnreadAdminNotifications = jest.fn();
 const mockMarkAdminNotificationsRead = jest.fn();
-const mockRunInTransaction = jest.fn((callback) => callback({}));
 
 jest.unstable_mockModule("../../repositories/userLifecycle.repository.js", () => ({
-  findInactiveStudentCandidates: mockFindInactiveStudentCandidates,
   deactivateUser: mockDeactivateUser,
   reactivateUser: mockReactivateUser,
   findUserById: mockFindUserById,
-  createAdminNotification: mockCreateAdminNotification,
   findUnreadAdminNotifications: mockFindUnreadAdminNotifications,
-  markAdminNotificationsRead: mockMarkAdminNotificationsRead,
-  runInTransaction: mockRunInTransaction
-}));
-
-const mockCreateWithGeneratedId = jest.fn((model, prefix, createFn) => createFn(`${prefix}-TEST`));
-jest.unstable_mockModule("../../utils/idGenerator.js", () => ({
-  createWithGeneratedId: mockCreateWithGeneratedId
+  markAdminNotificationsRead: mockMarkAdminNotificationsRead
 }));
 
 const {
-  sweepInactiveStudents,
+  deactivateStudent,
   listUnreadAdminNotifications,
   markNotificationsRead,
   reactivateStudent
@@ -34,36 +23,6 @@ const {
 
 beforeEach(() => {
   jest.clearAllMocks();
-  mockRunInTransaction.mockImplementation((callback) => callback({}));
-});
-
-describe("sweepInactiveStudents", () => {
-  it("deactivates each stale candidate and writes exactly one notification per user", async () => {
-    mockFindInactiveStudentCandidates.mockResolvedValue([
-      { id: "USR002", name: "Student One", email: "student1@student.uow.edu.my" },
-      { id: "USR003", name: "Student Two", email: "student2@student.uow.edu.my" }
-    ]);
-
-    const result = await sweepInactiveStudents();
-
-    expect(mockDeactivateUser).toHaveBeenCalledTimes(2);
-    expect(mockCreateAdminNotification).toHaveBeenCalledTimes(2);
-    expect(mockCreateAdminNotification).toHaveBeenCalledWith(
-      expect.objectContaining({ type: "USER_DEACTIVATED", targetUserId: "USR002" }),
-      expect.anything()
-    );
-    expect(result).toEqual({ deactivatedCount: 2, deactivatedUserIds: ["USR002", "USR003"] });
-  });
-
-  it("is a no-op when there are no candidates", async () => {
-    mockFindInactiveStudentCandidates.mockResolvedValue([]);
-
-    const result = await sweepInactiveStudents();
-
-    expect(mockDeactivateUser).not.toHaveBeenCalled();
-    expect(mockCreateAdminNotification).not.toHaveBeenCalled();
-    expect(result).toEqual({ deactivatedCount: 0, deactivatedUserIds: [] });
-  });
 });
 
 describe("listUnreadAdminNotifications", () => {
@@ -125,5 +84,42 @@ describe("reactivateStudent", () => {
 
     expect(mockReactivateUser).toHaveBeenCalledWith("USR002");
     expect(result).toEqual({ id: "USR002", isActive: true });
+  });
+});
+
+describe("deactivateStudent", () => {
+  it("throws 404 when the user does not exist", async () => {
+    mockFindUserById.mockResolvedValue(null);
+
+    await expect(deactivateStudent("USR999")).rejects.toMatchObject({ statusCode: 404 });
+  });
+
+  it("does not allow an admin account to be deactivated", async () => {
+    mockFindUserById.mockResolvedValue({ id: "ADM001", role: "ADMIN", isActive: true });
+
+    await expect(deactivateStudent("ADM001")).rejects.toMatchObject({ statusCode: 400 });
+    expect(mockDeactivateUser).not.toHaveBeenCalled();
+  });
+
+  it("deactivates an active student with the admin-provided reason", async () => {
+    mockFindUserById.mockResolvedValue({ id: "USR002", role: "STUDENT", isActive: true });
+    mockDeactivateUser.mockResolvedValue({ id: "USR002", isActive: false, deactivationReason: "Requested by user" });
+
+    const result = await deactivateStudent("USR002", "Requested by user");
+
+    expect(mockDeactivateUser).toHaveBeenCalledWith("USR002", "Requested by user");
+    expect(result).toEqual({ id: "USR002", isActive: false, deactivationReason: "Requested by user" });
+  });
+
+  it("uses a clear default reason when none is supplied", async () => {
+    mockFindUserById.mockResolvedValue({ id: "USR002", role: "STUDENT", isActive: true });
+    mockDeactivateUser.mockResolvedValue({ id: "USR002", isActive: false });
+
+    await deactivateStudent("USR002");
+
+    expect(mockDeactivateUser).toHaveBeenCalledWith(
+      "USR002",
+      "Deactivated by an administrator upon user request."
+    );
   });
 });

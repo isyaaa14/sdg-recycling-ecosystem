@@ -64,6 +64,31 @@ export function updateRedemptionIfStatus(id, expectedStatus, data, client = pris
   return client.redemption.updateMany({ where: { id, status: expectedStatus }, data });
 }
 
+export function completeRedemptionIfReservedAndUnexpired(id, now, client = prisma) {
+  return client.redemption.updateMany({
+    where: {
+      id,
+      status: "RESERVED",
+      OR: [{ expiresAt: null }, { expiresAt: { gt: now } }]
+    },
+    data: { status: "COMPLETED", completedAt: now }
+  });
+}
+
+export function findExpiredReservedRedemptions(now, client = prisma) {
+  return client.redemption.findMany({
+    where: { status: "RESERVED", expiresAt: { lte: now } },
+    select: {
+      id: true,
+      userId: true,
+      rewardId: true,
+      quantity: true,
+      pointsSpent: true
+    },
+    orderBy: { expiresAt: "asc" }
+  });
+}
+
 export function findRedemptionById(id, includeRelations, client = prisma) {
   return client.redemption.findUnique({ where: { id }, include: includeRelations });
 }

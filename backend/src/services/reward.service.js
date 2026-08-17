@@ -18,7 +18,9 @@ import {
 import {
   createRedemption,
   createReward as createRewardRecord,
+  completeRedemptionIfReservedAndUnexpired,
   decrementRewardStockIfAvailable,
+  findExpiredReservedRedemptions,
   findRedemptionCooldown,
   findRedemptionById,
   findRedemptions,
@@ -32,7 +34,8 @@ import {
   upsertRedemptionCooldown
 } from "../repositories/reward.repository.js";
 
-const DEFAULT_CLAIM_EXPIRY_DAYS = 30;
+export const RESERVATION_EXPIRY_DAYS = 3;
+const AUTO_EXPIRY_REASON = "Automatically cancelled: reward was not collected within 3 days.";
 
 export class RewardServiceError extends Error {
   constructor(statusCode, message) {
@@ -50,9 +53,7 @@ function parseId(id, label = "reward") {
 }
 
 function claimExpiryDate(now = new Date()) {
-  const expiresAt = new Date(now);
-  expiresAt.setDate(expiresAt.getDate() + DEFAULT_CLAIM_EXPIRY_DAYS);
-  return expiresAt;
+  return new Date(now.getTime() + RESERVATION_EXPIRY_DAYS * 24 * 60 * 60 * 1000);
 }
 
 function cooldownHoursForReward(reward) {
@@ -292,17 +293,44 @@ export async function redeemReward(id, payload, userId) {
 
 export async function completeRedemption(id, adminId) {
   const redemptionId = parseId(id, "redemption");
+  const now = new Date();
 
-  const result = await updateRedemptionIfStatus(redemptionId, "RESERVED", {
-    status: "COMPLETED",
-    completedAt: new Date()
-  });
+  const result = await completeRedemptionIfReservedAndUnexpired(redemptionId, now);
 
   if (result.count !== 1) {
     throw new RewardServiceError(409, "Only a reserved redemption pending pickup can be completed.");
   }
 
   return getRedemptionById(redemptionId, { id: adminId, role: "ADMIN" });
+}
+
+async function cancelReservedRedemption(existing, reason, now) {
+  return runInTransaction(async (tx) => {
+    const cancelResult = await updateRedemptionIfStatus(
+      existing.id,
+      "RESERVED",
+      { status: "CANCELLED", cancelledAt: now, cancelReason: reason },
+      tx
+    );
+
+    if (cancelResult.count !== 1) {
+      return false;
+    }
+
+    if (existing.rewardId) {
+      await incrementRewardStock(existing.rewardId, existing.quantity, tx);
+    }
+
+    await createPointsEventForRewardRefund({
+      userId: existing.userId,
+      redemptionId: existing.id,
+      points: existing.pointsSpent,
+      approvedAt: now,
+      client: tx
+    });
+
+    return true;
+  });
 }
 
 export async function cancelRedemption(id, payload, requestingUser) {
@@ -322,32 +350,29 @@ export async function cancelRedemption(id, payload, requestingUser) {
   }
 
   const now = new Date();
-  await runInTransaction(async (tx) => {
-    const cancelResult = await updateRedemptionIfStatus(
-      redemptionId,
-      "RESERVED",
-      { status: "CANCELLED", cancelledAt: now, cancelReason: result.data.reason ?? null },
-      tx
-    );
-
-    if (cancelResult.count !== 1) {
-      throw new RewardServiceError(409, "Only a reserved redemption pending pickup can be cancelled.");
-    }
-
-    if (existing.rewardId) {
-      await incrementRewardStock(existing.rewardId, existing.quantity, tx);
-    }
-
-    await createPointsEventForRewardRefund({
-      userId: existing.userId,
-      redemptionId,
-      points: existing.pointsSpent,
-      approvedAt: now,
-      client: tx
-    });
-  });
+  const cancelled = await cancelReservedRedemption(existing, result.data.reason ?? null, now);
+  if (!cancelled) {
+    throw new RewardServiceError(409, "Only a reserved redemption pending pickup can be cancelled.");
+  }
 
   return getRedemptionById(redemptionId, requestingUser);
+}
+
+export async function expireOverdueRedemptions(now = new Date()) {
+  const expired = await findExpiredReservedRedemptions(now);
+  const cancelledRedemptionIds = [];
+
+  for (const redemption of expired) {
+    const cancelled = await cancelReservedRedemption(redemption, AUTO_EXPIRY_REASON, now);
+    if (cancelled) {
+      cancelledRedemptionIds.push(redemption.id);
+    }
+  }
+
+  return {
+    cancelledCount: cancelledRedemptionIds.length,
+    cancelledRedemptionIds
+  };
 }
 
 export function listMyRedemptions(userId) {

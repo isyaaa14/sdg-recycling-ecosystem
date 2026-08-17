@@ -4,9 +4,11 @@ const fakeTx = { __tx: true };
 
 const mockCreateRedemption = jest.fn();
 const mockCreateRewardRecord = jest.fn();
+const mockCompleteRedemptionIfReservedAndUnexpired = jest.fn();
 const mockDecrementRewardStockIfAvailable = jest.fn();
 const mockFindRedemptionCooldown = jest.fn();
 const mockFindRedemptionById = jest.fn();
+const mockFindExpiredReservedRedemptions = jest.fn();
 const mockFindRedemptions = jest.fn();
 const mockFindRewardById = jest.fn();
 const mockFindRewards = jest.fn();
@@ -20,9 +22,11 @@ const mockUpsertRedemptionCooldown = jest.fn();
 jest.unstable_mockModule("../../repositories/reward.repository.js", () => ({
   createRedemption: mockCreateRedemption,
   createReward: mockCreateRewardRecord,
+  completeRedemptionIfReservedAndUnexpired: mockCompleteRedemptionIfReservedAndUnexpired,
   decrementRewardStockIfAvailable: mockDecrementRewardStockIfAvailable,
   findRedemptionCooldown: mockFindRedemptionCooldown,
   findRedemptionById: mockFindRedemptionById,
+  findExpiredReservedRedemptions: mockFindExpiredReservedRedemptions,
   findRedemptions: mockFindRedemptions,
   findRewardById: mockFindRewardById,
   findRewards: mockFindRewards,
@@ -65,7 +69,7 @@ jest.unstable_mockModule("../../services/upload.service.js", () => ({
   UploadServiceError: MockUploadServiceError
 }));
 
-const { cancelRedemption, completeRedemption, createReward, deactivateReward, redeemReward, updateReward } =
+const { cancelRedemption, completeRedemption, createReward, deactivateReward, expireOverdueRedemptions, redeemReward, updateReward } =
   await import("../../services/reward.service.js");
 
 const reward = {
@@ -178,13 +182,68 @@ describe("redeemReward", () => {
       expect.objectContaining({ client: fakeTx })
     );
   });
+
+  it("sets the collection deadline to three days after reservation", async () => {
+    mockFindRewardById.mockResolvedValue(reward);
+    mockLockUserForUpdate.mockResolvedValue(undefined);
+    mockSumPointsForUser.mockResolvedValue(1000);
+    mockDecrementRewardStockIfAvailable.mockResolvedValue({ count: 1 });
+    mockCreateRedemption.mockResolvedValue({ id: "RDM001" });
+    mockCreatePointsEventForRewardRedemption.mockResolvedValue({ id: "PEV001" });
+    mockFindRedemptionById.mockResolvedValue({ id: "RDM001", userId: "USR001" });
+
+    await redeemReward("RWD001", { quantity: 1 }, "USR001");
+
+    const reservation = mockCreateRedemption.mock.calls[0][0];
+    expect(reservation.expiresAt.getTime() - reservation.reservedAt.getTime()).toBe(3 * 24 * 60 * 60 * 1000);
+  });
 });
 
 describe("completeRedemption", () => {
   it("only completes a RESERVED redemption", async () => {
-    mockUpdateRedemptionIfStatus.mockResolvedValue({ count: 0 });
+    mockCompleteRedemptionIfReservedAndUnexpired.mockResolvedValue({ count: 0 });
 
     await expect(completeRedemption("RDM001", "ADM001")).rejects.toMatchObject({ statusCode: 409 });
+  });
+});
+
+describe("expireOverdueRedemptions", () => {
+  it("cancels overdue reservations and restores stock and points", async () => {
+    const now = new Date("2026-08-17T12:00:00.000Z");
+    mockFindExpiredReservedRedemptions.mockResolvedValue([
+      { id: "RDM001", userId: "USR001", rewardId: "RWD001", quantity: 2, pointsSpent: 200 }
+    ]);
+    mockUpdateRedemptionIfStatus.mockResolvedValue({ count: 1 });
+    mockIncrementRewardStock.mockResolvedValue(undefined);
+    mockCreatePointsEventForRewardRefund.mockResolvedValue({ id: "PEV002" });
+
+    const result = await expireOverdueRedemptions(now);
+
+    expect(mockFindExpiredReservedRedemptions).toHaveBeenCalledWith(now);
+    expect(mockUpdateRedemptionIfStatus).toHaveBeenCalledWith(
+      "RDM001",
+      "RESERVED",
+      expect.objectContaining({ status: "CANCELLED", cancelledAt: now }),
+      fakeTx
+    );
+    expect(mockIncrementRewardStock).toHaveBeenCalledWith("RWD001", 2, fakeTx);
+    expect(mockCreatePointsEventForRewardRefund).toHaveBeenCalledWith(
+      expect.objectContaining({ userId: "USR001", redemptionId: "RDM001", points: 200, client: fakeTx })
+    );
+    expect(result).toEqual({ cancelledCount: 1, cancelledRedemptionIds: ["RDM001"] });
+  });
+
+  it("does not restore stock or refund twice when another process already handled it", async () => {
+    mockFindExpiredReservedRedemptions.mockResolvedValue([
+      { id: "RDM001", userId: "USR001", rewardId: "RWD001", quantity: 1, pointsSpent: 100 }
+    ]);
+    mockUpdateRedemptionIfStatus.mockResolvedValue({ count: 0 });
+
+    const result = await expireOverdueRedemptions();
+
+    expect(mockIncrementRewardStock).not.toHaveBeenCalled();
+    expect(mockCreatePointsEventForRewardRefund).not.toHaveBeenCalled();
+    expect(result.cancelledCount).toBe(0);
   });
 });
 

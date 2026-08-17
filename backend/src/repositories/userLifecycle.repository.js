@@ -2,20 +2,6 @@ import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
-export function findInactiveStudentCandidates(cutoffDate, client = prisma) {
-  return client.user.findMany({
-    where: {
-      role: "STUDENT",
-      isActive: true,
-      OR: [
-        { lastRecyclingSubmissionAt: { lt: cutoffDate } },
-        { AND: [{ lastRecyclingSubmissionAt: null }, { createdAt: { lt: cutoffDate } }] }
-      ]
-    },
-    select: { id: true, name: true, email: true }
-  });
-}
-
 export function deactivateUser(userId, reason, client = prisma) {
   return client.user.update({
     where: { id: userId },
@@ -29,18 +15,13 @@ export function reactivateUser(userId, client = prisma) {
     data: {
       isActive: true,
       deactivatedAt: null,
-      deactivationReason: null,
-      lastRecyclingSubmissionAt: new Date()
+      deactivationReason: null
     }
   });
 }
 
 export function findUserById(userId, client = prisma) {
   return client.user.findUnique({ where: { id: userId } });
-}
-
-export function createAdminNotification(data, client = prisma) {
-  return client.adminNotification.create({ data });
 }
 
 export function findUnreadAdminNotifications(client = prisma) {
@@ -56,8 +37,4 @@ export function markAdminNotificationsRead(ids, adminId, client = prisma) {
     where: { id: { in: ids }, isRead: false },
     data: { isRead: true, readAt: new Date(), readById: adminId }
   });
-}
-
-export function runInTransaction(callback) {
-  return prisma.$transaction(callback);
 }

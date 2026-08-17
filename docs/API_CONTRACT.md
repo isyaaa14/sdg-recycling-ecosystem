@@ -459,7 +459,7 @@ Points for an approved submission are `floor(quantity * ratePerKg)`, capped by a
 
 ## Rewards
 
-Redemptions use a reserve-first flow: `POST /rewards/:id/redeem` deducts points immediately and reserves stock (status `RESERVED`); an admin later marks it `COMPLETED` at pickup, or it can be `CANCELLED`, which refunds the points and restores stock.
+Redemptions use a reserve-first flow: `POST /rewards/:id/redeem` deducts points immediately and reserves stock (status `RESERVED`). The student must collect the reward within three days. An admin marks it `COMPLETED` at pickup; after the deadline, the backend automatically changes it to `CANCELLED`, refunds the points, and restores the reserved quantity to reward stock.
 
 | Method | Path | Role | Purpose |
 | --- | --- | --- | --- |
@@ -549,6 +549,23 @@ Recycling submissions are rate-limited per student (max submissions per hour, co
 | Method | Path | Role | Purpose |
 | --- | --- | --- | --- |
 | PATCH | `/users/me` | Any logged-in user | Update my own profile (currently `name` only) |
+
+## Account Management
+
+Student accounts remain active until an administrator changes their status. Recycling inactivity does not automatically deactivate an account.
+
+| Method | Path | Role | Purpose |
+| --- | --- | --- | --- |
+| PATCH | `/admin/users/:userId/deactivate` | ADMIN | Manually deactivate an active student account |
+| PATCH | `/admin/users/:userId/reactivate` | ADMIN | Manually reactivate a deactivated student account |
+
+The deactivate endpoint accepts an optional reason:
+
+```json
+{
+  "reason": "Deactivated upon the student's request."
+}
+```
 
 ## Environment Variables
 

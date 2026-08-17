@@ -318,7 +318,7 @@ model Redemption {
 
   @@index([userId, createdAt])
   @@index([rewardId])
-  @@index([status])
+  @@index([status, expiresAt])
 }
 
 model RedemptionCooldown {

@@ -1,9 +1,9 @@
 import {
   UserLifecycleServiceError,
+  deactivateStudent,
   listUnreadAdminNotifications,
   markNotificationsRead,
-  reactivateStudent,
-  sweepInactiveStudents
+  reactivateStudent
 } from "../services/userLifecycle.service.js";
 
 function handleError(error, response) {
@@ -41,10 +41,10 @@ export async function reactivateStudentHandler(request, response) {
   }
 }
 
-export async function runInactivitySweepHandler(request, response) {
+export async function deactivateStudentHandler(request, response) {
   try {
-    const result = await sweepInactiveStudents();
-    return response.json({ data: result });
+    const user = await deactivateStudent(request.params.userId, request.body?.reason);
+    return response.json({ data: { user } });
   } catch (error) {
     return handleError(error, response);
   }

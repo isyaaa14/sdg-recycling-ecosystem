@@ -847,7 +847,7 @@ async function seedRecyclingSubmissions(adminId, approvedStudentId, pendingStude
 
 async function seedRedemptions(studentId) {
   const now = new Date();
-  const expiresAt = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
+  const expiresAt = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
   const earlierReservedAt = new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000);
 
   const reserved = await prisma.redemption.upsert({
