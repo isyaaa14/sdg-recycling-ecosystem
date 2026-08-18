@@ -1,0 +1,4 @@
+-- The "AuditLog" table already exists in the database (created outside of
+-- Prisma's migration history). This migration is a no-op baseline so that
+-- schema.prisma, the migration history, and the real table stay in sync
+-- without attempting to re-create it.
