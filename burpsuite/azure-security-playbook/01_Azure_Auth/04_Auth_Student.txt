@@ -1,0 +1,6 @@
+GET /api/v1/badges HTTP/1.1
+Host: app-sdg-backend-fwcvbshjeugbcuea.southeastasia-01.azurewebsites.net
+Authorization: Bearer <AZURE_STUDENT_TOKEN>
+Connection: close
+
+
