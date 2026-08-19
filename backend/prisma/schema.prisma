@@ -131,6 +131,7 @@ model User {
   progressRecords              LearningProgress[]
   pointsEvents                 PointsEvent[]
   uploads                      UploadedFile[]
+  auditLogs                    AuditLog[]
 }
 
 model Mission {
@@ -345,6 +346,18 @@ model SuspiciousActivityLog {
 
   @@index([userId, detectedAt])
   @@index([severity, detectedAt])
+}
+
+model AuditLog {
+  id        String   @id
+  action    String
+  userId    String?
+  details   Json?
+  createdAt DateTime @default(now())
+  user      User?    @relation(fields: [userId], references: [id])
+
+  @@index([userId, createdAt])
+  @@index([action, createdAt])
 }
 
 model AdminNotification {

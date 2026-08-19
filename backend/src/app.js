@@ -17,6 +17,7 @@ import rewardRoutes from "./routes/reward.routes.js";
 import leaderboardRoutes from "./routes/leaderboard.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import userLifecycleRoutes from "./routes/userLifecycle.routes.js";
+import auditRoutes from "./routes/audit.routes.js";
 
 const prisma = new PrismaClient();
 const app = express();
@@ -58,5 +59,6 @@ app.use("/api/v1/anti-gaming", antiGamingRoutes);
 app.use("/api/v1/rewards", rewardRoutes);
 app.use("/api/v1/leaderboard", leaderboardRoutes);
 app.use("/api/v1/admin", userLifecycleRoutes);
+app.use("/api/v1/audit-logs", auditRoutes);
 
 export default app;
