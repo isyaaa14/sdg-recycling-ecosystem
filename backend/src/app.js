@@ -3,10 +3,10 @@ import express from "express";
 import { PrismaClient } from "@prisma/client";
 import { buildCorsOptions } from "./utils/cors.js";
 import authRoutes from "./routes/auth.routes.js";
-import missionRoutes from "./routes/mission.routes.js";
-import submissionRoutes from "./routes/submission.routes.js";
-import contentRoutes from "./routes/content.routes.js";
-import badgeRoutes from "./routes/badge.routes.js";
+import missionRoutes from "./routes/mission.routes.js"; //Mission Engine
+import submissionRoutes from "./routes/submission.routes.js"; //Mission Engine
+import contentRoutes from "./routes/content.routes.js"; //Content Engine
+import badgeRoutes from "./routes/badge.routes.js"; //Badge Engine
 import pointsRoutes from "./routes/points.routes.js";
 import quizRoutes from "./routes/quiz.routes.js";
 import progressRoutes from "./routes/progress.routes.js";
