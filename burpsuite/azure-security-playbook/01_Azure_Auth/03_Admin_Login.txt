@@ -1,0 +1,10 @@
+POST /api/v1/auth/login HTTP/1.1
+Host: app-sdg-backend-fwcvbshjeugbcuea.southeastasia-01.azurewebsites.net
+Content-Type: application/json
+Connection: close
+
+{
+  "email": "admin@uow.edu.my",
+  "password": "<ENTER_ADMIN_PASSWORD_AT_RUNTIME>"
+}
+

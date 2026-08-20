@@ -37,8 +37,10 @@ azure-security-playbook/
 |-- 01_Azure_Auth/
 |   |-- 01_Health_Check.txt
 |   |-- 02_Student_Login.txt
-|   |-- 03_Auth_No_Token.txt
-|   `-- 04_Auth_Student.txt
+|   |-- 03_Admin_Login.txt
+|   |-- 04_Auth_No_Token.txt
+|   |-- 05_Auth_Student.txt
+|   `-- 06_Auth_Admin.txt
 `-- 02_Azure_Badge_Theft_Simulation/
     |-- 01_Access_Confidential_Award_Records.txt
     |-- 02_Badge_Progress_Baseline.txt
@@ -52,7 +54,7 @@ Create these two Repeater tab groups:
 
 | Burp group | Color | Tabs in order |
 | --- | --- | --- |
-| `Azure - Auth` | Blue | `Health Check`, `Student Login`, `Auth - No Token`, `Auth - Student` |
+| `Azure - Auth` | Blue | `Health Check`, `Student Login`, `Admin Login`, `Auth - No Token`, `Auth - Student`, `Auth - Admin` |
 | `Azure - Badge Theft Simulation` | Yellow | `Access confidential award records`, `Badge progress baseline`, `Impersonate another student`, `Lower the badge requirement` |
 
 In Repeater, click **+ > Create tab group**, enter the group name, choose the color, and add the relevant tabs.
@@ -113,6 +115,24 @@ replace the placeholder with the token returned by the login request.
 
 If the token expires, log in again and update all authenticated tabs.
 
+### Administrator login
+
+Open `01_Azure_Auth/03_Admin_Login.txt` and replace:
+
+```text
+<ENTER_ADMIN_PASSWORD_AT_RUNTIME>
+```
+
+Send the request and confirm:
+
+```text
+HTTP 200
+data.user.role = ADMIN
+data.token is present
+```
+
+Copy only the administrator token value. Replace `<AZURE_ADMIN_TOKEN>` in `06_Auth_Admin.txt` before sending it.
+
 ## Run order and expected results
 
 ### Group 1: Azure - Auth
@@ -157,9 +177,30 @@ data.token is present
 - **Say:** “The dedicated test account authenticates successfully, and Azure issues a JWT identifying this caller specifically as a student.”
 - **Key point:** This same student JWT is used for every later authorization test.
 
+#### AUTH-01B: Administrator Login
+
+File: `01_Azure_Auth/03_Admin_Login.txt`
+
+Objective: authenticate the approved Azure administrator and obtain an administrator JWT for the positive access-control comparison.
+
+Expected:
+
+```text
+HTTP 200
+data.user.email = admin@uow.edu.my
+data.user.role = ADMIN
+data.token is present
+```
+
+**Presentation notes**
+
+- **Show:** The administrator email, `200 OK`, and `role: ADMIN`. Hide the password and token.
+- **Say:** “This second login gives us an administrator identity so we can compare how the same protected endpoint behaves for two different roles.”
+- **Key point:** Keep the student and administrator tokens separate and clearly labelled.
+
 #### AUTH-02: No Token
 
-File: `01_Azure_Auth/03_Auth_No_Token.txt`
+File: `01_Azure_Auth/04_Auth_No_Token.txt`
 
 Objective: verify that the administrator badge list requires authentication.
 
@@ -179,7 +220,7 @@ No badge list is returned.
 
 #### AUTH-03: Student Role
 
-File: `01_Azure_Auth/04_Auth_Student.txt`
+File: `01_Azure_Auth/05_Auth_Student.txt`
 
 Objective: verify that a valid student cannot access the administrator badge list.
 
@@ -196,6 +237,25 @@ No badge list is returned.
 - **Show:** The valid student `Authorization` header, with its token redacted, and the `403 Forbidden` response.
 - **Say:** “The token is valid, but the account has the student role. The backend recognizes the user and blocks the administrator-only action.”
 - **Key point:** `403` proves authorization is checked separately from authentication.
+
+#### AUTH-03B: Administrator Role
+
+File: `01_Azure_Auth/06_Auth_Admin.txt`
+
+Objective: demonstrate that an authenticated administrator can access the same badge list that rejected the student.
+
+Expected:
+
+```text
+HTTP 200
+data.badges is returned
+```
+
+**Presentation notes**
+
+- **Show:** The same `GET /api/v1/badges` request used in `Auth - Student`, now with the redacted administrator token, followed by `200 OK` and the badge list.
+- **Say:** “The student received 403, while the administrator receives 200 on the same endpoint. The difference is the authenticated role.”
+- **Key point:** This positive control confirms that the endpoint is available but intentionally restricted to administrators.
 
 ### Group 2: Azure - Badge Theft Simulation
 
@@ -288,14 +348,16 @@ The badge is not modified.
 | --- | --- |
 | AUTH-00 | `200` |
 | AUTH-01 | `200`, student JWT |
+| AUTH-01B | `200`, admin JWT |
 | AUTH-02 | `401` |
 | AUTH-03 | `403` |
+| AUTH-03B | `200`, badge list |
 | BDG-01 | `403` |
 | BDG-02 | `200`, own progress |
 | BDG-03 | `200`, still own progress |
 | BDG-04 | `403`, unchanged |
 
-The suite passes only when all eight results match.
+The suite passes only when all ten results match.
 
 ## Stop conditions
 
