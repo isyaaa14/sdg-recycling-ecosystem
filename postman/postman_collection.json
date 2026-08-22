@@ -79,6 +79,10 @@
       "value": ""
     },
     {
+      "key": "expiredMissionId",
+      "value": ""
+    },
+    {
       "key": "createdContentId",
       "value": ""
     },
@@ -1664,7 +1668,7 @@
             },
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"answers\": {\n    \"{{questionCode}}\": \"PET\"\n  },\n  \"timeSpentSeconds\": 72\n}"
+              "raw": "{\n  \"answers\": {\n    \"QQ0011\": \"PET\",\n    \"QQ0012\": \"Empty and rinse it\",\n    \"QQ0013\": \"It reduces contamination\",\n    \"QQ0014\": \"HDPE\",\n    \"QQ0015\": \"The batch quality drops\"\n  },\n  \"timeSpentSeconds\": 72\n}"
             }
           },
           "event": [
@@ -1674,7 +1678,10 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('status 201', function () { pm.response.to.have.status(201); });",
-                  "pm.test('attempt returned', function () { pm.expect(pm.response.json().data.attempt.id).to.be.a('string'); });"
+                  "const attempt = pm.response.json().data.attempt;",
+                  "pm.test('attempt returned', function () { pm.expect(attempt.id).to.be.a('string'); });",
+                  "pm.test('all answers correct', function () { pm.expect(attempt.correctAnswers).to.eql(attempt.totalQuestions); });",
+                  "pm.test('attempt passed', function () { pm.expect(attempt.passed).to.eql(true); });"
                 ]
               }
             }
@@ -2671,6 +2678,254 @@
                 "type": "text/javascript",
                 "exec": [
                   "pm.test('status 200', function () { pm.response.to.have.status(200); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Mission Missing Fields - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Incomplete Test Mission\",\n  \"description\": \"Missing the type field on purpose.\",\n  \"startAt\": \"2026-09-01T00:00:00.000Z\",\n  \"endAt\": \"2026-09-10T00:00:00.000Z\",\n  \"submissionCap\": 5,\n  \"points\": 50,\n  \"autoApprove\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Mission Invalid Window - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Invalid Window Test Mission\",\n  \"description\": \"endAt is before startAt.\",\n  \"type\": \"TIME_LIMITED\",\n  \"startAt\": \"2026-09-10T00:00:00.000Z\",\n  \"endAt\": \"2026-09-01T00:00:00.000Z\",\n  \"submissionCap\": 5,\n  \"points\": 50,\n  \"autoApprove\": true\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Setup: Create Expired Test Mission - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Expired Window Test Mission\",\n  \"description\": \"Both startAt and endAt are in the past, active for testing.\",\n  \"type\": \"TIME_LIMITED\",\n  \"startAt\": \"2026-01-01T00:00:00.000Z\",\n  \"endAt\": \"2026-01-02T00:00:00.000Z\",\n  \"submissionCap\": 5,\n  \"points\": 50,\n  \"autoApprove\": true,\n  \"status\": \"ACTIVE\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.environment.set('expiredMissionId', pm.response.json().data.mission.id);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Submit To Expired Mission - Student",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{studentToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/missions/{{expiredMissionId}}/submit",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "missions",
+                "{{expiredMissionId}}",
+                "submit"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"proofText\": \"Testing submission outside the window.\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Content Missing Title - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/content",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "content"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"description\": \"Content record missing its title field.\",\n  \"body\": \"Test content body.\",\n  \"tags\": [\"plastic\"]\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Create Badge Invalid Criteria - Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminToken}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/{{apiPrefix}}/badges",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "{{apiPrefix}}",
+                "badges"
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Invalid Criteria Test Badge\",\n  \"description\": \"Uses a criteriaType value that isn't in the enum.\",\n  \"tier\": \"BRONZE\",\n  \"criteriaType\": \"MISSIONS_JOINED\",\n  \"criteriaValue\": 3\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('status 400', function () { pm.response.to.have.status(400); });"
                 ]
               }
             }

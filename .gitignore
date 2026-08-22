@@ -30,6 +30,7 @@ sdg-recycling-ecosystem-main/
 static-deploy/
 aaron-backend-latest/
 aaron-backend-fixed/
+static-deploy/
 
 # Manual deployment packages
 *.zip
@@ -44,3 +45,11 @@ dist/
 backend/prisma/dev.db
 
 postman/
+
+# Keep component documentation visible even when local component worktrees are ignored
+!mobile-app/
+mobile-app/*
+!mobile-app/README.md
+!static-deploy/
+static-deploy/*
+!static-deploy/README.md

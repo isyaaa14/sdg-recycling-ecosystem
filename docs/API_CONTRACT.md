@@ -45,7 +45,7 @@ Content-Type: application/json
 
 ```json
 {
-  "email": "student1@sdg.local",
+  "email": "student1@student.uow.edu.my",
   "password": "Password123!"
 }
 ```
@@ -60,18 +60,20 @@ Content-Type: application/json
 ```json
 {
   "name": "Student One",
-  "email": "student1@example.com",
+  "email": "newstudent@student.uow.edu.my",
   "password": "Password123!"
 }
 ```
 
+Registration is restricted to `@uow.edu.my` and `@student.uow.edu.my` email addresses. Other domains are rejected with `400` and the message `"Registration is restricted to student.uow.edu.my or uow.edu.my email addresses."`
+
 Seeded local accounts:
 
 ```text
-admin@sdg.local / Password123!
-student1@sdg.local / Password123!
-student2@sdg.local / Password123!
-student3@sdg.local / Password123!
+admin@uow.edu.my / Password123!
+student1@student.uow.edu.my / Password123!
+student2@student.uow.edu.my / Password123!
+student3@student.uow.edu.my / Password123!
 ```
 
 ## Response Shape
@@ -95,6 +97,8 @@ Errors normally return:
 ```
 
 Frontend and mobile should read `error.message` for user-facing error handling.
+
+Requests with missing required fields, invalid field types, or unsupported enum values return `400 Bad Request` using the same error shape.
 
 ## Roles
 
@@ -160,7 +164,9 @@ Create mission body:
 }
 ```
 
-Join mission response creates a submission with status `ONGOING`. Submit mission changes that submission to `PENDING_REVIEW`, or `APPROVED` when the mission has `autoApprove: true`. Points are awarded only when approved submissions complete the mission target, not merely when any single submission is approved.
+`title`, `description`, `type`, `startAt`, `endAt`, `submissionCap`, `points`, and `autoApprove` are required when creating a mission. `endAt` must be later than `startAt`; otherwise the API returns `400 Bad Request` with `Invalid time window.`
+
+Join mission response creates a submission with status `ONGOING`. Joining or submitting is allowed only while the mission is active, has status `ACTIVE`, and the current time is between `startAt` and `endAt`. Requests outside that window return `400 Bad Request`. Submit mission changes the submission to `PENDING_REVIEW`, or `APPROVED` when the mission has `autoApprove: true`. Points are awarded only when approved submissions complete the mission target, not merely when any single submission is approved.
 
 Submit mission body:
 
