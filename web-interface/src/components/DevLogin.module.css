@@ -1,0 +1,154 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 5vw, 64px);
+  background: var(--void);
+  position: relative;
+  overflow: hidden;
+}
+
+.page::before {
+  content: '';
+  position: absolute;
+  top: 15%;
+  right: -10%;
+  width: min(420px, 60vw);
+  height: min(420px, 60vw);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23dfff00' stroke-width='0.55' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M12 4.2 8.8 10.5H11L9.7 13.4c1.7-.5 3.4-.1 4.7 1L16.5 10.8H18.6L12 4.2z'/%3E%3Cg transform='rotate(120 12 12)'%3E%3Cpath d='M12 4.2 8.8 10.5H11L9.7 13.4c1.7-.5 3.4-.1 4.7 1L16.5 10.8H18.6L12 4.2z'/%3E%3C/g%3E%3Cg transform='rotate(240 12 12)'%3E%3Cpath d='M12 4.2 8.8 10.5H11L9.7 13.4c1.7-.5 3.4-.1 4.7 1L16.5 10.8H18.6L12 4.2z'/%3E%3C/g%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  filter: blur(64px);
+  opacity: 0.2;
+  pointer-events: none;
+}
+
+.card {
+  width: 100%;
+  max-width: 480px;
+  padding: clamp(48px, 8vw, 80px) 0;
+  text-align: left;
+  background: transparent;
+  border: none;
+  border-top: 2px solid var(--signal);
+  border-bottom: 1px solid var(--line-on-void);
+  border-radius: 0;
+  box-shadow: none;
+  animation: surgeIn 1s cubic-bezier(0.19, 1, 0.22, 1) both;
+  position: relative;
+  z-index: 1;
+}
+
+.card:hover {
+  padding-left: 0;
+}
+
+.logo {
+  margin-bottom: 48px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: var(--display-track);
+  line-height: 0.95;
+  margin-bottom: 12px;
+  color: var(--paper);
+  transform: var(--display-narrow);
+  transform-origin: left center;
+}
+
+.subtitle {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  color: var(--text-muted-on-void);
+  margin-bottom: 48px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.devNote {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--signal);
+  margin-bottom: 48px;
+  border-bottom: 1px solid var(--signal);
+  padding-bottom: 2px;
+}
+
+.formGroup {
+  margin-bottom: 32px;
+}
+
+.formGroup label {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  font-weight: 500;
+  color: var(--text-muted-on-void);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.select {
+  width: 100%;
+  padding: 16px 0;
+  border: none;
+  border-bottom: 1px solid var(--line-on-void);
+  border-radius: 0;
+  background: transparent;
+  color: var(--paper);
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.select:focus {
+  outline: none;
+  border-bottom-color: var(--signal);
+}
+
+.select option {
+  background: var(--void);
+  color: var(--paper);
+}
+
+.loginBtn {
+  width: 100%;
+  padding: 18px 32px;
+  border: none;
+  background: var(--signal);
+  color: var(--void);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: opacity var(--transition);
+}
+
+.loginBtn:hover {
+  opacity: 0.85;
+}
+
+.hint {
+  margin-top: 32px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--text-muted-on-void);
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 40px 0;
+  }
+}

@@ -1,0 +1,38 @@
+.placeholder {
+  padding: var(--space-section) 0;
+  max-width: 640px;
+  margin: 0;
+  text-align: left;
+  border-top: 2px solid var(--void);
+}
+
+.iconWrap {
+  width: auto;
+  height: auto;
+  margin-bottom: 32px;
+  border: none;
+  background: transparent;
+  color: var(--void);
+  justify-content: flex-start;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 800;
+  letter-spacing: var(--display-track);
+  line-height: 0.9;
+  margin: 0 0 32px;
+  transform: var(--display-narrow);
+  transform-origin: left center;
+}
+
+.message {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  max-width: 400px;
+}

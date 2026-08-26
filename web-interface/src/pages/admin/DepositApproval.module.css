@@ -1,0 +1,142 @@
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 180px;
+}
+
+.rejectGroup {
+  display: flex;
+  gap: 8px;
+}
+
+.rejectInput {
+  flex: 1;
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid var(--line-strong);
+  font-size: 0.8125rem;
+  background: transparent;
+  transition: border-color var(--transition);
+}
+
+.rejectInput:focus {
+  outline: none;
+  border-bottom-color: var(--danger);
+}
+
+.rejectionReason {
+  font-size: 0.75rem;
+  color: var(--danger);
+  margin-top: 6px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.done {
+  color: var(--text-tertiary);
+}
+
+.status {
+  padding: var(--space-block) 0;
+}
+
+.errorMessage {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+.retryBtn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.retryBtn:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.proofImageBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.proofThumb {
+  width: 96px;
+  height: 72px;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+
+.linkBtn {
+  align-self: flex-start;
+  padding: 4px 8px;
+  border: none;
+  background: #111;
+  color: var(--signal);
+  font: inherit;
+  font-size: 0.8125rem;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.previewOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  box-sizing: border-box;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+.previewPanel {
+  width: min(420px, calc(100vw - 48px));
+  max-height: min(72vh, 560px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  padding: 14px;
+  margin: 0;
+  background: var(--surface, #fff);
+  border: 1px solid var(--line);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.28);
+}
+
+.previewToolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-shrink: 0;
+}
+
+.previewImage {
+  display: block;
+  width: 100%;
+  max-height: min(52vh, 420px);
+  height: auto;
+  margin: 0 auto;
+  object-fit: contain;
+  background: #111;
+}
+
+@media (max-width: 768px) {
+  .rejectGroup {
+    flex-direction: column;
+  }
+}

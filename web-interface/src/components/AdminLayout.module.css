@@ -1,0 +1,25 @@
+.layout {
+  display: flex;
+  min-height: 100vh;
+  background: var(--paper);
+}
+
+.main {
+  flex: 1;
+  width: 100%;
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  padding: 0 clamp(32px, 5vw, 64px) var(--space-section);
+  overflow-x: auto;
+}
+
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .main {
+    margin-left: 0;
+    padding: 0 20px 80px;
+  }
+}

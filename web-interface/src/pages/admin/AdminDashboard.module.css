@@ -1,0 +1,53 @@
+.moduleCard {
+  padding: var(--space-block) 0;
+  position: relative;
+}
+
+.moduleCard:hover {
+  padding-left: 0;
+}
+
+.grid-cards > .moduleCard:first-child .title {
+  font-size: clamp(1.5rem, 2.5vw, 2.25rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+}
+
+.iconWrap {
+  width: auto;
+  height: auto;
+  margin-bottom: 24px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--void);
+  justify-content: flex-start;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  letter-spacing: -0.03em;
+}
+
+.description {
+  font-size: 0.875rem;
+  color: var(--muted);
+  line-height: 1.6;
+  max-width: 320px;
+}
+
+.arrow {
+  position: absolute;
+  top: var(--space-block);
+  right: 0;
+  color: var(--void);
+  opacity: 0;
+  transition: opacity var(--transition);
+}
+
+.moduleCard:hover .arrow {
+  opacity: 1;
+}

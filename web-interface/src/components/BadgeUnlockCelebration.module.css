@@ -1,0 +1,132 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(8, 12, 10, 0.72);
+  backdrop-filter: blur(6px);
+}
+
+.burst {
+  position: absolute;
+  width: min(420px, 90vw);
+  height: min(420px, 90vw);
+  pointer-events: none;
+}
+
+.particle {
+  --i: 0;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin: -4px;
+  border-radius: 1px;
+  background: var(--signal, #e8ff1a);
+  opacity: 0;
+  transform: rotate(calc(var(--i) * 20deg)) translateY(0);
+  animation: particleFly 0.95s ease-out forwards;
+  animation-delay: calc(var(--i) * 18ms);
+}
+
+.particle:nth-child(odd) {
+  background: #fff;
+  width: 5px;
+  height: 5px;
+}
+
+.particle:nth-child(3n) {
+  background: var(--void, #1a3a2a);
+}
+
+@keyframes particleFly {
+  0% {
+    opacity: 0;
+    transform: rotate(calc(var(--i) * 20deg)) translateY(0) scale(0.4);
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: rotate(calc(var(--i) * 20deg)) translateY(-150px) scale(1);
+  }
+}
+
+.card {
+  position: relative;
+  z-index: 1;
+  width: min(380px, 100%);
+  max-width: 100%;
+  padding: 36px 28px 28px;
+  text-align: center;
+  background: var(--surface, #f4f7f2);
+  border: 1px solid var(--line, #d5ddd4);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.28);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 18px;
+}
+
+.iconWrap {
+  display: inline-flex;
+  color: var(--void);
+  margin-bottom: 16px;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 3.2vw, 1.75rem);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  margin: 0 0 8px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  transform: none;
+}
+
+.badgeName {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 0 0 10px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.description {
+  font-size: 0.9375rem;
+  color: var(--text-secondary);
+  line-height: 1.55;
+  margin: 0 0 16px;
+}
+
+.tier {
+  display: inline-block;
+  margin-bottom: 18px;
+}
+
+.actions {
+  display: flex;
+  justify-content: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .particle {
+    animation: none !important;
+    opacity: 0;
+  }
+}

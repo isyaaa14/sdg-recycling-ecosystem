@@ -1,0 +1,130 @@
+.pickSection {
+  max-width: 720px;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 24px;
+}
+
+.seedGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.seedCard {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 22px 18px;
+  border: 2px solid var(--void);
+  background: var(--paper);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.35s cubic-bezier(0.19, 1, 0.22, 1),
+    border-color 0.3s ease,
+    box-shadow 0.35s ease;
+}
+
+.seedCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.06);
+}
+
+.seedCard:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+.seedOrb {
+  width: 36px;
+  height: 44px;
+  border-radius: 50% 50% 45% 45%;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.12);
+}
+
+.seedName {
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  letter-spacing: var(--display-track);
+  transform: var(--display-narrow);
+  transform-origin: left center;
+}
+
+.seedBlurb {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.grownFooter {
+  margin-top: 20px;
+  text-align: left;
+}
+
+.stageLine {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--void);
+  margin: 0 0 8px;
+}
+
+.grownHint {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  line-height: 1.55;
+  margin: 0 0 20px;
+}
+
+.footerActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+
+.stagesLink,
+.replantBtn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  border: 1px solid var(--void);
+  background: transparent;
+  cursor: pointer;
+}
+
+.stagesLink:hover,
+.replantBtn:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.replantBtn {
+  background: var(--void);
+  color: var(--paper);
+}
+
+.replantBtn:hover {
+  background: transparent;
+}
+
+@media (max-width: 720px) {
+  .seedGrid {
+    grid-template-columns: 1fr;
+  }
+}

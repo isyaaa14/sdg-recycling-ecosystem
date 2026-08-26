@@ -1,0 +1,108 @@
+/* UNDO RECYCLING POLISH — decorative only, no interaction */
+
+.layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.motif {
+  position: absolute;
+  color: var(--void, #0d1f16);
+  opacity: 0.055;
+}
+
+.svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.loopA {
+  top: 42%;
+  left: 4%;
+  width: min(88px, 13vw);
+  color: var(--signal, #c8f542);
+  opacity: 0.07;
+  animation: spinSlow 28s linear infinite;
+}
+
+.loopB {
+  bottom: 28%;
+  right: 5%;
+  width: min(64px, 11vw);
+  opacity: 0.05;
+  animation: spinSlow 36s linear infinite reverse;
+}
+
+.bottle {
+  top: 68%;
+  right: 12%;
+  width: min(48px, 9vw);
+  opacity: 0.05;
+  animation: floatA 18s ease-in-out infinite;
+}
+
+.leaf {
+  top: 12%;
+  left: 10%;
+  width: min(56px, 10vw);
+  opacity: 0.05;
+  animation: floatB 12s ease-in-out infinite;
+}
+
+.can {
+  top: 55%;
+  right: 22%;
+  width: min(40px, 8vw);
+  opacity: 0.04;
+  animation: floatA 20s ease-in-out infinite 1s;
+}
+
+@keyframes floatA {
+  0%,
+  100% {
+    transform: translateY(0) rotate(-4deg);
+  }
+  50% {
+    transform: translateY(-14px) rotate(3deg);
+  }
+}
+
+@keyframes floatB {
+  0%,
+  100% {
+    transform: translateY(0) rotate(5deg);
+  }
+  50% {
+    transform: translateY(12px) rotate(-3deg);
+  }
+}
+
+@keyframes spinSlow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 768px) {
+  .loopA,
+  .can {
+    display: none;
+  }
+
+  .motif {
+    opacity: 0.04;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motif {
+    animation: none !important;
+  }
+}

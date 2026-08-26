@@ -1,0 +1,46 @@
+{
+  "byUser": {
+    "0137612@student.uow.edu.my": [
+      {
+        "id": "ntf_1786264100040_elcdwn",
+        "type": "mission",
+        "title": "Mission approved",
+        "body": "Bottle Count Challenge was approved. Points and badge progress may update.",
+        "link": "/events",
+        "read": true,
+        "dedupeKey": "mission-approved:SUB005",
+        "createdAt": "2026-08-09T08:28:20.040Z"
+      },
+      {
+        "id": "ntf_1786263321480_f5jutl",
+        "type": "mission",
+        "title": "Mission submitted",
+        "body": "Your proof is pending admin review.",
+        "link": "/events",
+        "read": true,
+        "dedupeKey": "mission-submit:SUB005",
+        "createdAt": "2026-08-09T08:15:21.480Z"
+      },
+      {
+        "id": "ntf_1786262565127_wed0vv",
+        "type": "mission",
+        "title": "Mission completed",
+        "body": "Your mission proof was auto-approved.",
+        "link": "/events",
+        "read": true,
+        "dedupeKey": "mission-auto:SUB004",
+        "createdAt": "2026-08-09T08:02:45.127Z"
+      },
+      {
+        "id": "ntf_1786014324605_2p1qso",
+        "type": "deposit",
+        "title": "Recycling deposit rejected",
+        "body": "Your deposit was rejected: hellobye",
+        "link": "/dashboard",
+        "read": true,
+        "dedupeKey": "deposit-rejected:RCS008",
+        "createdAt": "2026-08-06T11:05:24.605Z"
+      }
+    ]
+  }
+}

@@ -1,0 +1,136 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(0, 0, 0, 0.72);
+  animation: fadeIn 0.35s ease both;
+}
+
+.panel {
+  position: relative;
+  width: min(420px, 100%);
+  padding: 48px 32px 36px;
+  border: 1px solid var(--line, #333);
+  background: #111;
+  color: #f5f5f5;
+  text-align: center;
+  overflow: hidden;
+  animation: popIn 0.55s cubic-bezier(0.19, 1, 0.22, 1) both;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--signal, #c8f542);
+  margin: 0 0 12px;
+}
+
+.level {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 8vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  margin: 0 0 8px;
+  animation: pulse 0.8s ease 0.2s both;
+}
+
+.title {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #aaa;
+  margin: 0 0 28px;
+}
+
+.closeBtn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  padding: 12px 28px;
+  border: none;
+  background: var(--signal, #c8f542);
+  color: #111;
+  cursor: pointer;
+}
+
+.particle {
+  position: absolute;
+  top: 55%;
+  border-radius: 1px;
+  background: var(--signal, #c8f542);
+  opacity: 0;
+  animation-name: burst;
+  animation-timing-function: ease-out;
+  animation-fill-mode: both;
+  pointer-events: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.86) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(0.7);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes burst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.4);
+  }
+  20% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--drift, 0), -120px) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .panel,
+  .level,
+  .particle {
+    animation: none !important;
+    opacity: 1;
+  }
+
+  .particle {
+    display: none;
+  }
+}

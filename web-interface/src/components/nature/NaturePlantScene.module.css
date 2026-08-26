@@ -1,0 +1,472 @@
+.stage {
+  width: min(560px, 100%);
+  margin: 0 auto;
+  text-align: center;
+}
+
+.captionRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 0 0 20px;
+  flex-wrap: wrap;
+}
+
+.caption {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0;
+  text-align: center;
+}
+
+.periodChip {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--void);
+  border: 1px solid var(--line-strong, var(--line));
+  padding: 4px 8px;
+}
+
+.frame {
+  position: relative;
+  border: 2px solid var(--void);
+  background: #0a0a0a;
+  overflow: hidden;
+}
+
+.letterboxTop,
+.letterboxBottom {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 28px;
+  background: #050505;
+  z-index: 20;
+  pointer-events: none;
+}
+
+.letterboxTop {
+  top: 0;
+}
+
+.letterboxBottom {
+  bottom: 0;
+}
+
+.camera {
+  transform-origin: 50% 60%;
+  will-change: transform;
+}
+
+.scene {
+  --sprout: #5a9a4a;
+  --accent: #8fbf6a;
+  position: relative;
+  height: 400px;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.sky {
+  position: absolute;
+  inset: 0;
+  transition: background 1.6s ease;
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 8%, rgba(255, 220, 150, 0.22), transparent 55%),
+    linear-gradient(180deg, #1a2430 0%, #3d4f5c 28%, #7a8f7a 48%, #b8a078 52%, #6b5338 100%);
+}
+
+.period_dawn .sky {
+  background:
+    radial-gradient(ellipse 70% 45% at 28% 20%, rgba(255, 170, 120, 0.35), transparent 55%),
+    linear-gradient(180deg, #2a3348 0%, #6a5a78 22%, #d4a078 45%, #b89868 52%, #6b5338 100%);
+}
+
+.period_day .sky {
+  background:
+    radial-gradient(ellipse 80% 50% at 70% 8%, rgba(255, 220, 150, 0.28), transparent 55%),
+    linear-gradient(180deg, #5a7a9a 0%, #8aabbf 26%, #a8b890 48%, #b8a078 52%, #6b5338 100%);
+}
+
+.period_dusk .sky {
+  background:
+    radial-gradient(ellipse 75% 50% at 78% 18%, rgba(255, 140, 90, 0.4), transparent 55%),
+    linear-gradient(180deg, #1e2440 0%, #6a4060 24%, #c47858 46%, #9a7048 52%, #5c4730 100%);
+}
+
+.period_night .sky {
+  background:
+    radial-gradient(ellipse 60% 40% at 30% 12%, rgba(120, 150, 220, 0.12), transparent 50%),
+    linear-gradient(180deg, #06080f 0%, #12182a 30%, #1c2430 48%, #3a3228 52%, #2a2218 100%);
+}
+
+.stars {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.star {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(240, 245, 255, 0.9);
+  box-shadow: 0 0 4px rgba(220, 230, 255, 0.7);
+  animation: starTwinkle 3.6s ease-in-out infinite;
+}
+
+@keyframes starTwinkle {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.haze {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(180, 200, 210, 0.28) 0%,
+    transparent 40%,
+    rgba(40, 28, 16, 0.15) 100%
+  );
+  z-index: 2;
+  pointer-events: none;
+}
+
+.godRays {
+  position: absolute;
+  inset: -10% -20%;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    conic-gradient(
+      from 210deg at 78% 8%,
+      transparent 0deg,
+      rgba(255, 230, 170, 0.08) 8deg,
+      transparent 14deg,
+      rgba(255, 220, 140, 0.14) 22deg,
+      transparent 30deg,
+      rgba(255, 235, 180, 0.1) 38deg,
+      transparent 48deg
+    );
+  mix-blend-mode: screen;
+  filter: blur(0.5px);
+}
+
+.sunBloom {
+  position: absolute;
+  left: var(--sun-x, 78%);
+  top: var(--sun-y, 12%);
+  width: 90px;
+  height: 90px;
+  margin-left: -45px;
+  margin-top: -45px;
+  border-radius: 50%;
+  z-index: 4;
+  background: radial-gradient(
+    circle at 40% 40%,
+    rgba(255, 250, 230, 0.95) 0%,
+    rgba(255, 210, 110, 0.55) 35%,
+    rgba(255, 180, 80, 0.12) 60%,
+    transparent 72%
+  );
+  box-shadow:
+    0 0 60px rgba(255, 210, 120, 0.45),
+    0 0 120px rgba(255, 190, 90, 0.2);
+  pointer-events: none;
+  transition: left 1.6s ease, top 1.6s ease;
+}
+
+.moon {
+  position: absolute;
+  width: 42px;
+  height: 42px;
+  margin-left: -21px;
+  margin-top: -21px;
+  border-radius: 50%;
+  z-index: 4;
+  background:
+    radial-gradient(circle at 35% 35%, #f4f0e4, #c8c4b8 55%, #9a968c);
+  box-shadow:
+    0 0 28px rgba(200, 210, 255, 0.35),
+    inset -8px -4px 12px rgba(20, 30, 50, 0.25);
+  pointer-events: none;
+}
+
+.period_night .godRays {
+  mix-blend-mode: soft-light;
+}
+
+.period_night .mote {
+  background: rgba(190, 210, 255, 0.7);
+  box-shadow: 0 0 6px rgba(160, 190, 255, 0.45);
+}
+
+.period_night .vignette {
+  background: radial-gradient(
+    ellipse 70% 65% at 50% 45%,
+    transparent 35%,
+    rgba(0, 0, 0, 0.62) 100%
+  );
+}
+
+.motes {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  pointer-events: none;
+}
+
+.mote {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 245, 210, 0.85);
+  box-shadow: 0 0 6px rgba(255, 230, 160, 0.6);
+}
+
+.seed {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 20px;
+  height: 26px;
+  margin-left: -10px;
+  z-index: 8;
+  will-change: transform, opacity;
+}
+
+.seedBody {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 48% 48% 42% 42%;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255, 255, 255, 0.35), transparent 40%),
+    linear-gradient(155deg, var(--accent), var(--sprout) 55%, #3d5c30);
+  box-shadow:
+    inset -3px -4px 8px rgba(0, 0, 0, 0.35),
+    0 10px 18px rgba(0, 0, 0, 0.28);
+}
+
+.seedHighlight {
+  position: absolute;
+  top: 5px;
+  left: 4px;
+  width: 6px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  filter: blur(0.5px);
+}
+
+.dustBurst {
+  position: absolute;
+  left: 50%;
+  top: 54%;
+  width: 1px;
+  height: 1px;
+  z-index: 7;
+  pointer-events: none;
+}
+
+.dust {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: rgba(110, 85, 50, 0.75);
+  box-shadow: 0 0 4px rgba(80, 55, 30, 0.4);
+}
+
+.crater {
+  position: absolute;
+  left: 50%;
+  top: 53%;
+  width: 84px;
+  height: 22px;
+  margin-left: -42px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse, rgba(40, 28, 14, 0.45), transparent 72%);
+  z-index: 6;
+  pointer-events: none;
+}
+
+.pour {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  width: 3px;
+  height: 42%;
+  margin-left: -1.5px;
+  transform-origin: top center;
+  z-index: 9;
+  background: linear-gradient(
+    180deg,
+    rgba(200, 230, 255, 0.15),
+    rgba(140, 200, 245, 0.75) 40%,
+    rgba(100, 170, 230, 0.55)
+  );
+  border-radius: 2px;
+  filter: blur(0.4px);
+  box-shadow: 0 0 10px rgba(140, 200, 255, 0.35);
+  pointer-events: none;
+}
+
+.splash {
+  position: absolute;
+  left: 50%;
+  top: 52%;
+  width: 100px;
+  height: 18px;
+  margin-left: -50px;
+  border-radius: 50%;
+  z-index: 7;
+  background: radial-gradient(
+    ellipse,
+    rgba(170, 215, 255, 0.55) 0%,
+    rgba(120, 180, 230, 0.2) 45%,
+    transparent 70%
+  );
+  pointer-events: none;
+}
+
+.wetSoil {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 140px;
+  height: 50px;
+  margin-left: -70px;
+  border-radius: 50%;
+  z-index: 6;
+  background: radial-gradient(ellipse, rgba(35, 24, 12, 0.55), transparent 70%);
+  pointer-events: none;
+}
+
+.sproutWrap {
+  position: absolute;
+  left: 50%;
+  top: 22%;
+  width: 140px;
+  height: 170px;
+  margin-left: -70px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.sprout {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.25));
+}
+
+.lifeGlow {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  width: 120px;
+  height: 120px;
+  margin-left: -60px;
+  border-radius: 50%;
+  z-index: 9;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--accent) 35%, transparent),
+    transparent 65%
+  );
+  pointer-events: none;
+}
+
+.ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 54%;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.soilFar {
+  position: absolute;
+  inset: 8% 0 0;
+  background: linear-gradient(180deg, #8a7352 0%, #5c4730 100%);
+  opacity: 0.55;
+  clip-path: ellipse(95% 80% at 50% 100%);
+}
+
+.soil {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 40% 20% at 50% 8%, rgba(90, 70, 40, 0.5), transparent 60%),
+    linear-gradient(180deg, #9a8158 0%, #6e5538 38%, #4a3824 100%);
+  clip-path: ellipse(88% 72% at 50% 100%);
+  box-shadow: inset 0 20px 40px rgba(0, 0, 0, 0.2);
+}
+
+.soilRim {
+  position: absolute;
+  left: 10%;
+  right: 10%;
+  top: 2%;
+  height: 12px;
+  border-radius: 50%;
+  background: linear-gradient(
+    180deg,
+    rgba(70, 50, 28, 0.35),
+    transparent
+  );
+}
+
+.vignette {
+  position: absolute;
+  inset: 0;
+  z-index: 15;
+  pointer-events: none;
+  background: radial-gradient(
+    ellipse 70% 65% at 50% 45%,
+    transparent 40%,
+    rgba(0, 0, 0, 0.45) 100%
+  );
+}
+
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 16;
+  pointer-events: none;
+  opacity: 0.12;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+.fade {
+  position: absolute;
+  inset: 0;
+  z-index: 25;
+  background: #050505;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .camera,
+  .fade,
+  .seed,
+  .pour,
+  .sproutWrap {
+    animation: none !important;
+  }
+}

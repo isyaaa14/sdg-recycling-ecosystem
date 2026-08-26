@@ -1,0 +1,49 @@
+.page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(24px, 5vw, 64px);
+  background: var(--paper);
+}
+
+.card {
+  max-width: 520px;
+  width: 100%;
+  padding: var(--space-section) 0;
+  text-align: left;
+  border-top: 2px solid var(--void);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 800;
+  letter-spacing: var(--display-track);
+  line-height: 0.95;
+  margin-bottom: 24px;
+  transform: var(--display-narrow);
+  transform-origin: left center;
+}
+
+.message {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  color: var(--muted);
+  margin-bottom: 48px;
+  line-height: 1.7;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  max-width: 360px;
+}
+
+.iconWrap {
+  width: auto;
+  height: auto;
+  margin-bottom: 32px;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  color: var(--void);
+  justify-content: flex-start;
+}

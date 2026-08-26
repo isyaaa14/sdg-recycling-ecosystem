@@ -1,0 +1,57 @@
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.filterLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.filterInput {
+  min-width: 220px;
+  padding: 8px 0;
+  border: none;
+  border-bottom: 1px solid var(--line-strong);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9375rem;
+}
+
+.filterInput:focus {
+  outline: none;
+  border-bottom-color: var(--signal);
+}
+
+.details {
+  max-width: 320px;
+  font-size: 0.8125rem;
+  color: var(--muted);
+  word-break: break-word;
+}
+
+.roleHint {
+  color: var(--muted);
+  font-size: 0.75rem;
+}
+
+.pager {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.pageInfo {
+  font-size: 0.8125rem;
+  color: var(--muted);
+}

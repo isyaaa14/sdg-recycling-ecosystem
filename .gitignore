@@ -1,4 +1,4 @@
-# Environment and secrets
+﻿# Environment and secrets
 .env
 .env.*
 !.env.example
@@ -53,3 +53,10 @@ mobile-app/*
 !static-deploy/
 static-deploy/*
 !static-deploy/README.md
+
+# Aaron portal + BFF local artifacts
+web-interface/node_modules/
+web-interface/dist/
+BFF/node_modules/
+BFF/.env
+BFF/uploads/

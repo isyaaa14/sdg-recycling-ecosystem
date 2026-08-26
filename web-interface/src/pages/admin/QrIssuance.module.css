@@ -1,0 +1,58 @@
+.section {
+  margin-bottom: var(--space-section);
+}
+
+.form {
+  max-width: 420px;
+}
+
+.preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+  align-items: flex-start;
+}
+
+.qrImage {
+  width: 220px;
+  height: 220px;
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 12px;
+}
+
+.previewMeta {
+  max-width: 420px;
+}
+
+.muted {
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.06em;
+}
+
+.rowActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.status {
+  padding: var(--space-block) 0;
+}
+
+.errorMessage {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+.successMessage {
+  color: var(--text);
+  margin-bottom: 16px;
+  max-width: 520px;
+  line-height: 1.65;
+}

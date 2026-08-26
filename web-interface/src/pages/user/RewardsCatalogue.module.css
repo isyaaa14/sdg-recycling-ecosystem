@@ -1,0 +1,733 @@
+.giftMark {
+  opacity: 0.22;
+  overflow: visible;
+}
+
+.giftSvg {
+  display: block;
+  overflow: visible;
+}
+
+.flatPaper {
+  opacity: 0;
+  stroke-width: 1.6;
+  transform-origin: center;
+  transform-box: fill-box;
+  animation: paperLay 1.35s ease both;
+}
+
+.boxBody {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: wrapBox 1.35s cubic-bezier(0.34, 1.4, 0.64, 1) both;
+}
+
+.boxLid {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  animation: wrapLid 1.35s cubic-bezier(0.34, 1.45, 0.64, 1) both;
+}
+
+.ribbon {
+  opacity: 0;
+  stroke-dasharray: 16;
+  stroke-dashoffset: 16;
+  animation: wrapRibbon 1.35s ease both;
+}
+
+.bowLeft,
+.bowRight {
+  opacity: 0;
+  transform-box: fill-box;
+}
+
+.bowLeft {
+  transform-origin: right bottom;
+  animation: wrapBowLeft 1.35s cubic-bezier(0.34, 1.55, 0.64, 1) both;
+}
+
+.bowRight {
+  transform-origin: left bottom;
+  animation: wrapBowRight 1.35s cubic-bezier(0.34, 1.55, 0.64, 1) both;
+}
+
+@keyframes paperLay {
+  0% {
+    opacity: 0;
+    transform: scaleX(0.15);
+  }
+  8% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  28% {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+  42% {
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+  100% {
+    opacity: 0;
+    transform: scaleX(0.4);
+  }
+}
+
+@keyframes wrapBox {
+  0%,
+  22% {
+    opacity: 0;
+    transform: scaleY(0.08) scaleX(1.05);
+  }
+  28% {
+    opacity: 1;
+    transform: scaleY(0.15) scaleX(1.02);
+  }
+  48% {
+    opacity: 1;
+    transform: scaleY(1.08) scaleX(1);
+  }
+  58% {
+    opacity: 1;
+    transform: scaleY(0.96) scaleX(1);
+  }
+  100% {
+    opacity: 1;
+    transform: scaleY(1) scaleX(1);
+  }
+}
+
+@keyframes wrapLid {
+  0%,
+  40% {
+    opacity: 0;
+    transform: translateY(-10px) scaleY(0.2);
+  }
+  55% {
+    opacity: 1;
+    transform: translateY(2px) scaleY(1.12);
+  }
+  68% {
+    opacity: 1;
+    transform: translateY(-1px) scaleY(0.96);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+}
+
+@keyframes wrapRibbon {
+  0%,
+  50% {
+    opacity: 0;
+    stroke-dashoffset: 16;
+  }
+  52% {
+    opacity: 1;
+    stroke-dashoffset: 16;
+  }
+  72% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes wrapBowLeft {
+  0%,
+  62% {
+    opacity: 0;
+    transform: scale(0) rotate(-28deg);
+  }
+  78% {
+    opacity: 1;
+    transform: scale(1.2) rotate(8deg);
+  }
+  90% {
+    opacity: 1;
+    transform: scale(0.94) rotate(-3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@keyframes wrapBowRight {
+  0%,
+  66% {
+    opacity: 0;
+    transform: scale(0) rotate(28deg);
+  }
+  82% {
+    opacity: 1;
+    transform: scale(1.2) rotate(-8deg);
+  }
+  94% {
+    opacity: 1;
+    transform: scale(0.94) rotate(3deg);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .flatPaper,
+  .boxBody,
+  .boxLid,
+  .ribbon,
+  .bowLeft,
+  .bowRight {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    stroke-dashoffset: 0;
+  }
+
+  .flatPaper {
+    opacity: 0;
+  }
+
+  .giftMark {
+    opacity: 0.12;
+  }
+}
+
+.rewardCard {
+  padding: 0;
+  text-align: left;
+}
+
+.rewardCard:hover {
+  padding-left: 0;
+}
+
+.grid-cards > .rewardCard:first-child .name {
+  font-size: clamp(1.75rem, 3vw, 2.5rem);
+  font-weight: 800;
+  letter-spacing: var(--display-track);
+  transform: var(--display-narrow);
+  transform-origin: left center;
+  margin-top: 32px;
+}
+
+.imageWrap {
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--void);
+  position: relative;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+}
+
+.grid-cards > .rewardCard:first-child .imageWrap {
+  aspect-ratio: 21 / 9;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: grayscale(100%) contrast(1.05);
+  transition: filter var(--transition-slow), transform var(--transition-slow);
+}
+
+.rewardCard:hover .image {
+  filter: grayscale(0%) contrast(1.02);
+  transform: scale(1.01);
+}
+
+.name {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  font-weight: 700;
+  margin: 24px 0 8px;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  padding: 0;
+}
+
+.points {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  color: var(--muted);
+  font-weight: 600;
+  margin: 0 0 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+.status {
+  padding: var(--space-block) 0;
+}
+
+.errorMessage {
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+.retryBtn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 18px;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.retryBtn:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.balance {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 14px 20px;
+  max-width: 100%;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--void, #111);
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  background:
+    linear-gradient(
+      145deg,
+      rgba(255, 255, 255, 0.72) 0%,
+      rgba(210, 228, 236, 0.42) 45%,
+      color-mix(in srgb, var(--signal, #dfff00) 18%, rgba(255, 255, 255, 0.28)) 100%
+    );
+  backdrop-filter: blur(22px) saturate(1.55);
+  -webkit-backdrop-filter: blur(22px) saturate(1.55);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.9) inset,
+    0 -1px 0 rgba(0, 0, 0, 0.05) inset,
+    0 18px 40px rgba(20, 40, 35, 0.1),
+    0 0 0 1px color-mix(in srgb, var(--signal, #dfff00) 28%, transparent);
+}
+
+.balanceLabel {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--text-secondary, #5a5954);
+}
+
+.balanceValue {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--void, #111);
+  text-shadow: 0 0 18px color-mix(in srgb, var(--signal, #dfff00) 35%, transparent);
+}
+
+.successMessage {
+  color: var(--text);
+  margin-bottom: var(--space-block);
+  max-width: 520px;
+  line-height: 1.65;
+}
+
+.reservedBadge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(138, 109, 0, 0.92);
+  color: #fff;
+  padding: 8px 10px;
+}
+
+.cardActions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: auto;
+}
+
+.ticketLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0;
+  padding: 12px 14px;
+  border: 1px solid var(--void);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  color: var(--void);
+}
+
+.ticketLink:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+
+.dialogOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(8, 12, 10, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.dialogPanel {
+  width: min(420px, 100%);
+  background: var(--paper);
+  border: 2px solid var(--void);
+  padding: 28px 26px;
+}
+
+.dialogEyebrow {
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.dialogTitle {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: -0.03em;
+}
+
+.dialogCopy {
+  margin: 0 0 22px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.dialogActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.dialogPrimary,
+.dialogSecondary {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.dialogPrimary {
+  border: 1px solid var(--void);
+  background: var(--void);
+  color: var(--paper, #fff);
+}
+
+.dialogSecondary {
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+}
+
+.dialogSecondary:hover {
+  border-color: var(--void);
+}
+
+.flyLayer {
+  position: fixed;
+  inset: 0;
+  z-index: 1210;
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+}
+
+.flyTicket {
+  width: min(280px, 80vw);
+  padding: 18px 20px;
+  background: var(--paper);
+  border: 2px dashed var(--void);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.flyTicketLabel {
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.flyTicket strong {
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  letter-spacing: -0.02em;
+}
+
+.flyTicketId {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--text-secondary);
+}
+
+.successOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.successPanel {
+  width: min(420px, 100%);
+  background: var(--paper);
+  border: 2px solid var(--void);
+  padding: 28px 26px;
+}
+
+.successEyebrow {
+  margin: 0 0 8px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #8a6d00;
+}
+
+.successTitle {
+  margin: 0 0 10px;
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  letter-spacing: var(--display-track);
+  transform: var(--display-narrow);
+  transform-origin: left center;
+}
+
+.successCopy {
+  margin: 0 0 16px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.successTicketId {
+  margin: 0 0 22px;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  letter-spacing: 0.08em;
+  padding: 10px 12px;
+  border: 1px dashed var(--void);
+}
+
+.successActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.successPrimary,
+.successSecondary {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 12px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  border: 1px solid var(--void);
+}
+
+.successPrimary {
+  background: var(--void);
+  color: var(--paper);
+}
+
+.successSecondary {
+  background: transparent;
+  color: var(--void);
+}
+
+.unavailableBadge {
+  position: absolute;
+  left: 12px;
+  bottom: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.75);
+  color: #fff;
+  padding: 8px 10px;
+}
+
+.redeemBtn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  padding: 10px 16px;
+  margin: 0;
+  border: 1px solid var(--line);
+  background: var(--signal);
+  color: #111;
+  cursor: pointer;
+}
+
+.redeemBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: transparent;
+  color: var(--muted);
+}
+
+.galleryCount {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(0, 0, 0, 0.7);
+  color: #fff;
+  padding: 6px 8px;
+}
+
+.lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 1200;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.lightboxPanel {
+  width: min(880px, 100%);
+  background: var(--surface, #161616);
+  border: 1px solid var(--line);
+  padding: 20px;
+}
+
+.lightboxHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.lightboxTitle {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  margin: 0;
+}
+
+.lightboxClose {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.lightboxImage {
+  width: 100%;
+  max-height: 55vh;
+  object-fit: contain;
+  background: #000;
+  display: block;
+}
+
+.lightboxNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.lightboxNavBtn {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid var(--line);
+  background: transparent;
+  color: var(--text);
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.lightboxCounter {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+
+.lightboxThumbs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.lightboxThumb {
+  width: 64px;
+  height: 48px;
+  padding: 0;
+  border: 1px solid var(--line);
+  background: transparent;
+  cursor: pointer;
+}
+
+.lightboxThumbActive {
+  border-color: var(--signal);
+}
+
+.lightboxThumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
