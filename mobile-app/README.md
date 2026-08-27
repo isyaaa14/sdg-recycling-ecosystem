@@ -70,3 +70,47 @@ admin-local/                                      Standalone local admin test pa
 - Blob URLs returned by local Azurite may also need their host translated for the emulator/device.
 
 See the repository [local integration guide](../docs/LOCAL_INTEGRATION_GUIDE.md) for the complete mobile smoke-test flow.
+
+
+## Junior Developer Handover Note - Known Issues and Verification Items
+
+Purpose
+This note records the current known issues and handover risks for the Android Participation and Engagement mobile app. It is intended to help future junior developers understand what still needs to be checked or fixed.
+
+
+Known Issues
+
+1. Form data disappears after phone rotation
+When the phone is rotated from portrait mode to landscape mode, the screen changes orientation and the information entered into the form may disappear. Form state needs to be preserved during configuration changes.
+
+2. Some form input text may not be visible on certain phones
+On some devices, text inside form input fields may be difficult or impossible to see because the font colour does not contrast properly with the background. This appears to depend on the phone or display/theme settings.
+
+3. Cached values may be accessible by different users
+Some values are stored locally on the phone. This can allow another user on the same device to access cached information, which should not happen. Local storage and user-session handling need to be reviewed.
+
+4. Forget Password is unavailable
+The Forget Password feature is currently unavailable. Users cannot reset their password through the app.
+
+5. Leaderboard snapshot is not working
+The leaderboard snapshot feature does not work because the required database table has not been created yet.
+
+6. Notifications are local only
+The notification feature currently uses local notifications. It does not support server-side or push notifications.
+
+7. Quiz always treats the first option as correct
+The quiz currently always shows or treats the first option as the correct answer. The answer-checking logic needs to be reviewed and fixed.
+
+
+
+Recommended Next Steps
+
+1. Fix state preservation for forms during phone rotation.
+2. Review all form input colours and theme settings.
+3. Audit local cache/session storage and clear sensitive data properly.
+4. Add or connect the Forget Password flow.
+5. Create the missing leaderboard snapshot database table.
+6. Decide whether local notifications are enough or push notifications are required.
+7. Fix quiz answer validation so the correct answer is based on the stored question data, not always the first option.
+
+GoodLuck
